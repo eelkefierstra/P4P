@@ -1,0 +1,6 @@
+putty: http://the.earth.li/~sgtatham/putty/latest/x86/putty-0.64-installer.exe
+java client jme sdk #zoveel: http://download.oracle.com/otn/java/javame/8/oracle-jmesdk-8-1-rr-win-bin.exe?AuthParam=1429354682_adc8b0e4927c8ddf6e7b9f4ad315e230
+java server jme sdk: http://download.oracle.com/otn/java/javame/8/oracle-jmee-8-1-rr-raspberrypi-linux-bin.zip?AuthParam=1429354666_982c6a7c3799e693e7c460353258f4e9
+eclipse: http://eclipse.mirror.triple-it.nl/technology/epp/downloads/release/luna/SR2/eclipse-java-luna-SR2-win32-x86_64.zip
+eclipse plugins: http://download.oracle.com/otn/java/javame/8/oracle-jmesdk-8-1-rr-eclipse-plugins.zip?AuthParam=1429354687_6bcf4cabf7b47c0cf37f0528dda0eec4
+pi4j: curl -s get.pi4j.com | sudo bash
