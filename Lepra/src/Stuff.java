@@ -1,3 +1,6 @@
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.midlet.MIDletStateChangeException;
 /*
@@ -11,6 +14,7 @@ import com.pi4j.io.gpio.RaspiPin;
 
 public class Stuff extends MIDlet
 {
+	// TODO Make MeerStuff a List
 	private MeerStuff t;
 	/*
 	// create gpio controller
@@ -22,26 +26,36 @@ public class Stuff extends MIDlet
 	*/
 	public Stuff() 
 	{
+		// throws some random exception, wut?
 		// TODO Auto-generated constructor stub
-		System.out.println("Foo");
-		t = new MeerStuff();
-		new Thread(t).start();
+		//System.out.println("Foo");
 		/*
         // set shutdown state for this pin
         pin.setShutdownOptions(true, PinState.LOW);
         pin1.setShutdownOptions(true, PinState.LOW);
         */
-		for(byte i = 0; i < 250; i += 50)
-		{
-			t.setPWM(i);
-		}
 	}
 
 	@Override
 	protected void startApp() throws MIDletStateChangeException
 	{
 		// TODO Auto-generated method stub
-		
+		t = new MeerStuff();
+		new Thread(t).start();
+
+		try
+		{
+			for(int i = 0; i < Integer.MAX_VALUE; i++)
+			{
+				t.setPWM(i);
+				Thread.sleep(50);
+			}
+		} 
+		catch (InterruptedException e) 
+		{
+			// TODO Auto-generated catch block
+			Logger.getLogger(Stuff.class.getName()).log(Level.SEVERE, null, e);
+		}
 	}
 
 	@Override

@@ -1,3 +1,7 @@
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.opencv.core.Point;
+
 import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioFactory;
 import com.pi4j.io.gpio.GpioPinPwmOutput;
@@ -8,14 +12,16 @@ public class MeerStuff implements Runnable
 {
 	
 	private boolean running;
-	public byte i;
+	private int i;
+	private int[] servos = { 0, 0, 0, 0 };
+	
 	// create gpio controller
-    final GpioController gpio = GpioFactory.getInstance();
+    private final GpioController gpio = GpioFactory.getInstance();
     
     // provision gpio pin #01 as an output pin and turn on
     //final GpioPinDigitalOutput pin = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_01, "MyLED", PinState.HIGH);
-    final GpioPinPwmOutput pin1 = gpio.provisionPwmOutputPin(RaspiPin.GPIO_01);
-
+    private final GpioPinPwmOutput[] pins = { gpio.provisionPwmOutputPin(RaspiPin.GPIO_01) };
+	
 	
 	public MeerStuff()
 	{
@@ -23,22 +29,53 @@ public class MeerStuff implements Runnable
 		i = 0;
         // set shutdown state for this pin
         //pin.setShutdownOptions(true, PinState.LOW);
-        pin1.setShutdownOptions(true, PinState.LOW);
-
+		
+		for(int i = 0; i < pins.length; i++)
+		{
+			pins[i].setShutdownOptions(true, PinState.LOW);
+		}
+		
 	}
 	
-	public void setPWM(byte i)
+	public void setPWM(int i)
 	{
 		this.i = i;
 	}
 	
 	public void run()
 	{
-		//while(running)
-		//{
-			System.out.println("Foo " + i);
-			pin1.setPwm(i);
-		//}
+		try
+		{
+			while(running)
+			{
+				System.out.println("Foo " + i);
+				pins[0].setPwm(i);
+				Thread.sleep(500);
+			}
+		}
+		catch(InterruptedException e)
+		{
+			Logger.getLogger(Stuff.class.getName()).log(Level.SEVERE, null, e);
+		}
+	}
+	
+	private void updateServos(Point[] x)
+	{
+		for(byte i = 0; i < x.length; i++)
+		{
+			//TODO Implement stuff that translates the points to a PWM signal
+			//representing the motion of the servos 
+		}
+	}
+	
+	private void setServos()
+	{
+		/*
+		for(byte i = 0; i < pins.length; i++)
+		{
+			pins[i].setPwm(servos[i]);
+		}
+		*/
 	}
 	
 	public void dinges()
@@ -46,7 +83,7 @@ public class MeerStuff implements Runnable
 		running = false;
         try
         {
-        	gpio.shutdown();
+        	//gpio.shutdown();
             //pin.close();
         }
         finally
@@ -56,7 +93,7 @@ public class MeerStuff implements Runnable
         /*
         catch (IOException ex)
         {
-            Logger.getLogger(Tester.class.getName()).
+            Logger.getLogger(Stuff.class.getName()).
                 log(Level.SEVERE, null, ex);
         }*/
 
