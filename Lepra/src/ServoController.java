@@ -1,6 +1,6 @@
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.opencv.core.Point;
+//import org.opencv.core.Point;
 
 import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioFactory;
@@ -8,7 +8,7 @@ import com.pi4j.io.gpio.GpioPinPwmOutput;
 import com.pi4j.io.gpio.PinState;
 import com.pi4j.io.gpio.RaspiPin;
 
-public class MeerStuff implements Runnable
+public class ServoController implements Runnable
 {
 	
 	private boolean running;
@@ -24,7 +24,7 @@ public class MeerStuff implements Runnable
     private final GpioPinPwmOutput[] pins = { gpio.provisionPwmOutputPin(RaspiPin.GPIO_01) };
 	
 	
-	public MeerStuff()
+	public ServoController()
 	{
 		running = true;
 		i = 0;
@@ -56,10 +56,10 @@ public class MeerStuff implements Runnable
 		}
 		catch(InterruptedException e)
 		{
-			Logger.getLogger(MeerStuff.class.getName()).log(Level.SEVERE, null, e);
+			Logger.getLogger(ServoController.class.getName()).log(Level.SEVERE, null, e);
 		}
 	}
-	
+	/*
 	private void updateServos(Point[] x)
 	{
 		for(byte i = 0; i < x.length; i++)
@@ -68,7 +68,7 @@ public class MeerStuff implements Runnable
 			//representing the motion of the servos 
 		}
 	}
-	
+	*/
 	private void setServos()
 	{
 		

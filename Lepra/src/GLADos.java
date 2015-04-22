@@ -4,11 +4,11 @@ import java.util.logging.Logger;
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.midlet.MIDletStateChangeException;
 
-public class Stuff extends MIDlet
+public class GLADos extends MIDlet
 {
 	// TODO Make MeerStuff a List
-	private MeerStuff t;
-	public Stuff() 
+	private ServoController t;
+	public GLADos() 
 	{
 		// TODO Auto-generated constructor stub
 		//System.out.println("Foo");
@@ -18,7 +18,7 @@ public class Stuff extends MIDlet
 	protected void startApp() throws MIDletStateChangeException
 	{
 		// TODO Auto-generated method stub
-		t = new MeerStuff();
+		t = new ServoController();
 		new Thread(t).start();
 
 		try
@@ -32,7 +32,7 @@ public class Stuff extends MIDlet
 		catch (InterruptedException e) 
 		{
 			// TODO Auto-generated catch block
-			Logger.getLogger(Stuff.class.getName()).log(Level.SEVERE, null, e);
+			Logger.getLogger(GLADos.class.getName()).log(Level.SEVERE, null, e);
 		}
 	}
 

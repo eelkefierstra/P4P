@@ -7,3 +7,4 @@ pi4j: curl -s get.pi4j.com | sudo bash
 IP adress of testing pi 141.252.206.60
 IP adress of testing pi 141.252.206.61
 /usr/share/raspi-ui-overrides/applications/minecraft-pi
+-storepass=storespass -keypass=keyspass

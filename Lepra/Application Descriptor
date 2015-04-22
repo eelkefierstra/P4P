@@ -4,5 +4,5 @@ MIDlet-Jar-URL: Lepra.jar
 MicroEdition-Configuration: CLDC-1.8
 MIDlet-Permissions: com.oracle.deviceaccess.gpio
 MicroEdition-Profile: MEEP-8.0
-MIDlet-1: Stuff,,Stuff
+MIDlet-1: Stuff,,GLADos
 MIDlet-Name: Lepra MIDlet Suite
