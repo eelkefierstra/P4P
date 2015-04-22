@@ -5,3 +5,5 @@ eclipse: http://eclipse.mirror.triple-it.nl/technology/epp/downloads/release/lun
 eclipse plugins: http://download.oracle.com/otn/java/javame/8/oracle-jmesdk-8-1-rr-eclipse-plugins.zip?AuthParam=1429354687_6bcf4cabf7b47c0cf37f0528dda0eec4
 pi4j: curl -s get.pi4j.com | sudo bash
 IP adress of testing pi 141.252.206.60
+IP adress of testing pi 141.252.206.61
+/usr/share/raspi-ui-overrides/applications/minecraft-pi

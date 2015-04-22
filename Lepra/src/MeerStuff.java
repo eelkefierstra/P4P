@@ -15,6 +15,7 @@ public class MeerStuff implements Runnable
 	private int i;
 	private int[] servos = { 0, 0, 0, 0 };
 	
+	// throws some random exception, wut?
 	// create gpio controller
     private final GpioController gpio = GpioFactory.getInstance();
     
@@ -55,7 +56,7 @@ public class MeerStuff implements Runnable
 		}
 		catch(InterruptedException e)
 		{
-			Logger.getLogger(Stuff.class.getName()).log(Level.SEVERE, null, e);
+			Logger.getLogger(MeerStuff.class.getName()).log(Level.SEVERE, null, e);
 		}
 	}
 	
@@ -70,12 +71,12 @@ public class MeerStuff implements Runnable
 	
 	private void setServos()
 	{
-		/*
+		
 		for(byte i = 0; i < pins.length; i++)
 		{
 			pins[i].setPwm(servos[i]);
 		}
-		*/
+		
 	}
 	
 	public void dinges()
@@ -83,7 +84,7 @@ public class MeerStuff implements Runnable
 		running = false;
         try
         {
-        	//gpio.shutdown();
+        	gpio.shutdown();
             //pin.close();
         }
         finally
@@ -93,7 +94,7 @@ public class MeerStuff implements Runnable
         /*
         catch (IOException ex)
         {
-            Logger.getLogger(Stuff.class.getName()).
+            Logger.getLogger(MeerStuff.class.getName()).
                 log(Level.SEVERE, null, ex);
         }*/
 
