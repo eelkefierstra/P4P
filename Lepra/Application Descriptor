@@ -1,10 +1,8 @@
-MIDlet-1: Stuff,,Stuff
-MIDlet-Jar-URL: Lepra.jar
-MIDlet-Permission-3: jdk.dio.pwm.PWMPermission null
-MIDlet-Permission-2: jdk.dio.gpio.GPIOPinPermission null
-MicroEdition-Configuration: CLDC-1.8
-MIDlet-Permission-1: jdk.dio.gpio.GPIOPortPermission null
 MIDlet-Version: 1.0.0
 MIDlet-Vendor: MIDlet Suite Vendor
-MIDlet-Name: Lepra MIDlet Suite
+MIDlet-Jar-URL: Lepra.jar
+MicroEdition-Configuration: CLDC-1.8
+MIDlet-Permissions: com.oracle.deviceaccess.gpio
 MicroEdition-Profile: MEEP-8.0
+MIDlet-1: Stuff,,Stuff
+MIDlet-Name: Lepra MIDlet Suite
