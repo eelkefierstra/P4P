@@ -14,14 +14,7 @@ public class Glados extends MIDlet
 		//System.out.println("Foo");
 		t = new ServoController();
 		new Thread(t).start();
-
-	}
-
-	@Override
-	protected void startApp() throws MIDletStateChangeException
-	{
-		// TODO Auto-generated method stub
-
+		
 		try
 		{
 			for(int i = 0; i < Integer.MAX_VALUE; i++)
@@ -35,6 +28,14 @@ public class Glados extends MIDlet
 			// TODO Auto-generated catch block
 			Logger.getLogger(Glados.class.getName()).log(Level.SEVERE, null, e);
 		}
+
+	}
+
+	@Override
+	protected void startApp() throws MIDletStateChangeException
+	{
+		// TODO Auto-generated method stub
+
 	}
 
 	@Override
