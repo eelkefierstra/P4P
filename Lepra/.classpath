@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="src" path="res"/>
 	<classpathentry kind="con" path="org.elipse.mtj.JavaMEContainer/Oracle Java(TM) Platform Micro Edition SDK 8.1/EmbeddedDevice1"/>
-	<classpathentry kind="lib" path="lib/pi4j-core.jar"/>
-	<classpathentry kind="lib" path="lib/pi4j-device.jar"/>
-	<classpathentry kind="lib" path="lib/pi4j-gpio-extension.jar"/>
-	<classpathentry kind="lib" path="lib/pi4j-service.jar"/>
+	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.USER_LIBRARY/pi4j"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

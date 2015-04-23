@@ -2,7 +2,6 @@ MIDlet-Version: 1.0.0
 MIDlet-Vendor: MIDlet Suite Vendor
 MIDlet-Jar-URL: Lepra.jar
 MicroEdition-Configuration: CLDC-1.8
-MIDlet-Permissions: jdk.dio.DeviceMgmtPermission "GPIO7:7" "open"
 MicroEdition-Profile: MEEP-8.0
-MIDlet-1: Stuff,,GLADos
+MIDlet-1: GLADos,,Glados
 MIDlet-Name: Lepra MIDlet Suite
