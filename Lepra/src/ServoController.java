@@ -25,7 +25,6 @@ public class ServoController implements Runnable
 	public ServoController()
 	{
 		//running = true;
-		i = 0;
         // set shutdown state for this pin
 		
 		for(int i = 0; i < 1/*pins.length*/; i++)
