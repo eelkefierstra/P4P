@@ -4,13 +4,13 @@ import java.util.logging.Logger;
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.midlet.MIDletStateChangeException;
 
-public class GLaDOS extends MIDlet
+public class GLADos extends MIDlet
 {
 	// TODO Make MeerStuff a List
 	private ServoController t;
 	private GUI gui = new GUI();
 	
-	public GLaDOS()
+	public GLADos()
 	{
 		// TODO Auto-generated constructor stub
 		//System.out.println("Foo");
@@ -28,7 +28,7 @@ public class GLaDOS extends MIDlet
 		catch (InterruptedException e) 
 		{
 			// TODO Auto-generated catch block
-			Logger.getLogger(GLaDOS.class.getName()).log(Level.SEVERE, null, e);
+			Logger.getLogger(GLADos.class.getName()).log(Level.SEVERE, null, e);
 		}
 
 	}
