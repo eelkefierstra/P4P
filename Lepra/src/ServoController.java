@@ -1,4 +1,4 @@
-import java.io.IOException;
+//import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 //import org.opencv.core.Point;
@@ -26,7 +26,7 @@ public class ServoController implements Runnable
 		//running = true;
         // set shutdown state for this pin
 		
-		for(int i = 0; i < 1/*pins.length*/; i++)
+		for(int i = 0; i < pins.length; i++)
 		{
 			pins[i].setShutdownOptions(true, PinState.LOW);
 		}
