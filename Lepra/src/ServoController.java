@@ -18,7 +18,6 @@ public class ServoController implements Runnable
     private final GpioController gpio = GpioFactory.getInstance();
     
     // provision gpio pin #01 as an output pin and turn on
-    //final GpioPinDigitalOutput[] pins = { gpio.provisionDigitalOutputPin(RaspiPin.GPIO_01, "MyLED", PinState.HIGH) };
     private final GpioPinPwmOutput[] pins = { gpio.provisionPwmOutputPin(RaspiPin.GPIO_01) };
 	
 	

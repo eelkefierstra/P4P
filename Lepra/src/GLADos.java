@@ -8,6 +8,8 @@ public class GLaDOS extends MIDlet
 {
 	// TODO Make MeerStuff a List
 	private ServoController t;
+	private GUI gui = new GUI();
+	
 	public GLaDOS()
 	{
 		// TODO Auto-generated constructor stub
