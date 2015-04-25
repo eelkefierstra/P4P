@@ -4,7 +4,6 @@ import java.util.logging.Logger;
 //import org.opencv.core.Point;
 import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioFactory;
-//import com.pi4j.io.gpio.GpioPinDigitalOutput;
 import com.pi4j.io.gpio.GpioPinPwmOutput;
 import com.pi4j.io.gpio.PinState;
 import com.pi4j.io.gpio.RaspiPin;
@@ -46,9 +45,7 @@ public class ServoController implements Runnable
 			{
 				System.out.println("Foo " + servos[0]);
 				pins[0].setPwm(servos[0]);
-				//pins[0].high();
 				Thread.sleep(500);
-				//pins[0].low();
 			}
 		}
 		catch(Exception e)
