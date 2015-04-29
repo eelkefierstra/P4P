@@ -8,3 +8,4 @@ IP adress of testing pi 141.252.206.60
 IP adress of testing pi 141.252.206.61
 /usr/share/raspi-ui-overrides/applications/minecraft-pi
 -storepass=storespass -keypass=keyspass
+https://keithmaggio.wordpress.com/2011/02/15/math-magician-lerp-slerp-and-nlerp/

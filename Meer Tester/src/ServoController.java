@@ -24,12 +24,12 @@ public class ServoController implements Runnable
 	{
 		//running = true;
         // set shutdown state for this pin
-		
+		/*
 		for(int i = 0; i < pins.length; i++)
 		{
 			pins[i].setShutdownOptions(true, PinState.LOW);
 		}
-		
+		*/
 	}
 	
 	public void setPWM(int i)
@@ -43,9 +43,9 @@ public class ServoController implements Runnable
 		{
 			for(;;)
 			{
-				System.out.println("Foo " + servos[0]);
+				//System.out.println("Foo " + servos[0]);
 				pins[0].setPwm(servos[0]);
-				Thread.sleep(500);
+				Thread.sleep(1000);
 			}
 		}
 		catch(Exception e)
