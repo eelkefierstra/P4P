@@ -5,54 +5,60 @@ import java.lang.String;
 
 public class Main
 {
-	private ServoController t;
-	//private GUI gui = new GUI();
+	//private ServoController t;
+	private GUI gui = new GUI();
 	
     public static void main(String[] args)
     {
 		Main p = new Main();
 		// TODO Auto-generated constructor stub
 		//System.out.println("Foo");
-		p.t = new ServoController();
-		new Thread(p.t).start();
+		//p.t = new ServoController();
+		//new Thread(p.t).start();
 		
-		//try
-		//{
-			/*
-			int i = 1000;
+		try
+		{
+			
+			int i = 1010;
+			int[] x = { 0 };
 			for(;;)
 			{
-				for(; i <= 2000; i += 100)
+				for(; i < 1030; i += 2)
 				{
-					p.t.setPWM(i);
+					x[0] = i;
+					//p.t.setPWM(x);
 					//p.gui.label.setText("PWM = " + i);
 					//p.gui.button.setText(p.gui.);
 					Thread.sleep(1000);
 				}
-				for(; i >= 1000; i -= 100)
+				for(; i >= 1010; i -= 2)
 				{
-					p.t.setPWM(i);
+					x[0] = i;
+					//p.t.setPWM(x);
 					//p.gui.label.setText("PWM = " + i);
 					//p.gui.button.setText(p.gui.);
 					Thread.sleep(1000);
 				}
 				System.out.println("dinges");
 			}
-			*/
+			
+		/*
 			String i = System.console().readLine();
 			while(i != "exit")
 			{
-				p.t.setPWM(Integer.parseInt(i));
+				int[] x = { Integer.parseInt(i) };
+				p.t.setPWM(x);
 				i = System.console().readLine();
 			}
-		//}
-		/*
+			*/
+		}
+		
 		catch (InterruptedException e) 
 		{
 			// TODO Auto-generated catch block
 			Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, e);
 		}
-		*/
-		p.t.dinges();
+		
+		//p.t.dinges();
 	}
 }

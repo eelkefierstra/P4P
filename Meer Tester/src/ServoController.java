@@ -8,7 +8,7 @@ import com.pi4j.io.gpio.GpioPinPwmOutput;
 import com.pi4j.io.gpio.PinState;
 import com.pi4j.io.gpio.RaspiPin;
 
-public class ServoController implements Runnable
+public class ServoController// implements Runnable
 {
 	//private boolean running;
 	private int[] servos = { 0, 0, 0, 0 };
@@ -32,11 +32,15 @@ public class ServoController implements Runnable
 		*/
 	}
 	
-	public void setPWM(int i)
+	public void setPWM(int[] x)
 	{
-		servos[0] = i;
+		System.out.println(x[0]);
+		for(int i = 0; i < x.length; i++)
+		{
+			pins[i].setPwm(x[i]);
+		}
 	}
-	
+	/*
 	public void run()
 	{
 		try

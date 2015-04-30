@@ -25,7 +25,7 @@ public class GUI extends JFrame
 	
 	public GUI()
 	{
-	    panel.setLayout(new FlowLayout());
+	    panel.setLayout(new );
 		JLabel picLabel = new JLabel("");
 		//VideoCapture video = new VideoCapture("C:/Users/Dudecake/Videos/Anime/Sword of the Stranger [BluRay,720p,x264,DTS] vXv/Sword of the Stranger [BluRay,720p,x264,DTS] vXv");
 		
@@ -58,7 +58,7 @@ public class GUI extends JFrame
 	
 	class SomeAction extends AbstractAction
 	{
-		
+		int i = 0;
 		/**
 		 * 
 		 */
@@ -68,7 +68,8 @@ public class GUI extends JFrame
 		public void actionPerformed(ActionEvent e)
 		{
 			// TODO Auto-generated method stub
-			
+			label.setText("" + i);
+			i++;
 		}
 		
 	}
