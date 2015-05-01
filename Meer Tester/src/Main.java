@@ -25,7 +25,7 @@ public class Main
 			{
 				for(; i <= 0.125f; i += 0.005f)
 				{
-					//ServoController.WritePWM(23, i);
+					ServoController.WritePWM(23, i);
 					//x[0] = i;
 					//p.t.setPWM(x);
 					//p.gui.label.setText("PWM = " + i);
@@ -34,7 +34,7 @@ public class Main
 				}
 				for(; i >= 0.025f; i -= 0.005f)
 				{
-					//ServoController.WritePWM(23, i);
+					ServoController.WritePWM(23, i);
 					//x[0] = i;
 					//p.t.setPWM(x);
 					//p.gui.label.setText("PWM = " + i);
