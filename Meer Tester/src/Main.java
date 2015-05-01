@@ -6,34 +6,36 @@ import java.lang.String;
 public class Main
 {
 	//private ServoController t;
-	private GUI gui = new GUI();
+	//private GUI gui = new GUI();
 	
     public static void main(String[] args)
     {
-		Main p = new Main();
-		// TODO Auto-generated constructor stub
+		//Main p = new Main();
+		ShutdownHook shutdown = new ShutdownHook();
+	    shutdown.attachShutDownHook();
 		//System.out.println("Foo");
 		//p.t = new ServoController();
 		//new Thread(p.t).start();
 		
 		try
 		{
-			
-			int i = 1010;
-			int[] x = { 0 };
+			float i = 0.025f;
+			//int[] x = { 0 };
 			for(;;)
 			{
-				for(; i < 1030; i += 2)
+				for(; i <= 0.125f; i += 0.005f)
 				{
-					x[0] = i;
+					//ServoController.WritePWM(23, i);
+					//x[0] = i;
 					//p.t.setPWM(x);
 					//p.gui.label.setText("PWM = " + i);
 					//p.gui.button.setText(p.gui.);
 					Thread.sleep(1000);
 				}
-				for(; i >= 1010; i -= 2)
+				for(; i >= 0.025f; i -= 0.005f)
 				{
-					x[0] = i;
+					//ServoController.WritePWM(23, i);
+					//x[0] = i;
 					//p.t.setPWM(x);
 					//p.gui.label.setText("PWM = " + i);
 					//p.gui.button.setText(p.gui.);
@@ -52,7 +54,6 @@ public class Main
 			}
 			*/
 		}
-		
 		catch (InterruptedException e) 
 		{
 			// TODO Auto-generated catch block

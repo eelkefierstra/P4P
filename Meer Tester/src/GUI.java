@@ -5,8 +5,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.awt.FlowLayout;
 
-import org.opencv.highgui.VideoCapture;
-import org.opencv.video.Video;
+//import org.opencv.highgui.VideoCapture;
+//import org.opencv.video.Video;
 
 import javax.swing.*;
 import javax.imageio.ImageIO;
@@ -25,7 +25,7 @@ public class GUI extends JFrame
 	
 	public GUI()
 	{
-	    panel.setLayout(new );
+	    panel.setLayout(new FlowLayout());
 		JLabel picLabel = new JLabel("");
 		//VideoCapture video = new VideoCapture("C:/Users/Dudecake/Videos/Anime/Sword of the Stranger [BluRay,720p,x264,DTS] vXv/Sword of the Stranger [BluRay,720p,x264,DTS] vXv");
 		
