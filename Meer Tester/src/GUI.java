@@ -3,7 +3,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.awt.FlowLayout;
+import java.awt.GridLayout;
 
 //import org.opencv.highgui.VideoCapture;
 //import org.opencv.video.Video;
@@ -25,7 +25,7 @@ public class GUI extends JFrame
 	
 	public GUI()
 	{
-	    panel.setLayout(new FlowLayout());
+	    panel.setLayout(new GridLayout(16, 9));
 		JLabel picLabel = new JLabel("");
 		//VideoCapture video = new VideoCapture("C:/Users/Dudecake/Videos/Anime/Sword of the Stranger [BluRay,720p,x264,DTS] vXv/Sword of the Stranger [BluRay,720p,x264,DTS] vXv");
 		
@@ -41,6 +41,8 @@ public class GUI extends JFrame
 	    
 		label = new JLabel("This is a label!");
 	    button = new JButton();
+	    SomeAction action = new SomeAction();
+	    button.setAction(action);
 	    button.setText("Press me");
 	    panel.add(picLabel);
 	    panel.add(label);
@@ -50,10 +52,6 @@ public class GUI extends JFrame
 	    this.setLocationRelativeTo(null);
 	    this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    this.setVisible(true);
-	    SomeAction action = new SomeAction();
-	    button.setAction(action);
-	    button.setText("Press me");
-
 	}
 	
 	class SomeAction extends AbstractAction
