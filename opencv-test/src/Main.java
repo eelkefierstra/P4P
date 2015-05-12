@@ -93,7 +93,7 @@ public class Main
 		Vector<Point> contours = new Vector<Point>();
 		Vector<Integer[][]> hierarchy = new Vector<Integer[][]>(4);
 		//find contours of filtered image using openCV findContours function
-		findContours(temp,contours,hierarchy,CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE );
+		Imgproc.findContours(temp,contours,hierarchy, Imgproc.RETR_CCOMP, Imgproc.CHAIN_APPROX_SIMPLE );
 		//use moments method to find our filtered object
 		double refArea = 0;
 		boolean objectFound = false;
@@ -101,9 +101,9 @@ public class Main
 			int numObjects = hierarchy.size();
 	        //if number of objects greater than MAX_NUM_OBJECTS we have a noisy filter
 	        if(numObjects<maxNumObjects){
-				for (int index = 0; index >= 0; index = hierarchy[index][0]) {
+				for (int index = 0; index >= 0; index = hierarchy.toArray(new int[4][4])[index][0]) {
 
-					Moments moment = new Moments((Mat)contours[index]);
+					Moments moment = new Moments((Mat)contours.toArray(new int[4][4])[index]);
 					double area = moment.get_m00();
 
 					//if the area is less than 20 px by 20px then it is probably just noise
@@ -156,9 +156,9 @@ public class Main
 			if(trackObjects)
 				trackFilteredObject(x,y,threshold,cameraFeed);
 			//Zou afbeelding in venster moeten laten zien
-			imshow(windowName2,threshold);
-			imshow(windowName,cameraFeed);
-			imshow(windowName1,HSV);
+			Highgui.imshow(windowName2,threshold);
+			Highgui.imshow(windowName,cameraFeed);
+			Highgui.imshow(windowName1,HSV);
 			
 			wait(30);
 		}
