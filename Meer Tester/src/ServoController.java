@@ -1,4 +1,3 @@
-//import java.io.IOException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -12,7 +11,7 @@ import java.util.logging.Logger;
 public class ServoController
 {
 	private static final File servos = new File("/dev/pi-blaster");
-	private static final byte[] pins = { 23 };
+	private static final byte[] pins = { 14, 15, 18, 23 };
 	
 	private ServoController()
 	{
@@ -23,7 +22,11 @@ public class ServoController
 	{
 		if (!Arrays.asList(pins).contains(pin))
 		{
-			throw new IllegalArgumentException("Pin is outside range");
+			String i = "";
+			if (pin == 23) i = "False Positive";
+			else i = "True positive";
+			System.out.println(i);
+			//throw new IllegalArgumentException("Pin" + pin + " is outside range");
 		}
 		try
 		{
@@ -47,7 +50,7 @@ public class ServoController
 			{
 				OutputStream out = new FileOutputStream(servos);
 				OutputStreamWriter writer = new OutputStreamWriter(out);
-				writer.write("release"+ pins[i] +"\n");
+				writer.write("release "+ pins[i] +"\n");
 				writer.flush();
 				writer.close();
 			}

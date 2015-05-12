@@ -25,7 +25,7 @@ public class GUI extends JFrame
 	
 	public GUI()
 	{
-	    panel.setLayout(new GridLayout(16, 9));
+	    //panel.setLayout(new GridLayout(16, 9));
 		JLabel picLabel = new JLabel("");
 		//VideoCapture video = new VideoCapture("C:/Users/Dudecake/Videos/Anime/Sword of the Stranger [BluRay,720p,x264,DTS] vXv/Sword of the Stranger [BluRay,720p,x264,DTS] vXv");
 		
@@ -38,7 +38,7 @@ public class GUI extends JFrame
 		{
 			Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
 	    }
-	    
+	    picLabel.setLocation(0, 0);
 		label = new JLabel("This is a label!");
 	    button = new JButton();
 	    SomeAction action = new SomeAction();
@@ -48,7 +48,9 @@ public class GUI extends JFrame
 	    panel.add(label);
 	    panel.add(button);
 	    this.add(panel);
+	    this.setTitle("GLaDOS");
 	    this.setSize(1280, 720);
+	    this.setResizable(false);
 	    this.setLocationRelativeTo(null);
 	    this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    this.setVisible(true);

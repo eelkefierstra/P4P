@@ -1,12 +1,21 @@
 //import org.opencv.*;
 //import org.opencv.core.*;
 //import org.opencv.core.Point;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Vector;
+
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 
 import org.opencv.highgui.*;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
 import org.opencv.core.Core;
+import org.opencv.core.MatOfByte;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.core.Mat;
@@ -28,10 +37,14 @@ public class Main
 	static int minObjectArea = 15*15;
 	static int maxObjectArea = (int)((double)frame_width*(double)frame_height/1.5);
 	
-	
+	static Screen screen1 = new Screen();
+	static Screen screen2 = new Screen();
+	static Screen screen3 = new Screen();
+	/*
 	static final String windowName = "Original";
 	static final String windowName1 = "HSV";
 	static final String windowName2 = "Threshold";
+	*/
 	static final String windowName3 = "After Morph";
 	static final String trackbarWindowName = "Trackbars";
 	
@@ -134,12 +147,12 @@ public class Main
 		boolean trackObjects = false;
 		boolean useMorph = false;
 		
-		Mat cameraFeed;
-		Mat HSV;
-		Mat threshold;
+		Mat cameraFeed = new Mat();
+		Mat HSV = new Mat();
+		Mat threshold = new Mat();
 		int x=0,y=0;
 		
-		VideoCapture capture;
+		VideoCapture capture = new VideoCapture();
 		capture.open(0);
 		capture.set(Highgui.CV_CAP_PROP_FRAME_WIDTH,frame_width);
 		capture.set(Highgui.CV_CAP_PROP_FRAME_HEIGHT,frame_height);
@@ -156,11 +169,45 @@ public class Main
 			if(trackObjects)
 				trackFilteredObject(x,y,threshold,cameraFeed);
 			//Zou afbeelding in venster moeten laten zien
-			Highgui.imshow(windowName2,threshold);
-			Highgui.imshow(windowName,cameraFeed);
-			Highgui.imshow(windowName1,HSV);
+			try
+			{
+				MatOfByte matOfByte = new MatOfByte();
+				Highgui.imencode(".jpg", threshold, matOfByte);
+				byte[] byteArray = matOfByte.toArray();
+				BufferedImage bufImage = null;
+				InputStream in = new ByteArrayInputStream(byteArray);
+				bufImage = ImageIO.read(in);
+				screen1.screen = new JLabel(new ImageIcon(bufImage));
+				Highgui.imencode(".jpg", cameraFeed, matOfByte);
+				byteArray = matOfByte.toArray();
+				in = new ByteArrayInputStream(byteArray);
+				bufImage = ImageIO.read(in);
+				screen2.screen = new JLabel(new ImageIcon(bufImage));
+				Highgui.imencode(".jpg", HSV, matOfByte);
+				byteArray = matOfByte.toArray();
+				in = new ByteArrayInputStream(byteArray);
+				bufImage = ImageIO.read(in);
+				screen3.screen = new JLabel(new ImageIcon(bufImage));
+			}
+			catch (IOException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			//Highgui.imshow(windowName2,threshold);
+			//Highgui.imshow(windowName,cameraFeed);
+			//Highgui.imshow(windowName1,HSV);
 			
-			wait(30);
+			try
+			{
+				Thread.sleep(50);
+			}
+			catch (InterruptedException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 	}
