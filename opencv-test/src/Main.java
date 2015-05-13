@@ -1,10 +1,12 @@
 //import org.opencv.*;
 //import org.opencv.core.*;
 //import org.opencv.core.Point;
+import java.util.List;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Vector;
 
 import javax.imageio.ImageIO;
@@ -16,6 +18,7 @@ import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
 import org.opencv.core.Core;
 import org.opencv.core.MatOfByte;
+import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.core.Mat;
@@ -100,13 +103,15 @@ public class Main
 	
 	public static void trackFilteredObject(int x, int y, Mat threshold, Mat cameraFeed)
 	{
-		Mat temp;
+		Mat temp = new Mat();
 		threshold.copyTo(temp);
 		//these two vectors needed for output of findContours
-		Vector<Point> contours = new Vector<Point>();
+		//Vector<Point> contours = new Vector<Point>();
+		List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
 		Vector<Integer[][]> hierarchy = new Vector<Integer[][]>(4);
+		Mat tempMat = new Mat();
 		//find contours of filtered image using openCV findContours function
-		Imgproc.findContours(temp,contours,hierarchy, Imgproc.RETR_CCOMP, Imgproc.CHAIN_APPROX_SIMPLE );
+		Imgproc.findContours(temp,contours, tempMat,/*hierarchy, */Imgproc.RETR_CCOMP, Imgproc.CHAIN_APPROX_SIMPLE );
 		//use moments method to find our filtered object
 		double refArea = 0;
 		boolean objectFound = false;
@@ -116,7 +121,8 @@ public class Main
 	        if(numObjects<maxNumObjects){
 				for (int index = 0; index >= 0; index = hierarchy.toArray(new int[4][4])[index][0]) {
 
-					Moments moment = new Moments((Mat)contours.toArray(new int[4][4])[index]);
+					//Moments moment = new Moments((Mat)contours.toArray(new int[4][4])[index]);
+		        	Moments moment = Imgproc.moments( (contours.get(index)), false );
 					double area = moment.get_m00();
 
 					//if the area is less than 20 px by 20px then it is probably just noise
@@ -144,6 +150,7 @@ public class Main
 	
 	public static void main( String[] args )
 	{
+		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		boolean trackObjects = false;
 		boolean useMorph = false;
 		

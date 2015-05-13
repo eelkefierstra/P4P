@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 public class ServoController
 {
 	private static final File servos = new File("/dev/pi-blaster");
-	private static final byte[] pins = { 14, 15, 18, 23 };
+	private static final byte[] pins = { 18, 23, 24, 25 };
 	
 	private ServoController()
 	{
@@ -22,9 +22,7 @@ public class ServoController
 	{
 		if (!Arrays.asList(pins).contains(pin))
 		{
-			String i = "";
-			if (pin == 23) i = "False Positive";
-			else i = "True positive";
+			String i = (pin == 23) + " Positive";
 			System.out.println(i);
 			//throw new IllegalArgumentException("Pin" + pin + " is outside range");
 		}
