@@ -20,13 +20,14 @@ public class GUI extends JFrame
 	private static final long serialVersionUID = 1L;
 	private BufferedImage image;
 	public JPanel panel = new JPanel();
+	JLabel picLabel;
 	public JLabel label;
 	public JButton button;
 	
 	public GUI()
 	{
 	    //panel.setLayout(new GridLayout(16, 9));
-		JLabel picLabel = new JLabel("");
+		picLabel = new JLabel("");
 		//VideoCapture video = new VideoCapture("C:/Users/Dudecake/Videos/Anime/Sword of the Stranger [BluRay,720p,x264,DTS] vXv/Sword of the Stranger [BluRay,720p,x264,DTS] vXv");
 		
 		try
