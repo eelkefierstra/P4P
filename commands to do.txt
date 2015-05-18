@@ -1,0 +1,5 @@
+putty connecteren
+if [ -f /usr/X11R6/bin/Xvfb ]; then
+/usr/X11R6/bin/Xvfb :1 -screen 0 1280x720x32; fi
+sudo pi-blaster/./pi-blaster -pcm
+java -jar p4p.jar

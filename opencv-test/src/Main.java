@@ -1,6 +1,3 @@
-//import org.opencv.*;
-//import org.opencv.core.*;
-//import org.opencv.core.Point;
 import java.util.List;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -10,19 +7,23 @@ import java.util.ArrayList;
 import java.util.Vector;
 
 import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
+import javax.rmi.CORBA.Util;
 
 import org.opencv.highgui.*;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
 import org.opencv.core.Core;
+import org.opencv.core.CvType;
 import org.opencv.core.MatOfByte;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.core.Mat;
 import org.opencv.core.Size;
+
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
+import java.io.File;
 
 public class Main
 {
@@ -164,10 +165,26 @@ public class Main
 		capture.set(Highgui.CV_CAP_PROP_FRAME_WIDTH,frame_width);
 		capture.set(Highgui.CV_CAP_PROP_FRAME_HEIGHT,frame_height);
 		
+        BufferedImage image = null;
+        Main p = new Main();
+        Mat mat = new Mat();
+        
+		try {
+			image = ImageIO.read(p.getClass().getResource("/images/Konachan.com - 199548 atha braids brown_eyes brown_hair hat long_hair original ponytail.png"));;
+	        //byte[] data = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
+	        //mat = new Mat(image.getHeight(), image.getWidth(), CvType.CV_8UC3);
+	        //mat.put(0, 0, data);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		boolean first = true;
+
 		while(true)
 		{
 			capture.read(cameraFeed);
-			Imgproc.cvtColor(cameraFeed,HSV,Imgproc.COLOR_BGR2HSV);
+	        //mat = new Mat(image.getHeight(), image.getWidth(), CvType.CV_8UC3);			
+			Imgproc.cvtColor(cameraFeed,HSV, Imgproc.COLOR_BGR2HSV);
 			Core.inRange(HSV,new Scalar(H_min,S_min,V_min),new Scalar(H_max,S_max,V_max),threshold);
 			
 			if(useMorph)
@@ -178,34 +195,37 @@ public class Main
 			//Zou afbeelding in venster moeten laten zien
 			try
 			{
+				// deze laat een wit scherm zien
 				MatOfByte matOfByte = new MatOfByte();
 				Highgui.imencode(".jpg", threshold, matOfByte);
 				byte[] byteArray = matOfByte.toArray();
 				BufferedImage bufImage = null;
 				InputStream in = new ByteArrayInputStream(byteArray);
 				bufImage = ImageIO.read(in);
-				screen1.screen = new JLabel(new ImageIcon(bufImage));
+				screen1.SetImage(bufImage);
+				// deze laat ongealterd plaatje zien
 				Highgui.imencode(".jpg", cameraFeed, matOfByte);
 				byteArray = matOfByte.toArray();
 				in = new ByteArrayInputStream(byteArray);
 				bufImage = ImageIO.read(in);
-				screen2.screen = new JLabel(new ImageIcon(bufImage));
+				if (first)
+				{
+					File file = new File("Lepra.jpg");
+					ImageIO.write(bufImage, "jpg", file);
+					first = false;
+				}
+				screen2.SetImage(bufImage);
+				// deze laat een plaatje met andere kleuren zien
 				Highgui.imencode(".jpg", HSV, matOfByte);
 				byteArray = matOfByte.toArray();
 				in = new ByteArrayInputStream(byteArray);
 				bufImage = ImageIO.read(in);
-				screen3.screen = new JLabel(new ImageIcon(bufImage));
+				screen3.SetImage(bufImage);
 			}
 			catch (IOException e)
 			{
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-
-			//Highgui.imshow(windowName2,threshold);
-			//Highgui.imshow(windowName,cameraFeed);
-			//Highgui.imshow(windowName1,HSV);
-			
 			try
 			{
 				Thread.sleep(50);
