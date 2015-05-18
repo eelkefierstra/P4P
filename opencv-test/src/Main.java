@@ -1,29 +1,20 @@
 import java.util.List;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Vector;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 
 import javax.imageio.ImageIO;
-import javax.rmi.CORBA.Util;
+//import javax.rmi.CORBA.Util;
 
 import org.opencv.highgui.*;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
-import org.opencv.core.Core;
-import org.opencv.core.CvType;
-import org.opencv.core.MatOfByte;
-import org.opencv.core.MatOfPoint;
-import org.opencv.core.Point;
-import org.opencv.core.Scalar;
-import org.opencv.core.Mat;
-import org.opencv.core.Size;
+import org.opencv.core.*;
 
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
-import java.io.File;
 
 public class Main
 {
@@ -165,17 +156,20 @@ public class Main
 		capture.set(Highgui.CV_CAP_PROP_FRAME_WIDTH,frame_width);
 		capture.set(Highgui.CV_CAP_PROP_FRAME_HEIGHT,frame_height);
 		
-        BufferedImage image = null;
+        @SuppressWarnings("unused")
+		BufferedImage image = null;
         Main p = new Main();
-        Mat mat = new Mat();
+        @SuppressWarnings("unused")
+		Mat mat = new Mat();
         
 		try {
 			image = ImageIO.read(p.getClass().getResource("/images/Konachan.com - 199548 atha braids brown_eyes brown_hair hat long_hair original ponytail.png"));;
 	        //byte[] data = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
 	        //mat = new Mat(image.getHeight(), image.getWidth(), CvType.CV_8UC3);
 	        //mat.put(0, 0, data);
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
+		}
+		catch (IOException e1)
+		{
 			e1.printStackTrace();
 		}
 		boolean first = true;
