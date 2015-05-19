@@ -13,7 +13,8 @@ public class Main
 		Main p = new Main();
 		ShutdownHook shutdown = new ShutdownHook();
 	    shutdown.attachShutDownHook();
-		int x = 1;
+
+	    int x = 1;
 		try
 		{
 			float i = 0.025f;

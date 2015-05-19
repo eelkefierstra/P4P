@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import javax.imageio.ImageIO;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.MediaView;
 //import javax.rmi.CORBA.Util;
 
 import org.opencv.highgui.*;

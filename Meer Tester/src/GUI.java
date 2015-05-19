@@ -29,7 +29,7 @@ public class GUI extends JFrame
 		try
 		{
 			image = ImageIO.read(getClass().getResource("/images/Konachan.com - 199548 atha braids brown_eyes brown_hair hat long_hair original ponytail.png"));
-			picLabel = new JLabel(new ImageIcon(image.getScaledInstance(-1, 360, 0)));
+			picLabel.setIcon(new ImageIcon(image.getScaledInstance(-1, 360, 0)));
 	    }
 		catch (IOException ex)
 		{
