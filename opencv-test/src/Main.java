@@ -3,7 +3,6 @@ import java.util.ArrayList;
 import java.util.Vector;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -35,11 +34,7 @@ public class Main
 	static Screen screen1 = new Screen();
 	static Screen screen2 = new Screen();
 	static Screen screen3 = new Screen();
-	/*
-	static final String windowName = "Original";
-	static final String windowName1 = "HSV";
-	static final String windowName2 = "Threshold";
-	*/
+
 	static final String windowName3 = "After Morph";
 	static final String trackbarWindowName = "Trackbars";
 	
@@ -164,20 +159,15 @@ public class Main
         
 		try {
 			image = ImageIO.read(p.getClass().getResource("/images/Konachan.com - 199548 atha braids brown_eyes brown_hair hat long_hair original ponytail.png"));;
-	        //byte[] data = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
-	        //mat = new Mat(image.getHeight(), image.getWidth(), CvType.CV_8UC3);
-	        //mat.put(0, 0, data);
 		}
 		catch (IOException e1)
 		{
 			e1.printStackTrace();
 		}
-		boolean first = true;
 
-		while(true)
+		for(;;)
 		{
 			capture.read(cameraFeed);
-	        //mat = new Mat(image.getHeight(), image.getWidth(), CvType.CV_8UC3);			
 			Imgproc.cvtColor(cameraFeed,HSV, Imgproc.COLOR_BGR2HSV);
 			Core.inRange(HSV,new Scalar(H_min,S_min,V_min),new Scalar(H_max,S_max,V_max),threshold);
 			
@@ -202,12 +192,6 @@ public class Main
 				byteArray = matOfByte.toArray();
 				in = new ByteArrayInputStream(byteArray);
 				bufImage = ImageIO.read(in);
-				if (first)
-				{
-					File file = new File("Lepra.jpg");
-					ImageIO.write(bufImage, "jpg", file);
-					first = false;
-				}
 				screen2.SetImage(bufImage);
 				// deze laat een plaatje met andere kleuren zien
 				Highgui.imencode(".jpg", HSV, matOfByte);

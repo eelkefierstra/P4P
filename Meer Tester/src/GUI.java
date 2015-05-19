@@ -3,10 +3,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.awt.GridLayout;
-
-//import org.opencv.highgui.VideoCapture;
-//import org.opencv.video.Video;
 
 import javax.swing.*;
 import javax.imageio.ImageIO;
