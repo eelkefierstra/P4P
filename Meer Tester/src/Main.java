@@ -95,7 +95,7 @@ public class Main
     public int getXRelativeTo()
     {
         int x = gui.getX() - MouseInfo.getPointerInfo().getLocation().x;
-        return x - (gui.getWidth() / 2) * -1;
+        return (x + (gui.getWidth() / 2)) * -1;
     }
     
     public int getYRelativeTo()
