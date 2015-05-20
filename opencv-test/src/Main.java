@@ -3,14 +3,11 @@ import java.util.ArrayList;
 import java.util.Vector;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.io.Console;
 import java.io.IOException;
 import java.io.InputStream;
 
 import javax.imageio.ImageIO;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
-import javafx.scene.media.MediaView;
-//import javax.rmi.CORBA.Util;
 
 import org.opencv.highgui.*;
 import org.opencv.imgproc.Imgproc;
@@ -20,26 +17,23 @@ import org.opencv.core.*;
 
 public class Main
 {
-	static int H_min = 0;
-	static int H_max = 256;
-	static int S_min = 0;
+	static int H_min = 9;
+	static int H_max = 28;
+	static int S_min = 226;
 	static int S_max = 256;
-	static int V_min = 0;
+	static int V_min = 153;
 	static int V_max = 256;
 	
 	static final int frame_width = 640;
 	static final int frame_height = 480;
 	
-	static int maxNumObjects = 50;
-	static int minObjectArea = 15*15;
+	static int maxNumObjects = 1500;
+	static int minObjectArea = 10*10;
 	static int maxObjectArea = (int)((double)frame_width*(double)frame_height/1.5);
 	
 	static Screen screen1 = new Screen();
 	static Screen screen2 = new Screen();
 	static Screen screen3 = new Screen();
-
-	static final String windowName3 = "After Morph";
-	static final String trackbarWindowName = "Trackbars";
 	
 	public static void drawObject(double x,double y,Mat frame)
 	{
@@ -91,7 +85,7 @@ public class Main
 		Imgproc.dilate(thresh,thresh,dilateElement);
 	}
 	
-	public static void trackFilteredObject(int x, int y, Mat threshold, Mat cameraFeed)
+	public static Boolean trackFilteredObject(int x, int y, Mat threshold, Mat cameraFeed)
 	{
 		Mat temp = new Mat();
 		threshold.copyTo(temp);
@@ -105,12 +99,14 @@ public class Main
 		//use moments method to find our filtered object
 		double refArea = 0;
 		boolean objectFound = false;
-		if (hierarchy.size() > 0) {
+		if (hierarchy.size() > 0) 
+		{
 			int numObjects = hierarchy.size();
 	        //if number of objects greater than MAX_NUM_OBJECTS we have a noisy filter
-	        if(numObjects<maxNumObjects){
-				for (int index = 0; index >= 0; index = hierarchy.toArray(new int[4][4])[index][0]) {
-
+	        if(numObjects<maxNumObjects)
+	        {
+				for (int index = 0; index >= 0; index = hierarchy.toArray(new int[4][4])[index][0]) 
+				{
 					//Moments moment = new Moments((Mat)contours.toArray(new int[4][4])[index]);
 		        	Moments moment = Imgproc.moments( (contours.get(index)), false );
 					double area = moment.get_m00();
@@ -119,30 +115,41 @@ public class Main
 					//if the area is the same as the 3/2 of the image size, probably just a bad filter
 					//we only want the object with the largest area so we safe a reference area each
 					//iteration and compare it to the area in the next iteration.
-	                if(area>minObjectArea && area<maxObjectArea && area>refArea){
+	                if(area>minObjectArea && area<maxObjectArea && area>refArea)
+	                {
 						x = (int) (moment.get_m10()/area);
 						y = (int) (moment.get_m01()/area);
 						objectFound = true;
 						refArea = area;
-					}else objectFound = false;
+					}
+	                else objectFound = false;
 
 
 				}
 				//let user know you found an object
-				if(objectFound ==true){
+				if(objectFound ==true)
+				{
 					Core.putText(cameraFeed,"Tracking Object",new Point(0,50),2,1,new Scalar(0,255,0),2);
 					//draw object location on screen
-					drawObject(x,y,cameraFeed);}
-
-			}else Core.putText(cameraFeed,"TOO MUCH NOISE! ADJUST FILTER",new Point(0,50),1,2,new Scalar(0,0,255),2);
+					drawObject(x,y,cameraFeed);
+					
+					return true;
+				}
+				else
+				{
+				Core.putText(cameraFeed,"TOO MUCH NOISE! ADJUST FILTER",new Point(0,50),1,2,new Scalar(0,0,255),2);
+				return false;
+				}
+			}
 		}
+		return false;
 	}
 	
 	public static void main( String[] args )
 	{
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-		boolean trackObjects = false;
-		boolean useMorph = false;
+		boolean trackObjects = true;
+		boolean useMorph = true;
 		
 		Mat cameraFeed = new Mat();
 		Mat HSV = new Mat();
@@ -168,17 +175,18 @@ public class Main
 			e1.printStackTrace();
 		}
 
-		for(;;)
+		while(true)
 		{
 			capture.read(cameraFeed);
 			Imgproc.cvtColor(cameraFeed,HSV, Imgproc.COLOR_BGR2HSV);
 			Core.inRange(HSV,new Scalar(H_min,S_min,V_min),new Scalar(H_max,S_max,V_max),threshold);
 			
 			if(useMorph)
-			morphOps(threshold);
+				morphOps(threshold);
 			
 			if(trackObjects)
 				trackFilteredObject(x,y,threshold,cameraFeed);
+			
 			//Zou afbeelding in venster moeten laten zien
 			try
 			{
