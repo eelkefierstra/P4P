@@ -6,12 +6,13 @@ import java.io.OutputStreamWriter;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-//import org.opencv.core.Point;
 
 public class ServoController
 {
 	private static final File servos = new File("/dev/pi-blaster");
 	private static final byte[] pins = { 18, 23, 24, 25 };
+	private static final byte[] maxActuation = { 90, 90, 90, 25 };
+	private static final byte[] minActuation = { -90, -90, -90, -25 };
 	
 	private ServoController()
 	{
