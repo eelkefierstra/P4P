@@ -3,7 +3,6 @@ import java.util.ArrayList;
 import java.util.Vector;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
-import java.io.Console;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -92,56 +91,65 @@ public class Main
 		//these two vectors needed for output of findContours
 		//Vector<Point> contours = new Vector<Point>();
 		List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
-		Vector<Integer[][]> hierarchy = new Vector<Integer[][]>(4);
-		Mat tempMat = new Mat();
+		Mat hierarchy = new Mat();
 		//find contours of filtered image using openCV findContours function
-		Imgproc.findContours(temp,contours, tempMat,/*hierarchy, */Imgproc.RETR_CCOMP, Imgproc.CHAIN_APPROX_SIMPLE );
+		Imgproc.findContours(temp,contours, hierarchy, Imgproc.RETR_CCOMP, Imgproc.CHAIN_APPROX_SIMPLE );
 		//use moments method to find our filtered object
 		double refArea = 0;
 		boolean objectFound = false;
-		if (hierarchy.size() > 0) 
+		if (!hierarchy.empty()) 
 		{
-			int numObjects = hierarchy.size();
+			//int numObjects = hierarchy.size();
 	        //if number of objects greater than MAX_NUM_OBJECTS we have a noisy filter
-	        if(numObjects<maxNumObjects)
-	        {
-				for (int index = 0; index >= 0; index = hierarchy.toArray(new int[4][4])[index][0]) 
+	        //if(numObjects<maxNumObjects)
+	        //{
+				try
 				{
-					//Moments moment = new Moments((Mat)contours.toArray(new int[4][4])[index]);
-		        	Moments moment = Imgproc.moments( (contours.get(index)), false );
-					double area = moment.get_m00();
+					for (int index = 0; index >= 0; index = (int) (hierarchy.get(index,0))[0])
+					{
+						//Moments moment = new Moments((Mat)contours.toArray(new int[4][4])[index]);
+			        	Moments moment = Imgproc.moments( (contours.get(index)), false );
+						double area = moment.get_m00();
 
-					//if the area is less than 20 px by 20px then it is probably just noise
-					//if the area is the same as the 3/2 of the image size, probably just a bad filter
-					//we only want the object with the largest area so we safe a reference area each
-					//iteration and compare it to the area in the next iteration.
-	                if(area>minObjectArea && area<maxObjectArea && area>refArea)
-	                {
-						x = (int) (moment.get_m10()/area);
-						y = (int) (moment.get_m01()/area);
-						objectFound = true;
-						refArea = area;
+						//if the area is less than 20 px by 20px then it is probably just noise
+						//if the area is the same as the 3/2 of the image size, probably just a bad filter
+						//we only want the object with the largest area so we safe a reference area each
+						//iteration and compare it to the area in the next iteration.
+		                if(area>minObjectArea && area<maxObjectArea && area>refArea)
+		                {
+							x = (int) (moment.get_m10()/area);
+							y = (int) (moment.get_m01()/area);
+							objectFound = true;
+							refArea = area;
+						}
+		                else objectFound = false;
+
+
 					}
-	                else objectFound = false;
-
-
 				}
+				catch(Exception e)
+				{
+					
+				}
+				
 				//let user know you found an object
 				if(objectFound ==true)
 				{
 					Core.putText(cameraFeed,"Tracking Object",new Point(0,50),2,1,new Scalar(0,255,0),2);
 					//draw object location on screen
 					drawObject(x,y,cameraFeed);
-					
+					System.out.println("coor: "+x+ "," +y);
 					return true;
 				}
 				else
 				{
-				Core.putText(cameraFeed,"TOO MUCH NOISE! ADJUST FILTER",new Point(0,50),1,2,new Scalar(0,0,255),2);
-				return false;
+					Core.putText(cameraFeed,"TOO MUCH NOISE! ADJUST FILTER",new Point(0,50),1,2,new Scalar(0,0,255),2);
+					System.out.println("Geen object gevonden");
+					return false;
 				}
-			}
+			//}
 		}
+		System.out.println("Geen hierarchy");
 		return false;
 	}
 	
@@ -217,7 +225,7 @@ public class Main
 			}
 			try
 			{
-				Thread.sleep(50);
+				Thread.sleep(20);
 			}
 			catch (InterruptedException e)
 			{
