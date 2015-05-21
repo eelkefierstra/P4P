@@ -33,32 +33,36 @@ public class Main
 	    {
 		    futurelist.add(executor.submit(new SomeCallableTask(file)));
 		}
-	    ArrayList<String> k = new ArrayList<String>();
 		try
 		{
+			int i = 0;
 		  	for (Future<String> future : futurelist)
 		  	{
-		    	k.add(future.get());
+		    	files[i] = future.get();
+		    	i++;
 			}
 		}
 		catch (Exception ex)
 		{
 			Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
 		}
-		String[] y = { "" };
-		y = k.toArray(y);
-	    AudioStuff audio = new AudioStuff(y);
+		ServoController servos = new ServoController();
+	    AudioStuff audio = new AudioStuff(files);
 	    audio.SetClip(0);
 	    int x = 0;
 		try
 		{
 			audio.PLayClip();
 			float i = 0.025f;
+			//PWMPin pin = new PWMPin((byte)23);
 			for(;;)
 			{
+				p.gui.setTitle(p.getLocationRelativeTo().toString());
+				servos.Update(p.getLocationRelativeTo());
+				/*
 				for(; i <= 0.125f; i += 0.000125f)
 				{
-					//ServoController.WritePWM(23, i);
+					//pin.SetPWM(i);
 					System.out.println("PWM = " + i);
 					p.gui.setTitle("X = " + (p.getXRelativeTo() + " Y = " + p.getYRelativeTo()));
 					//p.gui.label.setText("PWM = " + i);
@@ -67,7 +71,7 @@ public class Main
 				i = 0.125f;
 				for(; i >= 0.025f; i -= 0.000125f)
 				{
-					//ServoController.WritePWM(23, i);
+					//pin.SetPWM(i);
 					System.out.println("PWM = " + i);
 					//p.gui.label.setText("PWM = " + i);
 					Thread.sleep(50);
@@ -77,6 +81,8 @@ public class Main
 				x++;
 				audio.SetClip(x);
 				audio.PLayClip();
+				*/
+				Thread.sleep(100);
 			}
 		}
 		catch (InterruptedException e)
@@ -87,7 +93,7 @@ public class Main
     
     public Point getLocationRelativeTo()
     {
-        int x = (gui.getX() - MouseInfo.getPointerInfo().getLocation().x) - (gui.getWidth() / 2);
+        int x = (gui.getX() - MouseInfo.getPointerInfo().getLocation().x) - (gui.getWidth() / 2) * -1;
         int y = (gui.getY() - MouseInfo.getPointerInfo().getLocation().y) + (gui.getHeight() / 2);
         return new Point(x, y);
     }

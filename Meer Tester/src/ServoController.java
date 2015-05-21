@@ -1,62 +1,42 @@
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.awt.Point;
+
 
 public class ServoController
 {
-	private static final File servos = new File("/dev/pi-blaster");
-	private static final byte[] pins = { 18, 23, 24, 25 };
-	private static final byte[] maxActuation = { 90, 90, 90, 25 };
-	private static final byte[] minActuation = { -90, -90, -90, -25 };
+	private PWMPin[] pins = { new PWMPin((byte)18, (short)45, (short)36, (short)54), new PWMPin((byte) 23), new PWMPin((byte) 24), new PWMPin((byte) 25) };
+	private short PIXY_MIN_X             =    0;
+	private short PIXY_MAX_X             =  319;
+	private short PIXY_MIN_Y             =    0;
+	private short PIXY_MAX_Y             =  199;
+
+	private short PIXY_X_CENTER          =  (short) ((PIXY_MAX_X-PIXY_MIN_X) / 2);
+	private short PIXY_Y_CENTER          =  (short) ((PIXY_MAX_Y-PIXY_MIN_Y) / 2);
+	private short PIXY_RCS_MIN_POS       =    0;
+	private short PIXY_RCS_MAX_POS       =  180;
+	private short PIXY_RCS_CENTER_POS    =  (short) ((PIXY_RCS_MAX_POS-PIXY_RCS_MIN_POS) / 2);
+	private boolean odd;
 	
-	private ServoController()
+	public ServoController()
 	{
-		
+		odd = true;
 	}
 	
-	public static void WritePWM(int pin, float percentage)
+	public void Update(Point location)
 	{
-		if (!Arrays.asList(pins).contains(pin))
+		if (odd)
 		{
-			String i = (pin == 23) + " Positive";
-			System.out.println(i);
-			//throw new IllegalArgumentException("Pin" + pin + " is outside range");
-		}
-		try
-		{
-			OutputStream out = new FileOutputStream(servos);
-			OutputStreamWriter writer = new OutputStreamWriter(out);
-			writer.write(pin+"="+percentage+"\n");
-			writer.flush();
-			writer.close();
-		}
-		catch (IOException e)
-		{
-			Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, e);
-		}
-	}
-	
-	public static void ResetPWM()
-	{
-		try
-		{
-			for(byte i = 0; i < pins.length; i++)
+			short xError = (short) (PIXY_X_CENTER - location.x);
+			short yError = (short) (location.y - PIXY_Y_CENTER);
+			
+			if (Math.abs(xError) > 250)
 			{
-				OutputStream out = new FileOutputStream(servos);
-				OutputStreamWriter writer = new OutputStreamWriter(out);
-				writer.write("release "+ pins[i] +"\n");
-				writer.flush();
-				writer.close();
+				pins[0].Update(xError);
+			}
+			if (Math.abs(yError) < 125)
+			{
+				pins[1].Update(yError);
 			}
 		}
-		catch (IOException e)
-		{
-			Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, e);
-		}
+		odd = !odd;
 	}
 }
