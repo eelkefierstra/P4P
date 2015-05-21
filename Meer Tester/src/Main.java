@@ -17,6 +17,7 @@ public class Main
 		ShutdownHook shutdown = new ShutdownHook();
 	    shutdown.attachShutDownHook();
 	    String[] files = null;
+	    FPSCounter counter = new FPSCounter();
 		try
 		{
 			java.io.File file = new java.io.File(p.getClass().getResource("/audio/").toURI());
@@ -55,6 +56,7 @@ public class Main
 			audio.PLayClip();
 			float i = 0.025f;
 			//PWMPin pin = new PWMPin((byte)23);
+		    counter.start();
 			for(;;)
 			{
 				p.gui.setTitle(p.getLocationRelativeTo().toString());
@@ -82,6 +84,8 @@ public class Main
 				audio.SetClip(x);
 				audio.PLayClip();
 				*/
+				counter.interrupt();
+				p.gui.label.setText(counter.GetFPS()+"FPS");
 				Thread.sleep(100);
 			}
 		}
@@ -90,7 +94,7 @@ public class Main
 			Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, e);
 		}
 	}
-    
+        
     public Point getLocationRelativeTo()
     {
         int x = (gui.getX() - MouseInfo.getPointerInfo().getLocation().x) - (gui.getWidth() / 2) * -1;
