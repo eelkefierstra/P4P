@@ -3,7 +3,7 @@ import java.awt.Point;
 
 public class ServoController
 {
-	private PWMPin[] pins = { new PWMPin((byte)18, (short)45, (short)36, (short)54), new PWMPin((byte) 23), new PWMPin((byte) 24), new PWMPin((byte) 25) };
+	private PWMPin[] pins = { new PWMPin((byte)18, (short)500, (short)400, (short)300), new PWMPin((byte) 23), new PWMPin((byte) 24), new PWMPin((byte) 25) };
 	private short PIXY_MIN_X             =    0;
 	private short PIXY_MAX_X             =  319;
 	private short PIXY_MIN_Y             =    0;

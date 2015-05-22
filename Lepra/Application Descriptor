@@ -1,7 +1,0 @@
-MIDlet-Version: 1.0.0
-MIDlet-Vendor: MIDlet Suite Vendor
-MIDlet-Jar-URL: Lepra.jar
-MicroEdition-Configuration: CLDC-1.8
-MicroEdition-Profile: MEEP-8.0
-MIDlet-1: GLaDOS,,GLaDOS
-MIDlet-Name: Lepra MIDlet Suite

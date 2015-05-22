@@ -41,7 +41,7 @@ public class PWMPin
 		{
 			
 		}
-		System.out.println(MapPWM(position, 0, 180, 0.025f, 0.125f));
+		System.out.println(MapPWM(position, 0, 1000, 0.025f, 0.125f));
 		//PWMController.WritePWM(pin, MapPWM(position, 0, 180, 0.025f, 0.125f));
 	}
 	
@@ -53,10 +53,10 @@ public class PWMPin
 			short PGain = proportionalGain;
 			short DGain = derivativeGain;
 			int velocity = (error * PGain + errorDelta * DGain) / 1024;
-			position += velocity;
-			if (position > 180)
+			position += (velocity / 2);
+			if (position > 1000)
 			{
-				position = 180;
+				position = 1000;
 			}
 			else if (position < 0)
 			{

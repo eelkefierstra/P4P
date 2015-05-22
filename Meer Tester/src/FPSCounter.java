@@ -16,13 +16,13 @@ public class FPSCounter extends Thread
 			}
 			catch (Exception e)
 			{ }
-			fps = 1000000000.0 / (System.nanoTime() - lastTime);
+			fps = 100000000.0 / (System.nanoTime() - lastTime);
 			lastTime = System.nanoTime();
 		}
 	}
 	
 	public double GetFPS()
 	{
-		return fps;
+		return Math.round(fps) / 10;
 	}
 }
