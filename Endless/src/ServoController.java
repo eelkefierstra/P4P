@@ -13,30 +13,25 @@ public class ServoController
 	private short PIXY_Y_CENTER          =  (short) ((PIXY_MAX_Y-PIXY_MIN_Y) / 2);
 	private short PIXY_RCS_MIN_POS       =    0;
 	private short PIXY_RCS_MAX_POS       =  180;
+	@SuppressWarnings("unused")
 	private short PIXY_RCS_CENTER_POS    =  (short) ((PIXY_RCS_MAX_POS-PIXY_RCS_MIN_POS) / 2);
-	private boolean odd;
 	
 	public ServoController()
 	{
-		odd = true;
 	}
 	
 	public void Update(Point location)
 	{
-		if (odd)
+		short xError = (short) (PIXY_X_CENTER - location.x);
+		short yError = (short) (location.y - PIXY_Y_CENTER);
+		
+		if (Math.abs(xError) > 250)
 		{
-			short xError = (short) (PIXY_X_CENTER - location.x);
-			short yError = (short) (location.y - PIXY_Y_CENTER);
-			
-			if (Math.abs(xError) > 250)
-			{
-				pins[0].Update(xError);
-			}
-			if (Math.abs(yError) < 125)
-			{
-				pins[1].Update(yError);
-			}
+			pins[0].Update(xError);
 		}
-		odd = !odd;
+		if (Math.abs(yError) < 125)
+		{
+			pins[1].Update(yError);
+		}
 	}
 }

@@ -12,11 +12,9 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-//import java.util.Vector;
 import java.awt.image.BufferedImage;
-//import java.io.ByteArrayInputStream;
 import java.io.IOException;
-//import java.io.InputStream;
+
 import org.opencv.highgui.*;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
@@ -40,12 +38,13 @@ public class Main
 	static int minObjectArea = 10*10;
 	static int maxObjectArea = (int)((double)frame_width*(double)frame_height/1.5);
 	
-	static Screen screen1 = new Screen();
-	static Screen screen2 = new Screen();
-	static Screen screen3 = new Screen();
+	private Screen screen1 = new Screen();
+	private Screen screen2 = new Screen();
+	private Screen screen3 = new Screen();
 	
 	// Main loop
-    public static void main(String[] args)
+    @SuppressWarnings("unused")
+	public static void main(String[] args)
     {
     	System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		boolean trackObjects = true;
@@ -61,11 +60,8 @@ public class Main
 		capture.set(Highgui.CV_CAP_PROP_FRAME_WIDTH,frame_width);
 		capture.set(Highgui.CV_CAP_PROP_FRAME_HEIGHT,frame_height);
 		
-        @SuppressWarnings("unused")
 		BufferedImage image = null;
         Main p = new Main();
-        @SuppressWarnings("unused")
-		Mat mat = new Mat();
         FPSCounter counter = new FPSCounter();
         counter.start();
 		try {
@@ -78,9 +74,9 @@ public class Main
         double maxfps = 0.0f;
         double fps = 0.0f;
         long nextTime = System.nanoTime() + 1000000000;
-		ImShow show1 = new ImShow(screen1, threshold);
-		ImShow show2 = new ImShow(screen2, cameraFeed);
-		ImShow show3 = new ImShow(screen3, HSV);
+		ImShow show1 = new ImShow(p.screen1, threshold);
+		ImShow show2 = new ImShow(p.screen2, cameraFeed);
+		ImShow show3 = new ImShow(p.screen3, HSV);
 		ScheduledExecutorService executor = Executors.newScheduledThreadPool(3);
 		ScheduledFuture<?>[] futureList = new ScheduledFuture<?>[3];
 		DecimalFormat format = new DecimalFormat("#.##");
@@ -95,10 +91,10 @@ public class Main
 		}
 		catch (Exception ex)
 		{
-			Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+			Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
 		}
 		ServoController servos = new ServoController();
-	    AudioStuff audio = new AudioStuff(files);
+	    Audio audio = new Audio(files);
 	    audio.SetClip(0);
 
 
@@ -114,7 +110,7 @@ public class Main
 			if(trackObjects)
 				trackFilteredObject(x,y,threshold,cameraFeed);
 			
-			//p.gui.setTitle(p.getLocationRelativeTo().toString());
+			p.screen3.setTitle(p.getLocationRelativeTo().toString());
 			//servos.Update(p.getLocationRelativeTo());
 			
 			//Zou afbeelding in venster moeten laten zien
@@ -136,72 +132,23 @@ public class Main
 			{
 				maxfps = fps;
 			}
-			screen2.setTitle(format.format(fps)+" max "+format.format(maxfps));
+			p.screen2.setTitle(format.format(fps)+" max "+format.format(maxfps));
 			try
 			{
-				Thread.sleep(0);
+				Thread.sleep(10);
 			}
-			catch (InterruptedException e)
+			catch (InterruptedException ex)
 			{
-				e.printStackTrace();
+				Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
 			}
 		}
 	}
-    /*
-    public static  void StartCoen()
-    {
-    	// TODO extract stuff that we need
-    	Main p = new Main();
-	    FPSCounter counter = new FPSCounter();
-	    //int x = 0;
-		try
-		{
-			//audio.PLayClip();
-			//float i = 0.025f;
-			//PWMPin pin = new PWMPin((byte)23);
-		    counter.start();
-			for(;;)
-			{
-				/*
-				for(; i <= 0.125f; i += 0.000125f)
-				{
-					//pin.SetPWM(i);
-					System.out.println("PWM = " + i);
-					p.gui.setTitle("X = " + (p.getXRelativeTo() + " Y = " + p.getYRelativeTo()));
-					//p.gui.label.setText("PWM = " + i);
-					Thread.sleep(50);
-				}
-				i = 0.125f;
-				for(; i >= 0.025f; i -= 0.000125f)
-				{
-					//pin.SetPWM(i);
-					System.out.println("PWM = " + i);
-					//p.gui.label.setText("PWM = " + i);
-					Thread.sleep(50);
-				}
-				i = 0.025f;
-				System.out.println("Loop" + x);
-				x++;
-				audio.SetClip(x);
-				audio.PLayClip();
-				*//*
-				counter.interrupt();
-				//p.gui.label.setText(counter.GetFPS()+"FPS");
-				Thread.sleep(100);
-			}
-		}
-		catch (InterruptedException e)
-		{
-			Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, e);
-		}
-    }
-    */
     
     private String[] GetFileNames(String[] files) throws InterruptedException, ExecutionException
     {
     	String[] res = new String[files.length];
     	ExecutorService executor = Executors.newFixedThreadPool(3);
-	    ArrayList<Future<String>> futurelist = new ArrayList<Future<String>>();
+	    List<Future<String>> futurelist = new ArrayList<Future<String>>();
 	    for (String file : files)
 	    {
 		    futurelist.add(executor.submit(new SomeCallableTask(file)));

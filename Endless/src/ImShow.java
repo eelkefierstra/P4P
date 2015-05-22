@@ -13,7 +13,6 @@ public class ImShow implements Runnable
 {
 	private volatile Mat mat;
 	private Screen screen;
-	private boolean done;
 	
 	public ImShow(Screen screen, Mat mat)
 	{
@@ -21,12 +20,9 @@ public class ImShow implements Runnable
 		this.mat = mat;
 	}
 	
-	public void SetMat(Mat mat)
+	public synchronized void SetMat(Mat mat)
 	{
-		if (done)
-		{
-			this.mat = mat;
-		}
+		this.mat = mat;
 	}
 	
 	public void run()
@@ -34,9 +30,7 @@ public class ImShow implements Runnable
 		try
 		{
 			MatOfByte matOfByte = new MatOfByte();
-			//done = false;
 			Highgui.imencode(".jpg", mat, matOfByte);
-			//done = true;
 			byte[] byteArray = matOfByte.toArray();
 			BufferedImage bufImage = null;
 			InputStream in = new ByteArrayInputStream(byteArray);
