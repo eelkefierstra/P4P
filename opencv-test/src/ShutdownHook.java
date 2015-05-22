@@ -2,11 +2,8 @@ import java.util.concurrent.ScheduledExecutorService;
 
 public class ShutdownHook 
 {
-	ScheduledExecutorService executor;
-	
 	public void attachShutDownHook(ScheduledExecutorService executor)
 	{
-		this.executor = executor;
 		Runtime.getRuntime().addShutdownHook(new Thread()
 		{
 			@Override

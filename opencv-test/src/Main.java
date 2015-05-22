@@ -1,3 +1,4 @@
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.concurrent.Executors;
@@ -6,7 +7,9 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+
 import javax.imageio.ImageIO;
+
 import org.opencv.highgui.*;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
@@ -175,7 +178,6 @@ public class Main
 		Mat mat = new Mat();
         FPSCounter counter = new FPSCounter();
         counter.start();
-        
 		try {
 			image = ImageIO.read(p.getClass().getResource("/images/Konachan.com - 199548 atha braids brown_eyes brown_hair hat long_hair original ponytail.png"));;
 		}
@@ -183,12 +185,15 @@ public class Main
 		{
 			e1.printStackTrace();
 		}
-
+        double maxfps = 0.0f;
+        double fps = 0.0f;
+        long nextTime = System.nanoTime() + 1000000000;
 		ImShow show1 = new ImShow(screen1, threshold);
 		ImShow show2 = new ImShow(screen2, cameraFeed);
 		ImShow show3 = new ImShow(screen3, HSV);
 		ScheduledExecutorService executor = Executors.newScheduledThreadPool(3);
 		ScheduledFuture<?>[] futureList = new ScheduledFuture<?>[3];
+		DecimalFormat format = new DecimalFormat("#.##");
 		ShutdownHook hook = new ShutdownHook();
 		hook.attachShutDownHook(executor);
 	    
@@ -214,7 +219,17 @@ public class Main
 
 			
 			counter.interrupt();
-			screen2.setTitle(counter.GetFPS()+"");
+			fps = counter.GetFPS();
+			if (nextTime <= System.nanoTime())
+			{
+				maxfps = 0.0;
+				nextTime = System.nanoTime() + 2500000000l;
+			}
+			if (fps > maxfps)
+			{
+				maxfps = fps;
+			}
+			screen2.setTitle(format.format(fps)+" max "+format.format(maxfps));
 			try
 			{
 				Thread.sleep(0);
