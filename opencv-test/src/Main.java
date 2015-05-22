@@ -1,14 +1,12 @@
 import java.util.List;
 import java.util.ArrayList;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-
 import javax.imageio.ImageIO;
-
 import org.opencv.highgui.*;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
@@ -186,7 +184,13 @@ public class Main
 			e1.printStackTrace();
 		}
 
-	    ExecutorService executor = Executors.newFixedThreadPool(3);
+		ImShow show1 = new ImShow(screen1, threshold);
+		ImShow show2 = new ImShow(screen2, cameraFeed);
+		ImShow show3 = new ImShow(screen3, HSV);
+		ScheduledExecutorService executor = Executors.newScheduledThreadPool(3);
+		ScheduledFuture<?>[] futureList = new ScheduledFuture<?>[3];
+		ShutdownHook hook = new ShutdownHook();
+		hook.attachShutDownHook(executor);
 	    
 		while(true)
 		{
@@ -201,33 +205,14 @@ public class Main
 				trackFilteredObject(x,y,threshold,cameraFeed);
 			
 			//Zou afbeelding in venster moeten laten zien
-			try
-			{
-				// deze laat een wit scherm zien
-				MatOfByte matOfByte = new MatOfByte();
-				Highgui.imencode(".jpg", threshold, matOfByte);
-				byte[] byteArray = matOfByte.toArray();
-				BufferedImage bufImage = null;
-				InputStream in = new ByteArrayInputStream(byteArray);
-				bufImage = ImageIO.read(in);
-				screen1.SetImage(bufImage);
-				// deze laat ongealterd plaatje zien
-				Highgui.imencode(".jpg", cameraFeed, matOfByte);
-				byteArray = matOfByte.toArray();
-				in = new ByteArrayInputStream(byteArray);
-				bufImage = ImageIO.read(in);
-				screen2.SetImage(bufImage);
-				// deze laat een plaatje met andere kleuren zien
-				Highgui.imencode(".jpg", HSV, matOfByte);
-				byteArray = matOfByte.toArray();
-				in = new ByteArrayInputStream(byteArray);
-				bufImage = ImageIO.read(in);
-				screen3.SetImage(bufImage);
-			}
-			catch (IOException e)
-			{
-				e.printStackTrace();
-			}
+			show1.SetMat(threshold);
+		    futureList[0] = executor.schedule(show1, 0, TimeUnit.NANOSECONDS);
+			show2.SetMat(cameraFeed);
+		    futureList[1] = executor.schedule(show2, 0, TimeUnit.NANOSECONDS);
+			show3.SetMat(HSV);
+		    futureList[2] = executor.schedule(show3, 0, TimeUnit.NANOSECONDS);
+
+			
 			counter.interrupt();
 			screen2.setTitle(counter.GetFPS()+"");
 			try
@@ -236,7 +221,6 @@ public class Main
 			}
 			catch (InterruptedException e)
 			{
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
