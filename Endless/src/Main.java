@@ -26,7 +26,7 @@ import org.opencv.core.*;
 
 public class Main
 {
-	private GUI gui = new GUI();
+	//private GUI gui = new GUI();
 	
 	static int H_min = 9;
 	static int H_max = 28;
@@ -154,8 +154,33 @@ public class Main
 	
     public static void main(String[] args)
     {
-		StartCoen();
+		StartEelke();
 	}
+    
+    private String[] GetFileNames(String[] files)
+    {
+    	String[] res = new String[files.length];
+    	ExecutorService executor = Executors.newFixedThreadPool(3);
+	    ArrayList<Future<String>> futurelist = new ArrayList<Future<String>>();
+	    for (String file : files)
+	    {
+		    futurelist.add(executor.submit(new SomeCallableTask(file)));
+		}
+		try
+		{
+			int i = 0;
+		  	for (Future<String> future : futurelist)
+		  	{
+		    	res[i] = future.get();
+		    	i++;
+			}
+		}
+		catch (Exception ex)
+		{
+			Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+		}
+		return res;
+    }
     
     public static  void StartCoen()
     {
@@ -172,25 +197,7 @@ public class Main
 			Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
 		}
 
-	    ExecutorService executor = Executors.newFixedThreadPool(3);
-	    ArrayList<Future<String>> futurelist = new ArrayList<Future<String>>();
-	    for (String file : files)
-	    {
-		    futurelist.add(executor.submit(new SomeCallableTask(file)));
-		}
-		try
-		{
-			int i = 0;
-		  	for (Future<String> future : futurelist)
-		  	{
-		    	files[i] = future.get();
-		    	i++;
-			}
-		}
-		catch (Exception ex)
-		{
-			Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
-		}
+	    
 		ServoController servos = new ServoController();
 	    AudioStuff audio = new AudioStuff(files);
 	    audio.SetClip(0);
@@ -203,8 +210,8 @@ public class Main
 		    counter.start();
 			for(;;)
 			{
-				p.gui.setTitle(p.getLocationRelativeTo().toString());
-				servos.Update(p.getLocationRelativeTo());
+				//p.gui.setTitle(p.getLocationRelativeTo().toString());
+				//servos.Update(p.getLocationRelativeTo());
 				/*
 				for(; i <= 0.125f; i += 0.000125f)
 				{
@@ -229,7 +236,7 @@ public class Main
 				audio.PLayClip();
 				*/
 				counter.interrupt();
-				p.gui.label.setText(counter.GetFPS()+"FPS");
+				//p.gui.label.setText(counter.GetFPS()+"FPS");
 				Thread.sleep(100);
 			}
 		}
@@ -324,7 +331,7 @@ public class Main
 			}
 		}
     }
-    
+    /*
     public Point getLocationRelativeTo()
     {
         int x = (gui.getX() - MouseInfo.getPointerInfo().getLocation().x) - (gui.getWidth() / 2) * -1;
@@ -342,5 +349,5 @@ public class Main
     {
         int y = gui.getY() - MouseInfo.getPointerInfo().getLocation().y;
         return y + gui.getHeight() / 2;
-    }
+    }*/
 }
