@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -13,12 +14,9 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 //import java.util.Vector;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
+//import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-
-import javax.imageio.ImageIO;
-
+//import java.io.InputStream;
 import org.opencv.highgui.*;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
@@ -46,6 +44,197 @@ public class Main
 	static Screen screen2 = new Screen();
 	static Screen screen3 = new Screen();
 	
+	// Main loop
+    public static void main(String[] args)
+    {
+    	System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+		boolean trackObjects = true;
+		boolean useMorph = true;
+		
+		Mat cameraFeed = new Mat();
+		Mat HSV = new Mat();
+		Mat threshold = new Mat();
+		int x=0,y=0;
+		
+		VideoCapture capture = new VideoCapture();
+		capture.open(0);
+		capture.set(Highgui.CV_CAP_PROP_FRAME_WIDTH,frame_width);
+		capture.set(Highgui.CV_CAP_PROP_FRAME_HEIGHT,frame_height);
+		
+        @SuppressWarnings("unused")
+		BufferedImage image = null;
+        Main p = new Main();
+        @SuppressWarnings("unused")
+		Mat mat = new Mat();
+        FPSCounter counter = new FPSCounter();
+        counter.start();
+		try {
+			image = javax.imageio.ImageIO.read(p.getClass().getResource("/images/Konachan.com - 199548 atha braids brown_eyes brown_hair hat long_hair original ponytail.png"));;
+		}
+		catch (IOException e1)
+		{
+			e1.printStackTrace();
+		}
+        double maxfps = 0.0f;
+        double fps = 0.0f;
+        long nextTime = System.nanoTime() + 1000000000;
+		ImShow show1 = new ImShow(screen1, threshold);
+		ImShow show2 = new ImShow(screen2, cameraFeed);
+		ImShow show3 = new ImShow(screen3, HSV);
+		ScheduledExecutorService executor = Executors.newScheduledThreadPool(3);
+		ScheduledFuture<?>[] futureList = new ScheduledFuture<?>[3];
+		DecimalFormat format = new DecimalFormat("#.##");
+		ShutdownHook hook = new ShutdownHook();
+		hook.attachShutDownHook(executor);
+	    
+		String[] files = null;
+		try
+		{
+			java.io.File file = new java.io.File(p.getClass().getResource("/audio/").toURI());
+	    	files = p.GetFileNames(file.list());
+		}
+		catch (Exception ex)
+		{
+			Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+		}
+		ServoController servos = new ServoController();
+	    AudioStuff audio = new AudioStuff(files);
+	    audio.SetClip(0);
+
+
+		while(true)
+		{
+			capture.read(cameraFeed);
+			Imgproc.cvtColor(cameraFeed,HSV, Imgproc.COLOR_BGR2HSV);
+			Core.inRange(HSV,new Scalar(H_min,S_min,V_min),new Scalar(H_max,S_max,V_max),threshold);
+			
+			if(useMorph)
+				morphOps(threshold);
+			
+			if(trackObjects)
+				trackFilteredObject(x,y,threshold,cameraFeed);
+			
+			//p.gui.setTitle(p.getLocationRelativeTo().toString());
+			//servos.Update(p.getLocationRelativeTo());
+			
+			//Zou afbeelding in venster moeten laten zien
+			show1.SetMat(threshold);
+		    futureList[0] = executor.schedule(show1, 0, TimeUnit.NANOSECONDS);
+			show2.SetMat(cameraFeed);
+		    futureList[1] = executor.schedule(show2, 0, TimeUnit.NANOSECONDS);
+			show3.SetMat(HSV);
+		    futureList[2] = executor.schedule(show3, 0, TimeUnit.NANOSECONDS);
+		    
+			counter.interrupt();
+			fps = counter.GetFPS();
+			if (nextTime <= System.nanoTime())
+			{
+				maxfps = 0.0;
+				nextTime = System.nanoTime() + 2500000000L;
+			}
+			if (fps > maxfps)
+			{
+				maxfps = fps;
+			}
+			screen2.setTitle(format.format(fps)+" max "+format.format(maxfps));
+			try
+			{
+				Thread.sleep(0);
+			}
+			catch (InterruptedException e)
+			{
+				e.printStackTrace();
+			}
+		}
+	}
+    /*
+    public static  void StartCoen()
+    {
+    	// TODO extract stuff that we need
+    	Main p = new Main();
+	    FPSCounter counter = new FPSCounter();
+	    //int x = 0;
+		try
+		{
+			//audio.PLayClip();
+			//float i = 0.025f;
+			//PWMPin pin = new PWMPin((byte)23);
+		    counter.start();
+			for(;;)
+			{
+				/*
+				for(; i <= 0.125f; i += 0.000125f)
+				{
+					//pin.SetPWM(i);
+					System.out.println("PWM = " + i);
+					p.gui.setTitle("X = " + (p.getXRelativeTo() + " Y = " + p.getYRelativeTo()));
+					//p.gui.label.setText("PWM = " + i);
+					Thread.sleep(50);
+				}
+				i = 0.125f;
+				for(; i >= 0.025f; i -= 0.000125f)
+				{
+					//pin.SetPWM(i);
+					System.out.println("PWM = " + i);
+					//p.gui.label.setText("PWM = " + i);
+					Thread.sleep(50);
+				}
+				i = 0.025f;
+				System.out.println("Loop" + x);
+				x++;
+				audio.SetClip(x);
+				audio.PLayClip();
+				*//*
+				counter.interrupt();
+				//p.gui.label.setText(counter.GetFPS()+"FPS");
+				Thread.sleep(100);
+			}
+		}
+		catch (InterruptedException e)
+		{
+			Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, e);
+		}
+    }
+    */
+    
+    private String[] GetFileNames(String[] files) throws InterruptedException, ExecutionException
+    {
+    	String[] res = new String[files.length];
+    	ExecutorService executor = Executors.newFixedThreadPool(3);
+	    ArrayList<Future<String>> futurelist = new ArrayList<Future<String>>();
+	    for (String file : files)
+	    {
+		    futurelist.add(executor.submit(new SomeCallableTask(file)));
+		}
+		int i = 0;
+		for (Future<String> future : futurelist)
+		{
+		   	res[i] = future.get();
+		   	i++;
+		}
+		return res;
+    }
+    
+    public Point getLocationRelativeTo()
+    {
+        int x = (screen2.getX() - MouseInfo.getPointerInfo().getLocation().x) - (screen2.getWidth() / 2) * -1;
+        int y = (screen2.getY() - MouseInfo.getPointerInfo().getLocation().y) + (screen2.getHeight() / 2);
+        return new Point(x, y);
+    }
+    
+    public int getXRelativeTo()
+    {
+        int x = screen2.getX() - MouseInfo.getPointerInfo().getLocation().x;
+        return (x + (screen2.getWidth() / 2)) * -1;
+    }
+    
+    public int getYRelativeTo()
+    {
+        int y = screen2.getY() - MouseInfo.getPointerInfo().getLocation().y;
+        return y + screen2.getHeight() / 2;
+    }
+
+
 	public static void drawObject(double x,double y,Mat frame)
 	{
 		Core.circle(frame,new org.opencv.core.Point(x,y),20,new Scalar(0.0,255.0,0.0),2);
@@ -151,203 +340,4 @@ public class Main
 		System.out.println("Geen overeenkomsten in het beeld");
 		return false;
 	}
-	
-    public static void main(String[] args)
-    {
-		StartEelke();
-	}
-    
-    private String[] GetFileNames(String[] files)
-    {
-    	String[] res = new String[files.length];
-    	ExecutorService executor = Executors.newFixedThreadPool(3);
-	    ArrayList<Future<String>> futurelist = new ArrayList<Future<String>>();
-	    for (String file : files)
-	    {
-		    futurelist.add(executor.submit(new SomeCallableTask(file)));
-		}
-		try
-		{
-			int i = 0;
-		  	for (Future<String> future : futurelist)
-		  	{
-		    	res[i] = future.get();
-		    	i++;
-			}
-		}
-		catch (Exception ex)
-		{
-			Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
-		}
-		return res;
-    }
-    
-    public static  void StartCoen()
-    {
-    	Main p = new Main();
-	    String[] files = null;
-	    FPSCounter counter = new FPSCounter();
-		try
-		{
-			java.io.File file = new java.io.File(p.getClass().getResource("/audio/").toURI());
-	    	files = file.list();
-		}
-		catch (Exception ex)
-		{
-			Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
-		}
-
-	    
-		ServoController servos = new ServoController();
-	    AudioStuff audio = new AudioStuff(files);
-	    audio.SetClip(0);
-	    //int x = 0;
-		try
-		{
-			audio.PLayClip();
-			//float i = 0.025f;
-			//PWMPin pin = new PWMPin((byte)23);
-		    counter.start();
-			for(;;)
-			{
-				//p.gui.setTitle(p.getLocationRelativeTo().toString());
-				//servos.Update(p.getLocationRelativeTo());
-				/*
-				for(; i <= 0.125f; i += 0.000125f)
-				{
-					//pin.SetPWM(i);
-					System.out.println("PWM = " + i);
-					p.gui.setTitle("X = " + (p.getXRelativeTo() + " Y = " + p.getYRelativeTo()));
-					//p.gui.label.setText("PWM = " + i);
-					Thread.sleep(50);
-				}
-				i = 0.125f;
-				for(; i >= 0.025f; i -= 0.000125f)
-				{
-					//pin.SetPWM(i);
-					System.out.println("PWM = " + i);
-					//p.gui.label.setText("PWM = " + i);
-					Thread.sleep(50);
-				}
-				i = 0.025f;
-				System.out.println("Loop" + x);
-				x++;
-				audio.SetClip(x);
-				audio.PLayClip();
-				*/
-				counter.interrupt();
-				//p.gui.label.setText(counter.GetFPS()+"FPS");
-				Thread.sleep(100);
-			}
-		}
-		catch (InterruptedException e)
-		{
-			Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, e);
-		}
-    }
-        
-    public static void StartEelke()
-    {
-    	System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-		boolean trackObjects = true;
-		boolean useMorph = true;
-		
-		Mat cameraFeed = new Mat();
-		Mat HSV = new Mat();
-		Mat threshold = new Mat();
-		int x=0,y=0;
-		
-		VideoCapture capture = new VideoCapture();
-		capture.open(0);
-		capture.set(Highgui.CV_CAP_PROP_FRAME_WIDTH,frame_width);
-		capture.set(Highgui.CV_CAP_PROP_FRAME_HEIGHT,frame_height);
-		
-        @SuppressWarnings("unused")
-		BufferedImage image = null;
-        Main p = new Main();
-        @SuppressWarnings("unused")
-		Mat mat = new Mat();
-        FPSCounter counter = new FPSCounter();
-        counter.start();
-		try {
-			image = ImageIO.read(p.getClass().getResource("/images/Konachan.com - 199548 atha braids brown_eyes brown_hair hat long_hair original ponytail.png"));;
-		}
-		catch (IOException e1)
-		{
-			e1.printStackTrace();
-		}
-        double maxfps = 0.0f;
-        double fps = 0.0f;
-        long nextTime = System.nanoTime() + 1000000000;
-		ImShow show1 = new ImShow(screen1, threshold);
-		ImShow show2 = new ImShow(screen2, cameraFeed);
-		ImShow show3 = new ImShow(screen3, HSV);
-		ScheduledExecutorService executor = Executors.newScheduledThreadPool(3);
-		ScheduledFuture<?>[] futureList = new ScheduledFuture<?>[3];
-		DecimalFormat format = new DecimalFormat("#.##");
-		ShutdownHook hook = new ShutdownHook();
-		hook.attachShutDownHook(executor);
-
-		while(true)
-		{
-			capture.read(cameraFeed);
-			Imgproc.cvtColor(cameraFeed,HSV, Imgproc.COLOR_BGR2HSV);
-			Core.inRange(HSV,new Scalar(H_min,S_min,V_min),new Scalar(H_max,S_max,V_max),threshold);
-			
-			if(useMorph)
-				morphOps(threshold);
-			
-			if(trackObjects)
-				trackFilteredObject(x,y,threshold,cameraFeed);
-			
-			//Zou afbeelding in venster moeten laten zien
-			show1.SetMat(threshold);
-		    futureList[0] = executor.schedule(show1, 0, TimeUnit.NANOSECONDS);
-			show2.SetMat(cameraFeed);
-		    futureList[1] = executor.schedule(show2, 0, TimeUnit.NANOSECONDS);
-			show3.SetMat(HSV);
-		    futureList[2] = executor.schedule(show3, 0, TimeUnit.NANOSECONDS);
-
-			
-			counter.interrupt();
-			fps = counter.GetFPS();
-			if (nextTime <= System.nanoTime())
-			{
-				maxfps = 0.0;
-				nextTime = System.nanoTime() + 2500000000l;
-			}
-			if (fps > maxfps)
-			{
-				maxfps = fps;
-			}
-			screen2.setTitle(format.format(fps)+" max "+format.format(maxfps));
-			try
-			{
-				Thread.sleep(0);
-			}
-			catch (InterruptedException e)
-			{
-				e.printStackTrace();
-			}
-		}
-    }
-    /*
-    public Point getLocationRelativeTo()
-    {
-        int x = (gui.getX() - MouseInfo.getPointerInfo().getLocation().x) - (gui.getWidth() / 2) * -1;
-        int y = (gui.getY() - MouseInfo.getPointerInfo().getLocation().y) + (gui.getHeight() / 2);
-        return new Point(x, y);
-    }
-    
-    public int getXRelativeTo()
-    {
-        int x = gui.getX() - MouseInfo.getPointerInfo().getLocation().x;
-        return (x + (gui.getWidth() / 2)) * -1;
-    }
-    
-    public int getYRelativeTo()
-    {
-        int y = gui.getY() - MouseInfo.getPointerInfo().getLocation().y;
-        return y + gui.getHeight() / 2;
-    }*/
 }
