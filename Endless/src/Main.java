@@ -1,5 +1,6 @@
 import java.awt.MouseInfo;
 import java.awt.Point;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -7,6 +8,9 @@ import java.util.logging.Logger;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 //import java.util.Vector;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -156,8 +160,6 @@ public class Main
     public static  void StartCoen()
     {
     	Main p = new Main();
-		ShutdownHook shutdown = new ShutdownHook();
-	    shutdown.attachShutDownHook();
 	    String[] files = null;
 	    FPSCounter counter = new FPSCounter();
 		try
@@ -258,7 +260,8 @@ public class Main
         Main p = new Main();
         @SuppressWarnings("unused")
 		Mat mat = new Mat();
-        
+        FPSCounter counter = new FPSCounter();
+        counter.start();
 		try {
 			image = ImageIO.read(p.getClass().getResource("/images/Konachan.com - 199548 atha braids brown_eyes brown_hair hat long_hair original ponytail.png"));;
 		}
@@ -266,6 +269,17 @@ public class Main
 		{
 			e1.printStackTrace();
 		}
+        double maxfps = 0.0f;
+        double fps = 0.0f;
+        long nextTime = System.nanoTime() + 1000000000;
+		ImShow show1 = new ImShow(screen1, threshold);
+		ImShow show2 = new ImShow(screen2, cameraFeed);
+		ImShow show3 = new ImShow(screen3, HSV);
+		ScheduledExecutorService executor = Executors.newScheduledThreadPool(3);
+		ScheduledFuture<?>[] futureList = new ScheduledFuture<?>[3];
+		DecimalFormat format = new DecimalFormat("#.##");
+		ShutdownHook hook = new ShutdownHook();
+		hook.attachShutDownHook(executor);
 
 		while(true)
 		{
@@ -280,40 +294,32 @@ public class Main
 				trackFilteredObject(x,y,threshold,cameraFeed);
 			
 			//Zou afbeelding in venster moeten laten zien
+			show1.SetMat(threshold);
+		    futureList[0] = executor.schedule(show1, 0, TimeUnit.NANOSECONDS);
+			show2.SetMat(cameraFeed);
+		    futureList[1] = executor.schedule(show2, 0, TimeUnit.NANOSECONDS);
+			show3.SetMat(HSV);
+		    futureList[2] = executor.schedule(show3, 0, TimeUnit.NANOSECONDS);
+
+			
+			counter.interrupt();
+			fps = counter.GetFPS();
+			if (nextTime <= System.nanoTime())
+			{
+				maxfps = 0.0;
+				nextTime = System.nanoTime() + 2500000000l;
+			}
+			if (fps > maxfps)
+			{
+				maxfps = fps;
+			}
+			screen2.setTitle(format.format(fps)+" max "+format.format(maxfps));
 			try
 			{
-				// deze laat een wit scherm zien
-				MatOfByte matOfByte = new MatOfByte();
-				Highgui.imencode(".jpg", threshold, matOfByte);
-				byte[] byteArray = matOfByte.toArray();
-				BufferedImage bufImage = null;
-				InputStream in = new ByteArrayInputStream(byteArray);
-				bufImage = ImageIO.read(in);
-				screen1.SetImage(bufImage);
-				// deze laat ongealterd plaatje zien
-				Highgui.imencode(".jpg", cameraFeed, matOfByte);
-				byteArray = matOfByte.toArray();
-				in = new ByteArrayInputStream(byteArray);
-				bufImage = ImageIO.read(in);
-				screen2.SetImage(bufImage);
-				// deze laat een plaatje met andere kleuren zien
-				Highgui.imencode(".jpg", HSV, matOfByte);
-				byteArray = matOfByte.toArray();
-				in = new ByteArrayInputStream(byteArray);
-				bufImage = ImageIO.read(in);
-				screen3.SetImage(bufImage);
-			}
-			catch (IOException e)
-			{
-				e.printStackTrace();
-			}
-			try
-			{
-				Thread.sleep(20);
+				Thread.sleep(0);
 			}
 			catch (InterruptedException e)
 			{
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
