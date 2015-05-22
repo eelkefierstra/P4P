@@ -1,6 +1,7 @@
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Vector;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -174,6 +175,8 @@ public class Main
         Main p = new Main();
         @SuppressWarnings("unused")
 		Mat mat = new Mat();
+        FPSCounter counter = new FPSCounter();
+        counter.start();
         
 		try {
 			image = ImageIO.read(p.getClass().getResource("/images/Konachan.com - 199548 atha braids brown_eyes brown_hair hat long_hair original ponytail.png"));;
@@ -183,6 +186,8 @@ public class Main
 			e1.printStackTrace();
 		}
 
+	    ExecutorService executor = Executors.newFixedThreadPool(3);
+	    
 		while(true)
 		{
 			capture.read(cameraFeed);
@@ -223,9 +228,11 @@ public class Main
 			{
 				e.printStackTrace();
 			}
+			counter.interrupt();
+			screen2.setTitle(counter.GetFPS()+"");
 			try
 			{
-				Thread.sleep(20);
+				Thread.sleep(0);
 			}
 			catch (InterruptedException e)
 			{
