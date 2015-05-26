@@ -24,8 +24,8 @@ public class PWMPin
 		this.position = startPosition;
 		this.proportionalGain = proportionalGain;
 		this.derivativeGain = derivativeGain;
-		//this.maxPosition = maxPosition;
-		//this.minPosition = minPosition;
+		this.maxPosition = 1000;
+		this.minPosition = 0;
 		this.previousError = 0;
 		this.first = true;
 	}
@@ -37,10 +37,6 @@ public class PWMPin
 	
 	public void Actuate()
 	{
-		if (pin == 23)
-		{
-			
-		}
 		System.out.println(MapPWM(position, 0, 1000, 0.025f, 0.125f));
 		//PWMController.WritePWM(pin, MapPWM(position, 0, 180, 0.025f, 0.125f));
 	}
@@ -54,13 +50,13 @@ public class PWMPin
 			short DGain = derivativeGain;
 			int velocity = (error * PGain + errorDelta * DGain) / 1024;
 			position += velocity;
-			if (position > 1000)
+			if (position > maxPosition)
 			{
-				position = 1000;
+				position = maxPosition;
 			}
-			else if (position < 0)
+			else if (position < minPosition)
 			{
-				position = 0;
+				position = minPosition;
 			}
 		}
 		else
@@ -73,6 +69,11 @@ public class PWMPin
 	}
 	
 	private float MapPWM(int x, int in_min, int in_max, float out_min, float out_max)
+	{
+		return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+	}
+
+	private int MapPosition(int x, int in_min, int in_max, int out_min, int out_max)
 	{
 		return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 	}
