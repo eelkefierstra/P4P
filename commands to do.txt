@@ -3,3 +3,10 @@ if [ -f /usr/X11R6/bin/Xvfb ]; then
 /usr/X11R6/bin/Xvfb :1 -screen 0 1280x720x32; fi
 sudo pi-blaster/./pi-blaster -pcm
 java -jar p4p.jar
+
+https://encrypted.google.com/webhp?hl=en#safe=off&hl=en&q=opencv+jni
+http://personals.ac.upc.edu/rtous/howto_jniopencv.xhtml
+http://cs-people.bu.edu/dgurari/OpenCVwithJava.html
+http://cs-people.bu.edu/dgurari/code/OpenCV-CameraInterface.cpp
+http://stackoverflow.com/questions/2441198/opencv-to-jni-how-to-make-it-work
+http://docs.opencv.org/doc/tutorials/introduction/android_binary_package/android_binary_package_using_with_NDK.html#android-binary-package-with-ndk
