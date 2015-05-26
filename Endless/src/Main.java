@@ -82,6 +82,7 @@ public class Main
 		DecimalFormat format = new DecimalFormat("#.##");
 		ShutdownHook hook = new ShutdownHook();
 		hook.attachShutDownHook(executor);
+		int z = 0;
 	    
 		String[] files = null;
 		try
@@ -127,6 +128,13 @@ public class Main
 			{
 				maxfps = 0.0;
 				nextTime = System.nanoTime() + 2500000000L;
+				//audio.SetClip(z);
+				//audio.PLayClip();
+				z++;
+				if (z > 22)
+				{
+					x = 0;
+				}
 			}
 			if (fps > maxfps)
 			{
@@ -135,7 +143,7 @@ public class Main
 			p.screen2.setTitle(format.format(fps)+" max "+format.format(maxfps));
 			try
 			{
-				Thread.sleep(10);
+				Thread.sleep(0);
 			}
 			catch (InterruptedException ex)
 			{
@@ -164,7 +172,7 @@ public class Main
     
     public Point getLocationRelativeTo()
     {
-        int x = (screen2.getX() - MouseInfo.getPointerInfo().getLocation().x) - (screen2.getWidth() / 2) * -1;
+        int x = ((screen2.getX() - MouseInfo.getPointerInfo().getLocation().x) - (screen2.getWidth() / 2) * -1) * -1;
         int y = (screen2.getY() - MouseInfo.getPointerInfo().getLocation().y) + (screen2.getHeight() / 2);
         return new Point(x, y);
     }
@@ -203,7 +211,6 @@ public class Main
 	
 	public static void morphOps(Mat thresh)
 	{
-
 		//create structuring element that will be used to "dilate" and "erode" image.
 		//the element chosen here is a 3px by 3px rectangle
 
@@ -213,7 +220,6 @@ public class Main
 
 		Imgproc.erode(thresh,thresh,erodeElement);
 		Imgproc.erode(thresh,thresh,erodeElement);
-
 
 		Imgproc.dilate(thresh,thresh,dilateElement);
 		Imgproc.dilate(thresh,thresh,dilateElement);
@@ -258,8 +264,6 @@ public class Main
 							refArea = area;
 						}
 		                else objectFound = false;
-
-
 					}
 				}
 				catch(Exception e)

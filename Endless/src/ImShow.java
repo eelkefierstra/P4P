@@ -20,7 +20,7 @@ public class ImShow implements Runnable
 		this.mat = mat;
 	}
 	
-	public synchronized void SetMat(Mat mat)
+	public void SetMat(Mat mat)
 	{
 		this.mat = mat;
 	}
