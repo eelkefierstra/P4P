@@ -11,11 +11,15 @@ public class ServoController
 	
 	public void Update(Point location)
 	{
-		if (Math.abs(location.x) > 250)
+		if (Math.abs(location.x) > 100)
 		{
 			pins[0].Update((short) location.x);
+			if (Math.abs(location.x) > 319)
+			{
+				pins[3].Update((short) location.x);
+			}
 		}
-		if (Math.abs(location.y) > 125)
+		if (Math.abs(location.y) > 75)
 		{
 			pins[1].Update((short) location.y);
 		}
