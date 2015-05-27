@@ -4,7 +4,6 @@ public class PWMPin
 {
 	private byte pin;
 	private short position;
-	private short error;
 	private short previousError;
 	private short proportionalGain;
 	private short derivativeGain;
@@ -12,12 +11,6 @@ public class PWMPin
 	private short maxPosition;
 	private short minPosition;
 	private boolean first;
-	
-	public PWMPin(byte pin)
-	{
-		this.pin = pin;
-		first = true;
-	}
 	
 	public PWMPin(byte pin, short startPosition, short proportionalGain, short derivativeGain, byte range)
 	{
@@ -67,7 +60,6 @@ public class PWMPin
 		}
 		else
 		{
-			this.error = error;
 			first = false;
 		}
 		previousError = error;
