@@ -2,15 +2,16 @@
 
 public class PWMPin
 {
-	byte pin;
-	short position;
-	short error;
-	short previousError;
-	short proportionalGain;
-	short derivativeGain;
-	short maxPosition;
-	short minPosition;
-	boolean first;
+	private byte pin;
+	private short position;
+	private short error;
+	private short previousError;
+	private short proportionalGain;
+	private short derivativeGain;
+	private short middlePosition = 90;
+	private short maxPosition;
+	private short minPosition;
+	private boolean first;
 	
 	public PWMPin(byte pin)
 	{
@@ -18,16 +19,21 @@ public class PWMPin
 		first = true;
 	}
 	
-	public PWMPin(byte pin, short startPosition, short proportionalGain, short derivativeGain)
+	public PWMPin(byte pin, short startPosition, short proportionalGain, short derivativeGain, byte range)
 	{
 		this.pin = pin;
 		this.position = startPosition;
 		this.proportionalGain = proportionalGain;
 		this.derivativeGain = derivativeGain;
-		this.maxPosition = 1000;
-		this.minPosition = 0;
+		this.maxPosition = (short) MapPosition(middlePosition + range, 0, 180, 0, 1000);
+		this.minPosition = (short) MapPosition(middlePosition - range, 0, 180, 0, 1000);
 		this.previousError = 0;
 		this.first = true;
+	}
+	
+	public short GetLocation()
+	{
+		return (short) MapPosition(position, 0, 1000, 0, 180);
 	}
 	
 	public void SetPWM(float value)

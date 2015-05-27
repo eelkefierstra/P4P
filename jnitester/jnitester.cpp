@@ -49,7 +49,7 @@ const string windowName = "Original Image";
 const string windowName1 = "HSV Image";
 const string windowName2 = "Thresholded Image";
 const string windowName3 = "After Morphological Operations";
-const string trackbarWindowName = "Trackbars";
+//const string trackbarWindowName = "Trackbars";
 
 void on_trackbar( int, void* )
 {//This function gets called whenever a
@@ -61,7 +61,7 @@ string intToString(int number){
 	ss << number;
 	return ss.str();
 }
-
+/*
 void createTrackbars(){
 	//create window for trackbars
     namedWindow(trackbarWindowName,0);
@@ -85,7 +85,7 @@ void createTrackbars(){
     createTrackbar( "V_MIN", trackbarWindowName, &V_MIN, V_MAX, on_trackbar );
     createTrackbar( "V_MAX", trackbarWindowName, &V_MAX, V_MAX, on_trackbar );
 }
-
+*/
 void drawObject(int x, int y,Mat &frame){
 
 	//use some of the openCV drawing functions to draw crosshairs
@@ -186,7 +186,7 @@ int main(int argc, char* argv[])
 	//x and y values for the location of the object
 	int x=0, y=0;
 	//create slider bars for HSV filtering
-	createTrackbars();
+	//createTrackbars();
 	//video capture object to acquire webcam feed
 	VideoCapture capture;
 	//open capture object at location zero (default location for webcam)
