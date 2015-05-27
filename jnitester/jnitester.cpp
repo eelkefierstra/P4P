@@ -50,12 +50,12 @@ const string windowName1 = "HSV Image";
 const string windowName2 = "Thresholded Image";
 const string windowName3 = "After Morphological Operations";
 //const string trackbarWindowName = "Trackbars";
-
+/*
 void on_trackbar( int, void* )
 {//This function gets called whenever a
 	// trackbar position is changed
 }
-
+*/
 string intToString(int number){
 	std::stringstream ss;
 	ss << number;

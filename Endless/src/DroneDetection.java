@@ -1,7 +1,5 @@
 import java.awt.MouseInfo;
 import java.awt.Point;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,46 +19,46 @@ import org.opencv.imgproc.Moments;
 
 public class DroneDetection
 {
-	static int H_min = 9;
-	static int H_max = 28;
-	static int S_min = 226;
-	static int S_max = 256;
-	static int V_min = 153;
-	static int V_max = 256;
+	private static int H_min = 9;
+	private static int H_max = 28;
+	private static int S_min = 226;
+	private static int S_max = 256;
+	private static int V_min = 153;
+	private static int V_max = 256;
 	
-	static final int frame_width = 640;
-	static final int frame_height = 480;
+	private static final int frame_width = 640;
+	private static final int frame_height = 480;
 	
-	static int maxNumObjects = 1500;
-	static int minObjectArea = 10*10;
-	static int maxObjectArea = (int)((double)frame_width*(double)frame_height/1.5);
+	private static int maxNumObjects = 1500;
+	private static int minObjectArea = 10*10;
+	private static int maxObjectArea = (int)((double)frame_width*(double)frame_height/1.5);
 	
 	private Screen screen1 = new Screen();
 	private Screen screen2 = new Screen();
 	private Screen screen3 = new Screen();
 	
-	ScheduledFuture<?>[] futureList;
-	boolean trackObjects = true;
-	boolean useMorph = true;
+	private ScheduledFuture<?>[] futureList;
+	private boolean trackObjects = true;
+	private boolean useMorph = true;
 	
-	Mat cameraFeed = new Mat();
-	Mat HSV = new Mat();
-	Mat threshold = new Mat();
-	int x=0,y=0;
+	private Mat cameraFeed = new Mat();
+	private Mat HSV = new Mat();
+	private Mat threshold = new Mat();
+	private int x=0,y=0;
 
-	VideoCapture capture = new VideoCapture();
+	private VideoCapture capture = new VideoCapture();
 	
-    FPSCounter counter = new FPSCounter();
+	private FPSCounter counter = new FPSCounter();
 	
-    double maxfps;
-    double fps;
-    long nextTime;
-	ImShow show1;
-	ImShow show2;
-	ImShow show3;
-	ScheduledExecutorService executor;
-	DecimalFormat format;
-	int z = 0;
+	private double maxfps;
+	private double fps;
+	private long nextTime;
+	private ImShow show1;
+	private ImShow show2;
+	private ImShow show3;
+	private ScheduledExecutorService executor;
+	private DecimalFormat format;
+	private int z = 0;
 
 	public DroneDetection()
 	{
@@ -68,16 +66,9 @@ public class DroneDetection
 		capture.set(Highgui.CV_CAP_PROP_FRAME_WIDTH,frame_width);
 		capture.set(Highgui.CV_CAP_PROP_FRAME_HEIGHT,frame_height);
 		
-		BufferedImage image = null;
         counter = new FPSCounter();
         counter.start();
-		try {
-			image = javax.imageio.ImageIO.read(getClass().getResource("/images/Konachan.com - 199548 atha braids brown_eyes brown_hair hat long_hair original ponytail.png"));;
-		}
-		catch (IOException e1)
-		{
-			e1.printStackTrace();
-		}
+        
         maxfps = 0.0;
         fps = 0.0;
         nextTime = System.nanoTime() + 1000000000;
