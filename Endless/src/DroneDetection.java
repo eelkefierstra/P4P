@@ -38,8 +38,8 @@ public class DroneDetection
 	private Screen screen3 = new Screen();
 	
 	private ScheduledFuture<?>[] futureList;
-	private boolean trackObjects = true;
-	private boolean useMorph = true;
+	//private boolean trackObjects = true;
+	//private boolean useMorph = true;
 	
 	private Mat cameraFeed = new Mat();
 	private Mat HSV = new Mat();
@@ -47,8 +47,8 @@ public class DroneDetection
 	private int x=0,y=0;
 
 	private VideoCapture capture = new VideoCapture();
-	
 	private FPSCounter counter = new FPSCounter();
+	private Audio audio;
 	
 	private double maxfps;
 	private double fps;
@@ -60,7 +60,7 @@ public class DroneDetection
 	private DecimalFormat format;
 	private int z = 0;
 
-	public DroneDetection()
+	public DroneDetection(Audio audio)
 	{
 		capture.open(0);
 		capture.set(Highgui.CV_CAP_PROP_FRAME_WIDTH,frame_width);
@@ -68,6 +68,7 @@ public class DroneDetection
 		
         counter = new FPSCounter();
         counter.start();
+        this.audio = audio;
         
         maxfps = 0.0;
         fps = 0.0;
@@ -88,10 +89,10 @@ public class DroneDetection
 		Imgproc.cvtColor(cameraFeed,HSV, Imgproc.COLOR_BGR2HSV);
 		Core.inRange(HSV,new Scalar(H_min,S_min,V_min),new Scalar(H_max,S_max,V_max),threshold);
 		
-		if(useMorph)
+		//if(useMorph)
 			morphOps(threshold);
 		
-		if(trackObjects)
+		//if(trackObjects)
 			trackFilteredObject(x,y,threshold,cameraFeed);
 		
 		screen3.setTitle(getLocationRelativeTo().toString());
