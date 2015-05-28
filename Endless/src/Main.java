@@ -102,14 +102,43 @@ public class Main
 		while(true)
 		{
 			capture.read(cameraFeed);
+			
+			
 			Imgproc.cvtColor(cameraFeed,HSV, Imgproc.COLOR_BGR2HSV);
 			Core.inRange(HSV,new Scalar(H_min,S_min,V_min),new Scalar(H_max,S_max,V_max),threshold);
 			
-			if(useMorph)
-				morphOps(threshold);
+			int objects = 0;
+			Boolean objectsFound = false;
+			Boolean cont = true;
 			
-			if(trackObjects)
-				trackFilteredObject(x,y,threshold,cameraFeed);
+			while(cont)
+			{
+				switch(trackFilteredObject(x,y,threshold,cameraFeed))
+				{
+					case 0:
+						if(objects <= 4)
+						{
+							Core.putText(cameraFeed,"Tracking Object",new org.opencv.core.Point(0,50),2,1,new Scalar(0,255,0),2);
+							//draw object location on screen
+							drawObject(x,y,cameraFeed);
+							objectsFound = true;
+							objects++;
+						}
+						else
+						{
+							cont = false;
+						}
+						break;
+					case 1:
+						morphOps(threshold);
+						break;
+					case 2:
+						cont = false;
+						//TODO zelfstandig bewegen
+						break;
+				}
+			}
+			
 			
 			p.screen3.setTitle(p.getLocationRelativeTo().toString());
 			//servos.Update(p.getLocationRelativeTo());
@@ -225,7 +254,7 @@ public class Main
 		Imgproc.dilate(thresh,thresh,dilateElement);
 	}
 	
-	public static Boolean trackFilteredObject(int x, int y, Mat threshold, Mat cameraFeed)
+	public static int trackFilteredObject(int x, int y, Mat threshold, Mat cameraFeed)
 	{
 		Mat temp = new Mat();
 		threshold.copyTo(temp);
@@ -274,21 +303,18 @@ public class Main
 				//let user know you found an object
 				if(objectFound ==true)
 				{
-					Core.putText(cameraFeed,"Tracking Object",new org.opencv.core.Point(0,50),2,1,new Scalar(0,255,0),2);
-					//draw object location on screen
-					drawObject(x,y,cameraFeed);
 					System.out.println("coor: "+x+ "," +y);
-					return true;
+					return 0;
 				}
 				else
 				{
-					Core.putText(cameraFeed,"TOO MUCH NOISE! ADJUST FILTER",new org.opencv.core.Point(0,50),1,2,new Scalar(0,0,255),2);
+					//Core.putText(cameraFeed,"TOO MUCH NOISE! ADJUST FILTER",new org.opencv.core.Point(0,50),1,2,new Scalar(0,0,255),2);
 					System.out.println("Geen object gevonden");
-					return false;
+					return 1;
 				}
 			//}
 		}
 		System.out.println("Geen overeenkomsten in het beeld");
-		return false;
+		return 2;
 	}
 }
