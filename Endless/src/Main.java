@@ -123,6 +123,7 @@ public class Main
 							drawObject(x,y,cameraFeed);
 							objectsFound = true;
 							objects++;
+							Core.rectangle(threshold, new org.opencv.core.Point(x-20, y-20), new org.opencv.core.Point(x+20, y+20), new Scalar(0.0), -1);
 						}
 						else
 						{
@@ -309,7 +310,7 @@ public class Main
 				else
 				{
 					//Core.putText(cameraFeed,"TOO MUCH NOISE! ADJUST FILTER",new org.opencv.core.Point(0,50),1,2,new Scalar(0,0,255),2);
-					System.out.println("Geen object gevonden");
+					System.out.println("Geen goed object gevonden");
 					return 1;
 				}
 			//}
