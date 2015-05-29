@@ -79,6 +79,7 @@ public class Main
 		   	res[i] = future.get();
 		   	i++;
 		}
+		executor.shutdown();
 		return res;
     }
 }

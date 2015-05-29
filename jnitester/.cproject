@@ -35,7 +35,7 @@
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.mingw.base.134016124" name="MinGW C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.mingw.base"/>
 							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.mingw.base.454592077" name="MinGW C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.mingw.base">
 								<option id="gnu.cpp.link.option.paths.572243409" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
-									<listOptionValue builtIn="false" value="&quot;D:\Dudecake\Downloads\opencv\build\x64\vc12\lib&quot;"/>
+									<listOptionValue builtIn="false" value="D:\Dudecake\Downloads\opencv\build\x64\MinGW\lib"/>
 								</option>
 								<option id="gnu.cpp.link.option.libs.527031148" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="opencv_core2410"/>
