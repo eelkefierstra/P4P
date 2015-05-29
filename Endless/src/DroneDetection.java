@@ -26,8 +26,8 @@ public class DroneDetection
 	private static int V_min = 153;
 	private static int V_max = 256;
 	
-	private static final int frame_width = 640;
-	private static final int frame_height = 480;
+	private static final int frame_width = 320;
+	private static final int frame_height = 240;
 	
 	private static int maxNumObjects = 1500;
 	private static int minObjectArea = 10*10;

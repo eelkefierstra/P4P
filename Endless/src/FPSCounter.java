@@ -12,7 +12,7 @@ public class FPSCounter extends Thread
 			lastTime = System.nanoTime();
 			try
 			{
-				Thread.sleep(1000);
+				Thread.sleep(5000);
 			}
 			catch (Exception e)
 			{ }

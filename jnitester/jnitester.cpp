@@ -45,10 +45,10 @@ const int MAX_NUM_OBJECTS=1500;
 const int MIN_OBJECT_AREA = 10*10;
 const int MAX_OBJECT_AREA = FRAME_HEIGHT*FRAME_WIDTH/1.5;
 //names that will appear at the top of each window
-const string windowName = "Original Image";
-const string windowName1 = "HSV Image";
-const string windowName2 = "Thresholded Image";
-const string windowName3 = "After Morphological Operations";
+const std::string windowName = "Original Image";
+const std::string windowName1 = "HSV Image";
+const std::string windowName2 = "Thresholded Image";
+const std::string windowName3 = "After Morphological Operations";
 //const string trackbarWindowName = "Trackbars";
 /*
 void on_trackbar( int, void* )
@@ -56,7 +56,7 @@ void on_trackbar( int, void* )
 	// trackbar position is changed
 }
 */
-string intToString(int number){
+std::string intToString(int number){
 	std::stringstream ss;
 	ss << number;
 	return ss.str();

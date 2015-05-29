@@ -64,7 +64,6 @@ public class Main
         return y + screen2.getHeight() / 2;
     }
 	*/
-    @SuppressWarnings("unused")
 	private String[] GetFileNames(String[] files) throws InterruptedException, ExecutionException
     {
     	String[] res = new String[files.length];
