@@ -1,3 +1,8 @@
 eclipse.preferences.version=1
 environment/project/0.1731862006/append=true
 environment/project/0.1731862006/appendContributed=true
+environment/project/cdt.managedbuild.toolchain.gnu.mingw.base.2083307055/MINGW_HOME/delimiter=;
+environment/project/cdt.managedbuild.toolchain.gnu.mingw.base.2083307055/MINGW_HOME/operation=replace
+environment/project/cdt.managedbuild.toolchain.gnu.mingw.base.2083307055/MINGW_HOME/value=C\:\\Program Files\\mingw-w64\\x86_64-4.9.2-posix-seh-rt_v4-rev2\\mingw64
+environment/project/cdt.managedbuild.toolchain.gnu.mingw.base.2083307055/append=true
+environment/project/cdt.managedbuild.toolchain.gnu.mingw.base.2083307055/appendContributed=true
