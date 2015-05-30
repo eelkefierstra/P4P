@@ -1,29 +1,20 @@
-//objectTrackingTutorial.cpp
-
-//Written by  Kyle Hounslow 2013
-
-//Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software")
-//, to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-//The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-//THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-//IN THE SOFTWARE.
+/*
+ * DroneDetection.cpp
+ *
+ *  Created on: 30 mei 2015
+ *      Author: Dudecake
+ */
 
 #include <sstream>
 #include <string>
 #include <iostream>
 #include <opencv\highgui.h>
 #include <opencv\cv.h>
-#include <DroneDetection.h>
+#include "DroneDetection.h"
 
 using namespace cv;
 //initial min and max HSV filter values.
 //these will be changed using trackbars
-/*
 int H_MIN = 0;
 int H_MAX = 256;
 int S_MIN = 0;
@@ -52,13 +43,98 @@ const std::string windowName1 = "HSV Image";
 const std::string windowName2 = "Thresholded Image";
 const std::string windowName3 = "After Morphological Operations";
 //const string trackbarWindowName = "Trackbars";
+
+//some boolean variables for different functionality within this
+//program
+//bool trackObjects = true;
+//bool useMorphOps = true;
+//Matrix to store each frame of the webcam feed
+Mat cameraFeed;
+//matrix storage for HSV image
+Mat HSV;
+//matrix storage for binary threshold image
+Mat threshold;
+//x and y values for the location of the object
+int x=0, y=0;
+//create slider bars for HSV filtering
+//createTrackbars();
+//video capture object to acquire webcam feed
+VideoCapture capture;
+
+DroneDetection::DroneDetection()
+{
+	//open capture object at location zero (default location for webcam)
+	capture.open(0);
+	//set height and width of capture frame
+	capture.set(CV_CAP_PROP_FRAME_WIDTH,FRAME_WIDTH);
+	capture.set(CV_CAP_PROP_FRAME_HEIGHT,FRAME_HEIGHT);
+	//start an infinite loop where webcam feed is copied to cameraFeed matrix
+	//all of our operations will be performed within this loop
+}
+
+int loop()
+{
+	//store image to matrix
+	capture.read(cameraFeed);
+	//convert frame from BGR to HSV colorspace
+	cvtColor(cameraFeed,HSV,COLOR_BGR2HSV);
+
+	/*
+	//filter HSV image between values and store filtered image to
+	//threshold matrix
+	inRange(HSV, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), threshold);
+	//inRange(HSV, Scalar(H_MIN2, S_MIN2, V_MIN2), Scalar(H_MAX2, S_MAX2, V_MAX2), threshold);
+	//perform morphological operations on thresholded image to eliminate noise
+	//and emphasize the filtered object(s)
+	if(useMorphOps)
+	morphOps(threshold);
+	//pass in thresholded frame to our object tracking function
+	//this function will return the x and y coordinates of the
+	//filtered object
+	if(trackObjects)
+		trackFilteredObject(x,y,threshold,cameraFeed);
+	*/
+
+	inRange(HSV, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), threshold);
+	imshow("pre morph", threshold);
+	morphOps(threshold);
+	trackFilteredObject(x, y, threshold, cameraFeed);
+	imshow("Threshold Blue", threshold);
+	//inRange(HSV, Scalar(0, 156, 168), Scalar(79, 256, 256), threshold);
+	//morphOps(threshold);
+	//trackFilteredObject(x, y, threshold, cameraFeed);
+	//imshow("Threshold Red", threshold);
+
+	/*
+
+	//first find blue objects
+	cvtcolor(camerafeed, hsv, color_bgr2hsv);
+	inrange(hsv, blue.gethsvmin(), blue.gethsvmax(), threshold);
+	morphops(threshold);
+	trackfilteredobject(blue, threshold, hsv, camerafeed);
+	//then yellows
+	cvtcolor(camerafeed, hsv, color_bgr2hsv);
+	inrange(hsv, yellow.gethsvmin(), yellow.gethsvmax(), threshold);
+	morphops(threshold);
+	trackfilteredobject(yellow, threshold, hsv, camerafeed);
+
+	*/
+
+	//show frames
+
+	imshow(windowName,cameraFeed);
+	imshow(windowName1,HSV);
+	//delay 30ms so that screen can refresh.
+	//image will not appear without this waitKey() command
+	return 0;
+}
+
 /*
 void on_trackbar( int, void* )
 {//This function gets called whenever a
 	// trackbar position is changed
 }
 */
-/*
 std::string intToString(int number){
 	std::stringstream ss;
 	ss << number;
@@ -88,7 +164,7 @@ void createTrackbars(){
     createTrackbar( "V_MIN", trackbarWindowName, &V_MIN, V_MAX, on_trackbar );
     createTrackbar( "V_MAX", trackbarWindowName, &V_MAX, V_MAX, on_trackbar );
 }
-*//*
+*/
 void drawObject(int x, int y,Mat &frame){
 
 	//use some of the openCV drawing functions to draw crosshairs
@@ -173,92 +249,9 @@ void trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed){
 		}else putText(cameraFeed,"TOO MUCH NOISE! ADJUST FILTER",Point(0,50),1,2,Scalar(0,0,255),2);
 	}
 }
-*/
-int main(int argc, char* argv[])
+
+DroneDetection::~DroneDetection()
 {
-	/*
-	//some boolean variables for different functionality within this
-	//program
-    //bool trackObjects = true;
-    //bool useMorphOps = true;
-	//Matrix to store each frame of the webcam feed
-	Mat cameraFeed;
-	//matrix storage for HSV image
-	Mat HSV;
-	//matrix storage for binary threshold image
-	Mat threshold;
-	//x and y values for the location of the object
-	int x=0, y=0;
-	//create slider bars for HSV filtering
-	//createTrackbars();
-	//video capture object to acquire webcam feed
-	VideoCapture capture;
-	//open capture object at location zero (default location for webcam)
-	capture.open(0);
-	//set height and width of capture frame
-	capture.set(CV_CAP_PROP_FRAME_WIDTH,FRAME_WIDTH);
-	capture.set(CV_CAP_PROP_FRAME_HEIGHT,FRAME_HEIGHT);
-	//start an infinite loop where webcam feed is copied to cameraFeed matrix
-	//all of our operations will be performed within this loop
-	*/
-
-	while(1){
-		/*
-		//store image to matrix
-		capture.read(cameraFeed);
-		//convert frame from BGR to HSV colorspace
-		cvtColor(cameraFeed,HSV,COLOR_BGR2HSV);
-
-		/*
-		//filter HSV image between values and store filtered image to
-		//threshold matrix
-		inRange(HSV, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), threshold);
-		//inRange(HSV, Scalar(H_MIN2, S_MIN2, V_MIN2), Scalar(H_MAX2, S_MAX2, V_MAX2), threshold);
-		//perform morphological operations on thresholded image to eliminate noise
-		//and emphasize the filtered object(s)
-		if(useMorphOps)
-		morphOps(threshold);
-		//pass in thresholded frame to our object tracking function
-		//this function will return the x and y coordinates of the
-		//filtered object
-		if(trackObjects)
-			trackFilteredObject(x,y,threshold,cameraFeed);
-		*/
-		/*
-		inRange(HSV, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), threshold);
-		imshow("pre morph", threshold);
-		morphOps(threshold);
-		trackFilteredObject(x, y, threshold, cameraFeed);
-		imshow("Threshold Blue", threshold);
-		//inRange(HSV, Scalar(0, 156, 168), Scalar(79, 256, 256), threshold);
-		//morphOps(threshold);
-		//trackFilteredObject(x, y, threshold, cameraFeed);
-		//imshow("Threshold Red", threshold);
-
-		/*
-
-		//first find blue objects
-		cvtcolor(camerafeed, hsv, color_bgr2hsv);
-		inrange(hsv, blue.gethsvmin(), blue.gethsvmax(), threshold);
-		morphops(threshold);
-		trackfilteredobject(blue, threshold, hsv, camerafeed);
-		//then yellows
-		cvtcolor(camerafeed, hsv, color_bgr2hsv);
-		inrange(hsv, yellow.gethsvmin(), yellow.gethsvmax(), threshold);
-		morphops(threshold);
-		trackfilteredobject(yellow, threshold, hsv, camerafeed);
-
-		*/
-
-		//show frames
-		/*
-		imshow(windowName,cameraFeed);
-		imshow(windowName1,HSV);
-		//delay 30ms so that screen can refresh.
-		//image will not appear without this waitKey() command
-		waitKey(15);
-		*/
-	}
-	return 0;
+	// TODO Auto-generated destructor stub
 }
 
