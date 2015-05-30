@@ -53,7 +53,7 @@ Mat cameraFeed;
 //matrix storage for HSV image
 Mat HSV;
 //matrix storage for binary threshold image
-Mat threshold;
+//Mat threshold;
 //x and y values for the location of the object
 int x=0, y=0;
 //create slider bars for HSV filtering
@@ -68,65 +68,6 @@ DroneDetection::DroneDetection()
 	//set height and width of capture frame
 	capture.set(CV_CAP_PROP_FRAME_WIDTH,FRAME_WIDTH);
 	capture.set(CV_CAP_PROP_FRAME_HEIGHT,FRAME_HEIGHT);
-	//start an infinite loop where webcam feed is copied to cameraFeed matrix
-	//all of our operations will be performed within this loop
-}
-
-int loop()
-{
-	//store image to matrix
-	capture.read(cameraFeed);
-	//convert frame from BGR to HSV colorspace
-	cvtColor(cameraFeed,HSV,COLOR_BGR2HSV);
-
-	/*
-	//filter HSV image between values and store filtered image to
-	//threshold matrix
-	inRange(HSV, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), threshold);
-	//inRange(HSV, Scalar(H_MIN2, S_MIN2, V_MIN2), Scalar(H_MAX2, S_MAX2, V_MAX2), threshold);
-	//perform morphological operations on thresholded image to eliminate noise
-	//and emphasize the filtered object(s)
-	if(useMorphOps)
-	morphOps(threshold);
-	//pass in thresholded frame to our object tracking function
-	//this function will return the x and y coordinates of the
-	//filtered object
-	if(trackObjects)
-		trackFilteredObject(x,y,threshold,cameraFeed);
-	*/
-
-	inRange(HSV, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), threshold);
-	imshow("pre morph", threshold);
-	morphOps(threshold);
-	trackFilteredObject(x, y, threshold, cameraFeed);
-	imshow("Threshold Blue", threshold);
-	//inRange(HSV, Scalar(0, 156, 168), Scalar(79, 256, 256), threshold);
-	//morphOps(threshold);
-	//trackFilteredObject(x, y, threshold, cameraFeed);
-	//imshow("Threshold Red", threshold);
-
-	/*
-
-	//first find blue objects
-	cvtcolor(camerafeed, hsv, color_bgr2hsv);
-	inrange(hsv, blue.gethsvmin(), blue.gethsvmax(), threshold);
-	morphops(threshold);
-	trackfilteredobject(blue, threshold, hsv, camerafeed);
-	//then yellows
-	cvtcolor(camerafeed, hsv, color_bgr2hsv);
-	inrange(hsv, yellow.gethsvmin(), yellow.gethsvmax(), threshold);
-	morphops(threshold);
-	trackfilteredobject(yellow, threshold, hsv, camerafeed);
-
-	*/
-
-	//show frames
-
-	imshow(windowName,cameraFeed);
-	imshow(windowName1,HSV);
-	//delay 30ms so that screen can refresh.
-	//image will not appear without this waitKey() command
-	return 0;
 }
 
 /*
@@ -135,37 +76,13 @@ void on_trackbar( int, void* )
 	// trackbar position is changed
 }
 */
-std::string intToString(int number){
+std::string DroneDetection::intToString(int number){
 	std::stringstream ss;
 	ss << number;
 	return ss.str();
 }
-/*
-void createTrackbars(){
-	//create window for trackbars
-    namedWindow(trackbarWindowName,0);
-	//create memory to store trackbar name on window
-	char TrackbarName[50];
-	sprintf( TrackbarName, "H_MIN", H_MIN);
-	sprintf( TrackbarName, "H_MAX", H_MAX);
-	sprintf( TrackbarName, "S_MIN", S_MIN);
-	sprintf( TrackbarName, "S_MAX", S_MAX);
-	sprintf( TrackbarName, "V_MIN", V_MIN);
-	sprintf( TrackbarName, "V_MAX", V_MAX);
-	//create trackbars and insert them into window
-	//3 parameters are: the address of the variable that is changing when the trackbar is moved(eg.H_LOW),
-	//the max value the trackbar can move (eg. H_HIGH),
-	//and the function that is called whenever the trackbar is moved(eg. on_trackbar)
-	//                                  ---->    ---->     ---->
-    createTrackbar( "H_MIN", trackbarWindowName, &H_MIN, H_MAX, on_trackbar );
-    createTrackbar( "H_MAX", trackbarWindowName, &H_MAX, H_MAX, on_trackbar );
-    createTrackbar( "S_MIN", trackbarWindowName, &S_MIN, S_MAX, on_trackbar );
-    createTrackbar( "S_MAX", trackbarWindowName, &S_MAX, S_MAX, on_trackbar );
-    createTrackbar( "V_MIN", trackbarWindowName, &V_MIN, V_MAX, on_trackbar );
-    createTrackbar( "V_MAX", trackbarWindowName, &V_MAX, V_MAX, on_trackbar );
-}
-*/
-void drawObject(int x, int y,Mat &frame){
+
+void DroneDetection::drawObject(int x, int y,Mat &frame){
 
 	//use some of the openCV drawing functions to draw crosshairs
 	//on your tracked image!
@@ -191,7 +108,7 @@ void drawObject(int x, int y,Mat &frame){
 	putText(frame,intToString(x)+","+intToString(y),Point(x,y+30),1,1,Scalar(0,255,0),2);
 }
 
-void morphOps(Mat &thresh){
+void DroneDetection::morphOps(Mat &thresh){
 
 	//create structuring element that will be used to "dilate" and "erode" image.
 	//the element chosen here is a 3px by 3px rectangle
@@ -208,7 +125,7 @@ void morphOps(Mat &thresh){
 	dilate(thresh,thresh,dilateElement);
 }
 
-void trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed){
+void DroneDetection::trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed){
 
 	Mat temp;
 	threshold.copyTo(temp);
@@ -226,7 +143,7 @@ void trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed){
         if(numObjects<MAX_NUM_OBJECTS){
 			for (int index = 0; index >= 0; index = hierarchy[index][0]) {
 
-				Moments moment = moments((cv::Mat)contours[index]);
+				Moments moment = moments((Mat)contours[index]);
 				double area = moment.m00;
 
 				//if the area is less than 20 px by 20px then it is probably just noise
@@ -249,6 +166,30 @@ void trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed){
 		}else putText(cameraFeed,"TOO MUCH NOISE! ADJUST FILTER",Point(0,50),1,2,Scalar(0,0,255),2);
 	}
 }
+
+int DroneDetection::loop()
+{
+	Mat threshold;
+	//store image to matrix
+	capture.read(cameraFeed);
+	//convert frame from BGR to HSV colorspace
+	cvtColor(cameraFeed,HSV,COLOR_BGR2HSV);
+
+	inRange(HSV, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), threshold);
+	imshow("pre morph", threshold);
+	morphOps(threshold);
+	trackFilteredObject(x, y, threshold, cameraFeed);
+	imshow("Threshold Blue", threshold);
+
+	//show frames
+
+	imshow(windowName,cameraFeed);
+	imshow(windowName1,HSV);
+	//delay 30ms so that screen can refresh.
+	//image will not appear without this waitKey() command
+	return 0;
+}
+
 
 DroneDetection::~DroneDetection()
 {

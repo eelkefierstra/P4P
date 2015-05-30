@@ -16,11 +16,11 @@
 #include <sstream>
 #include <string>
 #include <iostream>
-#include <opencv\highgui.h>
-#include <opencv\cv.h>
+//#include <opencv\highgui.h>
+//#include <opencv\cv.h>
 #include <DroneDetection.h>
 
-using namespace cv;
+using namespace std;
 //initial min and max HSV filter values.
 //these will be changed using trackbars
 /*
@@ -52,43 +52,13 @@ const std::string windowName1 = "HSV Image";
 const std::string windowName2 = "Thresholded Image";
 const std::string windowName3 = "After Morphological Operations";
 //const string trackbarWindowName = "Trackbars";
-/*
-void on_trackbar( int, void* )
-{//This function gets called whenever a
-	// trackbar position is changed
-}
-*/
-/*
+
 std::string intToString(int number){
 	std::stringstream ss;
 	ss << number;
 	return ss.str();
 }
-/*
-void createTrackbars(){
-	//create window for trackbars
-    namedWindow(trackbarWindowName,0);
-	//create memory to store trackbar name on window
-	char TrackbarName[50];
-	sprintf( TrackbarName, "H_MIN", H_MIN);
-	sprintf( TrackbarName, "H_MAX", H_MAX);
-	sprintf( TrackbarName, "S_MIN", S_MIN);
-	sprintf( TrackbarName, "S_MAX", S_MAX);
-	sprintf( TrackbarName, "V_MIN", V_MIN);
-	sprintf( TrackbarName, "V_MAX", V_MAX);
-	//create trackbars and insert them into window
-	//3 parameters are: the address of the variable that is changing when the trackbar is moved(eg.H_LOW),
-	//the max value the trackbar can move (eg. H_HIGH),
-	//and the function that is called whenever the trackbar is moved(eg. on_trackbar)
-	//                                  ---->    ---->     ---->
-    createTrackbar( "H_MIN", trackbarWindowName, &H_MIN, H_MAX, on_trackbar );
-    createTrackbar( "H_MAX", trackbarWindowName, &H_MAX, H_MAX, on_trackbar );
-    createTrackbar( "S_MIN", trackbarWindowName, &S_MIN, S_MAX, on_trackbar );
-    createTrackbar( "S_MAX", trackbarWindowName, &S_MAX, S_MAX, on_trackbar );
-    createTrackbar( "V_MIN", trackbarWindowName, &V_MIN, V_MAX, on_trackbar );
-    createTrackbar( "V_MAX", trackbarWindowName, &V_MAX, V_MAX, on_trackbar );
-}
-*//*
+
 void drawObject(int x, int y,Mat &frame){
 
 	//use some of the openCV drawing functions to draw crosshairs
@@ -201,7 +171,7 @@ int main(int argc, char* argv[])
 	//start an infinite loop where webcam feed is copied to cameraFeed matrix
 	//all of our operations will be performed within this loop
 	*/
-
+	DroneDetection* drone = new DroneDetection;
 	while(1){
 		/*
 		//store image to matrix
@@ -230,25 +200,6 @@ int main(int argc, char* argv[])
 		morphOps(threshold);
 		trackFilteredObject(x, y, threshold, cameraFeed);
 		imshow("Threshold Blue", threshold);
-		//inRange(HSV, Scalar(0, 156, 168), Scalar(79, 256, 256), threshold);
-		//morphOps(threshold);
-		//trackFilteredObject(x, y, threshold, cameraFeed);
-		//imshow("Threshold Red", threshold);
-
-		/*
-
-		//first find blue objects
-		cvtcolor(camerafeed, hsv, color_bgr2hsv);
-		inrange(hsv, blue.gethsvmin(), blue.gethsvmax(), threshold);
-		morphops(threshold);
-		trackfilteredobject(blue, threshold, hsv, camerafeed);
-		//then yellows
-		cvtcolor(camerafeed, hsv, color_bgr2hsv);
-		inrange(hsv, yellow.gethsvmin(), yellow.gethsvmax(), threshold);
-		morphops(threshold);
-		trackfilteredobject(yellow, threshold, hsv, camerafeed);
-
-		*/
 
 		//show frames
 		/*
@@ -258,6 +209,8 @@ int main(int argc, char* argv[])
 		//image will not appear without this waitKey() command
 		waitKey(15);
 		*/
+		drone->loop();
+		cv::waitKey(15);
 	}
 	return 0;
 }
