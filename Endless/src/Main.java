@@ -3,6 +3,7 @@ import java.awt.MouseInfo;
 import java.awt.Point;
 import java.text.DecimalFormat;
 */
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -12,19 +13,22 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.opencv.core.Core;
+//import org.opencv.core.Core;
 
 public class Main
 {
 	//private GUI gui = new GUI();
+	
+	static
+	{
+    	System.loadLibrary("dronedetection");
+	}
+	
 	// Main loop
-    @SuppressWarnings("unused")
+    //@SuppressWarnings("unused")
 	public static void main(String[] args)
     {
-    	System.setProperty("java.library.path", System.getProperty("java.library.path") + ":/home/pi/opencv-2.4.10/release/lib:/home/pi/opencv-2.4.10/release/bin");
-    	System.out.println("geaddert");
-    	System.out.println(System.getProperty("java.library.path"));
-    	System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+    	//System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
         Main p = new Main();
 		String[] files = null;
 		try
@@ -44,6 +48,9 @@ public class Main
 			detection.Loop();
 		}
 	}
+	
+	private native void Loop();
+	
     /*
     public Point getLocationRelativeTo()
     {

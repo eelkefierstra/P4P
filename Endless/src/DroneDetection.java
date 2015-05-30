@@ -48,6 +48,7 @@ public class DroneDetection
 
 	private VideoCapture capture = new VideoCapture();
 	private FPSCounter counter = new FPSCounter();
+	@SuppressWarnings("unused")
 	private Audio audio;
 	
 	private double maxfps;
