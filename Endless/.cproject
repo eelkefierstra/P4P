@@ -52,10 +52,10 @@
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
 	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets">
 		<buildTargets>
-			<target name="JNITest.h" path="jni" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+			<target name="DroneTracker.h" path="jni" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
 				<buildArguments/>
-				<buildTarget>JNITest.h</buildTarget>
+				<buildTarget>DroneTracker.h</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>true</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>
