@@ -144,6 +144,7 @@ void trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed){
 	}
 }
 */
+
 int main(int argc, char* argv[])
 {
 	/*
@@ -171,6 +172,7 @@ int main(int argc, char* argv[])
 	//start an infinite loop where webcam feed is copied to cameraFeed matrix
 	//all of our operations will be performed within this loop
 	*/
+
 	DroneDetection* drone = new DroneDetection;
 	while(1){
 		/*

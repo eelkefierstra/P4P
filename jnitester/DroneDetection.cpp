@@ -53,13 +53,14 @@ Mat cameraFeed;
 //matrix storage for HSV image
 Mat HSV;
 //matrix storage for binary threshold image
-//Mat threshold;
+Mat thresh;
 //x and y values for the location of the object
 int x=0, y=0;
 //create slider bars for HSV filtering
 //createTrackbars();
 //video capture object to acquire webcam feed
 VideoCapture capture;
+bool first = true;
 
 DroneDetection::DroneDetection()
 {
@@ -108,7 +109,7 @@ void DroneDetection::drawObject(int x, int y,Mat &frame){
 	putText(frame,intToString(x)+","+intToString(y),Point(x,y+30),1,1,Scalar(0,255,0),2);
 }
 
-void DroneDetection::morphOps(Mat &thresh){
+void DroneDetection::morphOps(Mat &thresh1){
 
 	//create structuring element that will be used to "dilate" and "erode" image.
 	//the element chosen here is a 3px by 3px rectangle
@@ -117,12 +118,12 @@ void DroneDetection::morphOps(Mat &thresh){
     //dilate with larger element so make sure object is nicely visible
 	Mat dilateElement = getStructuringElement( MORPH_RECT,Size(6,6));
 
-	erode(thresh,thresh,erodeElement);
-	erode(thresh,thresh,erodeElement);
+	erode(thresh1,thresh1,erodeElement);
+	erode(thresh1,thresh1,erodeElement);
 
 
-	dilate(thresh,thresh,dilateElement);
-	dilate(thresh,thresh,dilateElement);
+	dilate(thresh1,thresh1,dilateElement);
+	dilate(thresh1,thresh1,dilateElement);
 }
 
 void DroneDetection::trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed){
@@ -169,17 +170,21 @@ void DroneDetection::trackFilteredObject(int &x, int &y, Mat threshold, Mat &cam
 
 int DroneDetection::loop()
 {
-	Mat threshold;
 	//store image to matrix
 	capture.read(cameraFeed);
+	if (first)
+	{
+		first = false;
+		return 0;
+	}
 	//convert frame from BGR to HSV colorspace
 	cvtColor(cameraFeed,HSV,COLOR_BGR2HSV);
 
-	inRange(HSV, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), threshold);
-	imshow("pre morph", threshold);
-	morphOps(threshold);
-	trackFilteredObject(x, y, threshold, cameraFeed);
-	imshow("Threshold Blue", threshold);
+	inRange(HSV, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), thresh);
+	imshow("pre morph", thresh);
+	morphOps(thresh);
+	trackFilteredObject(x, y, thresh, cameraFeed);
+	imshow("Threshold Blue", thresh);
 
 	//show frames
 
