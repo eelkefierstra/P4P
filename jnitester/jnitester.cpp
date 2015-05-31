@@ -181,6 +181,7 @@ int main(int argc, char* argv[])
 		//convert frame from BGR to HSV colorspace
 		cvtColor(cameraFeed,HSV,COLOR_BGR2HSV);
 
+		*/
 		/*
 		//filter HSV image between values and store filtered image to
 		//threshold matrix
@@ -204,6 +205,7 @@ int main(int argc, char* argv[])
 		imshow("Threshold Blue", threshold);
 
 		//show frames
+		*/
 		/*
 		imshow(windowName,cameraFeed);
 		imshow(windowName1,HSV);
