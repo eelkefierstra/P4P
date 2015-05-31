@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.text.DecimalFormat;
 */
 import java.awt.Point;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -12,18 +13,35 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 //import org.opencv.core.Core;
 
+@SuppressWarnings("unused")
 public class Main
 {
 	//private GUI gui = new GUI();
+	
+	private Screen screen1 = new Screen();
+	private Screen screen2 = new Screen();
+	private Screen screen3 = new Screen();
+	
+	private double maxfps;
+	private double fps;
+	private long nextTime;
+	private ImShow show1;
+	private ImShow show2;
+	private ImShow show3;
+	private ScheduledExecutorService executor;
+	private ScheduledFuture<?>[] futureList;
+	private DecimalFormat format;
 	
 	static
 	{
     	System.loadLibrary("dronedetection");
 	}
-	
 	// Main loop
     //@SuppressWarnings("unused")
 	public static void main(String[] args)
@@ -40,12 +58,29 @@ public class Main
 		{
 			Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
 		}
-			    
-        DroneDetection detection = new DroneDetection(new Audio(files));
-        
+		
+		p.show1 = new ImShow(p.screen1);
+		p.show2 = new ImShow(p.screen2);
+		p.show3 = new ImShow(p.screen3);
+		p.executor = Executors.newScheduledThreadPool(3);
+		p.futureList = new ScheduledFuture<?>[3];
+		p.format = new DecimalFormat("#.##");
+		ShutdownHook hook = new ShutdownHook();
+		hook.attachShutDownHook(p.executor);
+		
+        //DroneDetection detection = new DroneDetection(new Audio(files));
+        DroneTracker tracker = new DroneTracker();
+        tracker.Setup();
+		
 		while(true)
 		{
-			detection.Loop();
+			//tracker.Track();
+			p.show1.SetImage(tracker.GetThresh());
+			p.futureList[0] = p.executor.schedule(p.show1, 0, TimeUnit.NANOSECONDS);
+			p.show2.SetImage(tracker.GetFeed());
+			p.futureList[1] = p.executor.schedule(p.show2, 0, TimeUnit.NANOSECONDS);
+			p.show3.SetImage(tracker.GetHSV());
+			p.futureList[2] = p.executor.schedule(p.show3, 0, TimeUnit.NANOSECONDS);
 		}
 	}
 	

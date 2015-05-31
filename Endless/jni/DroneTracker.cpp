@@ -1,4 +1,4 @@
-#include <JNI.h>
+#include <jni.h>
 #include <sstream>
 #include <string>
 #include <iostream>
@@ -31,19 +31,6 @@ const int MAX_NUM_OBJECTS=1500;
 //minimum and maximum object area
 const int MIN_OBJECT_AREA = 10*10;
 const int MAX_OBJECT_AREA = FRAME_HEIGHT*FRAME_WIDTH/1.5;
-//names that will appear at the top of each window
-/*
-const std::string windowName = "Original Image";
-const std::string windowName1 = "HSV Image";
-const std::string windowName2 = "Thresholded Image";
-const std::string windowName3 = "After Morphological Operations";
-*/
-//const string trackbarWindowName = "Trackbars";
-
-//some boolean variables for different functionality within this
-//program
-//bool trackObjects = true;
-//bool useMorphOps = true;
 //Matrix to store each frame of the webcam feed
 Mat cameraFeed;
 //matrix storage for HSV image
@@ -52,10 +39,9 @@ Mat HSV;
 Mat thresh;
 //x and y values for the location of the object
 int x=0, y=0;
-//create slider bars for HSV filtering
-//createTrackbars();
 //video capture object to acquire webcam feed
 VideoCapture capture;
+
 bool first = true;
 
 JNIEXPORT void JNICALL Java_DroneTracker_Setup(JNIEnv *, jobject)
@@ -67,12 +53,6 @@ JNIEXPORT void JNICALL Java_DroneTracker_Setup(JNIEnv *, jobject)
 	capture.set(CV_CAP_PROP_FRAME_HEIGHT,FRAME_HEIGHT);
 }
 
-/*
-void on_trackbar( int, void* )
-{//This function gets called whenever a
-	// trackbar position is changed
-}
-*/
 std::string intToString(int number){
 	std::stringstream ss;
 	ss << number;
@@ -164,30 +144,63 @@ void trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed){
 	}
 }
 
-JNIEXPORT jobject JNICALL Java_DroneTracker_GetFeed(JNIEnv *, jobject)
+vector<uchar> ConvertMat(Mat &img)
 {
-	return 0;
+	vector<uchar> buff;//buffer for coding
+	vector<int> param = vector<int>(2);
+	param[0] = IMWRITE_PNG_COMPRESSION;
+	param[1] = 3;
+	imencode(".png", img, buff, param);
+	return buff;
 }
 
-JNIEXPORT jobject JNICALL Java_DroneTracker_GetThresh(JNIEnv *, jobject)
+JNIEXPORT jbyteArray JNICALL Java_DroneTracker_GetFeed(JNIEnv *env, jobject)
 {
-	return 0;
+	vector<uchar> tempvec = ConvertMat(cameraFeed);
+	jbyte* temp = new jbyte[tempvec.size()];
+	jbyteArray res = env->NewByteArray(tempvec.size());
+	for (int i = 0; i < tempvec.size(); i++)
+	{
+		temp[i] = (jbyte)tempvec[i];
+	}
+	env->SetByteArrayRegion(res, 0, tempvec.size(), temp);
+	return res;
 }
 
-JNIEXPORT jobject JNICALL Java_DroneTracker_GetHSV(JNIEnv *, jobject)
+JNIEXPORT jbyteArray JNICALL Java_DroneTracker_GetThresh(JNIEnv *env, jobject)
 {
-
-	return 0;
+	vector<uchar> tempvec = ConvertMat(thresh);
+	jbyte* temp = new jbyte[tempvec.size()];
+	jbyteArray res = env->NewByteArray(tempvec.size());
+	for (int i = 0; i < tempvec.size(); i++)
+	{
+		temp[i] = (jbyte)tempvec[i];
+	}
+	env->SetByteArrayRegion(res, 0, tempvec.size(), temp);
+	return res;
 }
 
-JNIEXPORT jobject JNICALL Java_DroneTracker_Track(JNIEnv *, jobject)
+JNIEXPORT jbyteArray JNICALL Java_DroneTracker_GetHSV(JNIEnv *env, jobject)
+{
+	vector<uchar> tempvec = ConvertMat(HSV);
+	jbyte* temp = new jbyte[tempvec.size()];
+	jbyteArray res = env->NewByteArray(tempvec.size());
+	for (int i = 0; i < tempvec.size(); i++)
+	{
+		temp[i] = (jbyte)tempvec[i];
+	}
+	env->SetByteArrayRegion(res, 0, tempvec.size(), temp);
+	return res;
+}
+
+JNIEXPORT void JNICALL Java_DroneTracker_Track(JNIEnv *env, jobject)
 {
 	//store image to matrix
 	capture.read(cameraFeed);
 	if (first)
 	{
 		first = false;
-		return 0;
+		return ;
 	}
 	//convert frame from BGR to HSV colorspace
 	cvtColor(cameraFeed,HSV,COLOR_BGR2HSV);
@@ -205,7 +218,7 @@ JNIEXPORT jobject JNICALL Java_DroneTracker_Track(JNIEnv *, jobject)
 	*/
 	//delay 30ms so that screen can refresh.
 	//image will not appear without this waitKey() command
-	return 0;
+	return ;
 }
 
 /*

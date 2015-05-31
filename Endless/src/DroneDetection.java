@@ -29,6 +29,7 @@ public class DroneDetection
 	private static final int frame_width = 320;
 	private static final int frame_height = 240;
 	
+	@SuppressWarnings("unused")
 	private static int maxNumObjects = 1500;
 	private static int minObjectArea = 10*10;
 	private static int maxObjectArea = (int)((double)frame_width*(double)frame_height/1.5);
@@ -74,9 +75,9 @@ public class DroneDetection
         maxfps = 0.0;
         fps = 0.0;
         nextTime = System.nanoTime() + 1000000000;
-		show1 = new ImShow(screen1, threshold);
-		show2 = new ImShow(screen2, cameraFeed);
-		show3 = new ImShow(screen3, HSV);
+		show1 = new ImShow(screen1);
+		show2 = new ImShow(screen2);
+		show3 = new ImShow(screen3);
 		executor = Executors.newScheduledThreadPool(3);
 		futureList = new ScheduledFuture<?>[3];
 		format = new DecimalFormat("#.##");
@@ -100,11 +101,11 @@ public class DroneDetection
 		//servos.Update(p.getLocationRelativeTo());
 		
 		//Zou afbeelding in venster moeten laten zien
-		show1.SetMat(threshold);
+		//show1.SetMat(threshold);
 	    futureList[0] = executor.schedule(show1, 0, TimeUnit.NANOSECONDS);
-		show2.SetMat(cameraFeed);
+		//show2.SetMat(cameraFeed);
 	    futureList[1] = executor.schedule(show2, 0, TimeUnit.NANOSECONDS);
-		show3.SetMat(HSV);
+		//show3.SetMat(HSV);
 	    futureList[2] = executor.schedule(show3, 0, TimeUnit.NANOSECONDS);
 	    
 		counter.interrupt();

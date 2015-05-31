@@ -1,18 +1,16 @@
 import java.awt.Point;
-import java.awt.image.BufferedImage;
-
 
 public class DroneTracker
 {
 	native void Setup();
 	
-	native Point Track();
+	native void Track();
 	
-	native BufferedImage GetFeed();
+	native byte[] GetFeed();
 	
-	native BufferedImage GetThresh();
+	native byte[] GetThresh();
 	
-	native BufferedImage GetHSV();
+	native byte[] GetHSV();
 	
 	public DroneTracker()
 	{

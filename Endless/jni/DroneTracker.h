@@ -18,33 +18,33 @@ JNIEXPORT void JNICALL Java_DroneTracker_Setup
 /*
  * Class:     DroneTracker
  * Method:    Track
- * Signature: ()Ljava/awt/Point;
+ * Signature: ()V
  */
-JNIEXPORT jobject JNICALL Java_DroneTracker_Track
+JNIEXPORT void JNICALL Java_DroneTracker_Track
   (JNIEnv *, jobject);
 
 /*
  * Class:     DroneTracker
  * Method:    GetFeed
- * Signature: ()Ljava/awt/image/BufferedImage;
+ * Signature: ()[B
  */
-JNIEXPORT jobject JNICALL Java_DroneTracker_GetFeed
+JNIEXPORT jbyteArray JNICALL Java_DroneTracker_GetFeed
   (JNIEnv *, jobject);
 
 /*
  * Class:     DroneTracker
  * Method:    GetThresh
- * Signature: ()Ljava/awt/image/BufferedImage;
+ * Signature: ()[B
  */
-JNIEXPORT jobject JNICALL Java_DroneTracker_GetThresh
+JNIEXPORT jbyteArray JNICALL Java_DroneTracker_GetThresh
   (JNIEnv *, jobject);
 
 /*
  * Class:     DroneTracker
  * Method:    GetHSV
- * Signature: ()Ljava/awt/image/BufferedImage;
+ * Signature: ()[B
  */
-JNIEXPORT jobject JNICALL Java_DroneTracker_GetHSV
+JNIEXPORT jbyteArray JNICALL Java_DroneTracker_GetHSV
   (JNIEnv *, jobject);
 
 #ifdef __cplusplus
