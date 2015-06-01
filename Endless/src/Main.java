@@ -107,7 +107,7 @@ public class Main
 			Imgproc.cvtColor(cameraFeed,HSV, Imgproc.COLOR_BGR2HSV);
 			Core.inRange(HSV,new Scalar(H_min,S_min,V_min),new Scalar(H_max,S_max,V_max),threshold);
 			
-			int objects = 0;
+			int objects = 0,morphs = 0;
 			Boolean objectsFound = false;
 			Boolean cont = true;
 			
@@ -116,25 +116,29 @@ public class Main
 				switch(trackFilteredObject(x,y,threshold,cameraFeed))
 				{
 					case 0:
-						if(objects <= 4)
+						
+						//Core.putText(cameraFeed,"Tracking Object",new org.opencv.core.Point(0,50),2,1,new Scalar(0,255,0),2);
+						//draw object location on screen
+						//drawObject(x,y,cameraFeed);
+						objectsFound = true;
+						objects++;
+						//Core.rectangle(threshold, new org.opencv.core.Point(x-20, y-20), new org.opencv.core.Point(x+20, y+20), new Scalar(0.0), -1);
+						cont = false;
+						break;
+					case 1:
+						if(morphs<5)
 						{
-							Core.putText(cameraFeed,"Tracking Object",new org.opencv.core.Point(0,50),2,1,new Scalar(0,255,0),2);
-							//draw object location on screen
-							drawObject(x,y,cameraFeed);
-							objectsFound = true;
-							objects++;
-							Core.rectangle(threshold, new org.opencv.core.Point(x-20, y-20), new org.opencv.core.Point(x+20, y+20), new Scalar(0.0), -1);
+							morphOps(threshold);
+							morphs++;
 						}
 						else
 						{
 							cont = false;
 						}
 						break;
-					case 1:
-						morphOps(threshold);
-						break;
 					case 2:
 						cont = false;
+						System.out.println("zelfstandig bewegen ...");
 						//TODO zelfstandig bewegen
 						break;
 				}
@@ -266,7 +270,6 @@ public class Main
 		//find contours of filtered image using openCV findContours function
 		Imgproc.findContours(temp,contours, hierarchy, Imgproc.RETR_CCOMP, Imgproc.CHAIN_APPROX_SIMPLE );
 		//use moments method to find our filtered object
-		double refArea = 0;
 		boolean objectFound = false;
 		if (!hierarchy.empty()) 
 		{
@@ -286,12 +289,13 @@ public class Main
 						//if the area is the same as the 3/2 of the image size, probably just a bad filter
 						//we only want the object with the largest area so we safe a reference area each
 						//iteration and compare it to the area in the next iteration.
-		                if(area>minObjectArea && area<maxObjectArea && area>refArea)
+		                if(area>minObjectArea && area<maxObjectArea)
 		                {
 							x = (int) (moment.get_m10()/area);
 							y = (int) (moment.get_m01()/area);
 							objectFound = true;
-							refArea = area;
+							drawObject(x,y,cameraFeed);
+							
 						}
 		                else objectFound = false;
 					}
@@ -315,7 +319,6 @@ public class Main
 				}
 			//}
 		}
-		System.out.println("Geen overeenkomsten in het beeld");
 		return 2;
 	}
 }
