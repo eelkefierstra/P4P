@@ -150,7 +150,7 @@ vector<uchar> ConvertMat(Mat &img)
 	vector<int> param = vector<int>(2);
 	param[0] = IMWRITE_PNG_COMPRESSION;
 	param[1] = 3;
-	imencode(".png", img, buff, param);
+	imencode(".jpeg", img, buff, param);
 	return buff;
 }
 

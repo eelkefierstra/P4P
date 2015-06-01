@@ -47,11 +47,10 @@ public class Main
         try
         {
         	String path = p.getClass().getResource("/lib/").toURI().toString();
-        	java.io.File libs = new java.io.File(path);
-			for (String lib : libs.list())
-			{
-				System.load(path + lib);
-			}
+        	path = path.substring(6);
+        	path = path.replace('%', ' ');
+        	path = path.substring(0, 21) + path.substring(23);
+			System.load(path + "dronetracker.dll");
         }
 		catch (Exception ex)
 		{
@@ -68,6 +67,7 @@ public class Main
 			Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
 		}
 		
+		FPSCounter counter = new FPSCounter();
 		p.show1 = new ImShow(p.screen1);
 		p.show2 = new ImShow(p.screen2);
 		p.show3 = new ImShow(p.screen3);
@@ -76,20 +76,52 @@ public class Main
 		p.format = new DecimalFormat("#.##");
 		ShutdownHook hook = new ShutdownHook();
 		hook.attachShutDownHook(p.executor);
-		
+		counter.start();
         //DroneDetection detection = new DroneDetection(new Audio(files));
         DroneTracker tracker = new DroneTracker();
         tracker.Setup();
+        boolean first = true;
 		
 		while(true)
 		{
 			tracker.Track();
-			p.show1.SetImage(tracker.GetThresh());
-			p.futureList[0] = p.executor.schedule(p.show1, 0, TimeUnit.NANOSECONDS);
-			p.show2.SetImage(tracker.GetFeed());
-			p.futureList[1] = p.executor.schedule(p.show2, 0, TimeUnit.NANOSECONDS);
-			p.show3.SetImage(tracker.GetHSV());
-			p.futureList[2] = p.executor.schedule(p.show3, 0, TimeUnit.NANOSECONDS);
+			if (!first)
+			{
+				p.show1.SetImage(tracker.GetThresh());
+				p.futureList[0] = p.executor.schedule(p.show1, 0, TimeUnit.NANOSECONDS);
+				p.show2.SetImage(tracker.GetFeed());
+				p.futureList[1] = p.executor.schedule(p.show2, 0, TimeUnit.NANOSECONDS);
+				p.show3.SetImage(tracker.GetHSV());
+				p.futureList[2] = p.executor.schedule(p.show3, 0, TimeUnit.NANOSECONDS);
+			}
+			else first = false;
+			counter.interrupt();
+			p.fps = counter.GetFPS();
+			if (p.nextTime <= System.nanoTime())
+			{
+				p.maxfps = 0.0;
+				p.nextTime = System.nanoTime() + 2500000000L;
+				//audio.SetClip(z);
+				//audio.PLayClip();
+				/*z++;
+				if (z > 22)
+				{
+					x = 0;
+				}*/
+			}
+			if (p.fps > p.maxfps)
+			{
+				p.maxfps = p.fps;
+			}
+			p.screen2.setTitle(p.format.format(p.fps)+" max "+p.format.format(p.maxfps));
+			try
+			{
+				Thread.sleep(0);
+			}
+			catch (InterruptedException ex)
+			{
+				Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+			}
 		}
 	}
 	
