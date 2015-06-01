@@ -38,16 +38,25 @@ public class Main
 	private ScheduledFuture<?>[] futureList;
 	private DecimalFormat format;
 	
-	static
-	{
-    	System.loadLibrary("dronedetection");
-	}
 	// Main loop
     //@SuppressWarnings("unused")
 	public static void main(String[] args)
     {
     	//System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
         Main p = new Main();
+        try
+        {
+        	String path = p.getClass().getResource("/lib/").toURI().toString();
+        	java.io.File libs = new java.io.File(path);
+			for (String lib : libs.list())
+			{
+				System.load(path + lib);
+			}
+        }
+		catch (Exception ex)
+		{
+			Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+		}
 		String[] files = null;
 		try
 		{
@@ -74,7 +83,7 @@ public class Main
 		
 		while(true)
 		{
-			//tracker.Track();
+			tracker.Track();
 			p.show1.SetImage(tracker.GetThresh());
 			p.futureList[0] = p.executor.schedule(p.show1, 0, TimeUnit.NANOSECONDS);
 			p.show2.SetImage(tracker.GetFeed());
