@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.text.DecimalFormat;
 */
 import java.awt.Point;
+import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,8 +49,8 @@ public class Main
         {
         	String path = p.getClass().getResource("/lib/").toURI().toString();
         	path = path.substring(6);
-        	path = path.replace('%', ' ');
-        	path = path.substring(0, 21) + path.substring(23);
+        	//path = path.replace('%', ' ');
+        	//path = path.substring(0, 21) + path.substring(23);
 			System.load(path + "dronetracker.dll");
         }
 		catch (Exception ex)

@@ -150,7 +150,7 @@ vector<uchar> ConvertMat(Mat &img)
 	vector<int> param = vector<int>(2);
 	param[0] = IMWRITE_PNG_COMPRESSION;
 	param[1] = 3;
-	imencode(".jpeg", img, buff, param);
+	imencode(".png", img, buff, param);
 	return buff;
 }
 
@@ -164,6 +164,7 @@ JNIEXPORT jbyteArray JNICALL Java_DroneTracker_GetFeed(JNIEnv *env, jobject)
 		temp[i] = (jbyte)tempvec[i];
 	}
 	env->SetByteArrayRegion(res, 0, tempvec.size(), temp);
+	~tempvec;
 	return res;
 }
 
@@ -191,6 +192,16 @@ JNIEXPORT jbyteArray JNICALL Java_DroneTracker_GetHSV(JNIEnv *env, jobject)
 	}
 	env->SetByteArrayRegion(res, 0, tempvec.size(), temp);
 	return res;
+}
+
+JNIEXPORT jint JNICALL Java_DroneTracker_GetX(JNIEnv *, jobject)
+{
+	return 0;
+}
+
+JNIEXPORT jint JNICALL Java_DroneTracker_GetY(JNIEnv *, jobject)
+{
+	return 0;
 }
 
 JNIEXPORT void JNICALL Java_DroneTracker_Track(JNIEnv *env, jobject)

@@ -47,6 +47,22 @@ JNIEXPORT jbyteArray JNICALL Java_DroneTracker_GetThresh
 JNIEXPORT jbyteArray JNICALL Java_DroneTracker_GetHSV
   (JNIEnv *, jobject);
 
+/*
+ * Class:     DroneTracker
+ * Method:    GetX
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_DroneTracker_GetX
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     DroneTracker
+ * Method:    GetY
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_DroneTracker_GetY
+  (JNIEnv *, jobject);
+
 #ifdef __cplusplus
 }
 #endif
