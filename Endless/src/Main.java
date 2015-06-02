@@ -1,5 +1,5 @@
-import java.awt.MouseInfo;
-import java.awt.Point;
+//import java.awt.MouseInfo;
+//import java.awt.Point;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -126,7 +126,7 @@ public class Main
 						cont = false;
 						break;
 					case 1:
-						if(morphs<5)
+						if(morphs<3)
 						{
 							morphOps(threshold);
 							morphs++;
@@ -145,8 +145,12 @@ public class Main
 			}
 			
 			
-			p.screen3.setTitle(p.getLocationRelativeTo().toString());
+			//TODO p.screen3.setTitle(p.getLocationRelativeTo().toString());
 			//servos.Update(p.getLocationRelativeTo());
+			
+			p.screen1.setSize(frame_width, frame_height);
+			p.screen2.setSize(frame_width, frame_height);
+			p.screen3.setSize(frame_width, frame_height);
 			
 			//Zou afbeelding in venster moeten laten zien
 			show1.SetMat(threshold);
@@ -204,6 +208,7 @@ public class Main
 		return res;
     }
     
+    /*
     public Point getLocationRelativeTo()
     {
         int x = ((screen2.getX() - MouseInfo.getPointerInfo().getLocation().x) - (screen2.getWidth() / 2) * -1) * -1;
@@ -222,7 +227,7 @@ public class Main
         int y = screen2.getY() - MouseInfo.getPointerInfo().getLocation().y;
         return y + screen2.getHeight() / 2;
     }
-
+	*/
 
 	public static void drawObject(double x,double y,Mat frame)
 	{
