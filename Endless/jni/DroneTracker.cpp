@@ -24,8 +24,8 @@ int V_MIN2 = 200;
 int V_MAX2 = 256;
 
 //default capture width and height
-const int FRAME_WIDTH = 640;
-const int FRAME_HEIGHT = 480;
+const int FRAME_WIDTH = 1280;
+const int FRAME_HEIGHT = 720;
 //max number of objects to be detected in frame
 const int MAX_NUM_OBJECTS=1500;
 //minimum and maximum object area
@@ -42,9 +42,6 @@ int x=0, y=0;
 //video capture object to acquire webcam feed
 VideoCapture capture;
 
-vector<int> param = vector<int>(2);
-param[0] = IMWRITE_PNG_COMPRESSION;
-param[1] = 3;
 bool first = true;
 
 JNIEXPORT void JNICALL Java_DroneTracker_Setup(JNIEnv *, jobject)
@@ -56,13 +53,15 @@ JNIEXPORT void JNICALL Java_DroneTracker_Setup(JNIEnv *, jobject)
 	capture.set(CV_CAP_PROP_FRAME_HEIGHT,FRAME_HEIGHT);
 }
 
-std::string intToString(int number){
+std::string intToString(int number)
+{
 	std::stringstream ss;
 	ss << number;
 	return ss.str();
 }
 
-void drawObject(int x, int y,Mat &frame){
+void drawObject(int x, int y,Mat &frame)
+{
 
 	//use some of the openCV drawing functions to draw crosshairs
 	//on your tracked image!
@@ -88,7 +87,8 @@ void drawObject(int x, int y,Mat &frame){
 	putText(frame,intToString(x)+","+intToString(y),Point(x,y+30),1,1,Scalar(0,255,0),2);
 }
 
-void morphOps(Mat &thresh1){
+void morphOps(Mat &thresh1)
+{
 
 	//create structuring element that will be used to "dilate" and "erode" image.
 	//the element chosen here is a 3px by 3px rectangle
@@ -105,7 +105,8 @@ void morphOps(Mat &thresh1){
 	dilate(thresh1,thresh1,dilateElement);
 }
 
-void trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed){
+int trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed)
+{
 
 	Mat temp;
 	threshold.copyTo(temp);
@@ -115,13 +116,15 @@ void trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed){
 	//find contours of filtered image using openCV findContours function
 	findContours(temp,contours,hierarchy,CV_RETR_CCOMP,CV_CHAIN_APPROX_SIMPLE );
 	//use moments method to find our filtered object
-	double refArea = 0;
 	bool objectFound = false;
-	if (hierarchy.size() > 0) {
+	if (hierarchy.size() > 0) 
+	{
 		int numObjects = hierarchy.size();
         //if number of objects greater than MAX_NUM_OBJECTS we have a noisy filter
-        if(numObjects<MAX_NUM_OBJECTS){
-			for (int index = 0; index >= 0; index = hierarchy[index][0]) {
+        if(numObjects<MAX_NUM_OBJECTS)
+		{
+			for (int index = 0; index >= 0; index = hierarchy[index][0]) 
+			{
 
 				Moments moment = moments((Mat)contours[index]);
 				double area = moment.m00;
@@ -130,26 +133,32 @@ void trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed){
 				//if the area is the same as the 3/2 of the image size, probably just a bad filter
 				//we only want the object with the largest area so we safe a reference area each
 				//iteration and compare it to the area in the next iteration.
-                if(area>MIN_OBJECT_AREA && area<MAX_OBJECT_AREA && area>refArea){
+                if(area>MIN_OBJECT_AREA && area<MAX_OBJECT_AREA)
+				{
 					x = moment.m10/area;
 					y = moment.m01/area;
 					objectFound = true;
-					refArea = area;
-				}else objectFound = false;
+					drawObject(x, y, cameraFeed);
+				}
+				else objectFound = false;
 			}
 			//let user know you found an object
-			if(objectFound ==true){
-				putText(cameraFeed,"Tracking Object",Point(0,50),2,1,Scalar(0,255,0),2);
-				//draw object location on screen
-				drawObject(x,y,cameraFeed);}
-
-		}else putText(cameraFeed,"TOO MUCH NOISE! ADJUST FILTER",Point(0,50),1,2,Scalar(0,0,255),2);
+			if(objectFound ==true)
+			{
+				return 0;
+			}
+			else return 1;
+		}
+		else return 2;
 	}
 }
 
 vector<uchar> ConvertMat(Mat &img)
 {
 	vector<uchar> buff;//buffer for coding
+	vector<int> param = vector<int>(2);
+	param[0] = IMWRITE_PNG_COMPRESSION;
+	param[1] = 3;
 	imencode(".png", img, buff, param);
 	return buff;
 }
@@ -164,7 +173,7 @@ JNIEXPORT jbyteArray JNICALL Java_DroneTracker_GetFeed(JNIEnv *env, jobject)
 		temp[i] = (jbyte)tempvec[i];
 	}
 	env->SetByteArrayRegion(res, 0, tempvec.size(), temp);
-
+	~tempvec;
 	return res;
 }
 
@@ -213,22 +222,41 @@ JNIEXPORT void JNICALL Java_DroneTracker_Track(JNIEnv *env, jobject)
 		first = false;
 		return ;
 	}
+	
 	//convert frame from BGR to HSV colorspace
 	cvtColor(cameraFeed,HSV,COLOR_BGR2HSV);
 
 	inRange(HSV, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), thresh);
-	//imshow("pre morph", thresh);
-	morphOps(thresh);
-	trackFilteredObject(x, y, thresh, cameraFeed);
-	//imshow("Threshold Blue", thresh);
+	int objects = 0, morphs = 0;
+	Boolean objectsFound = false;
+	Boolean cont = true;
 
-	//show frames
-	/*
-	imshow(windowName,cameraFeed);
-	imshow(windowName1,HSV);
-	*/
-	//delay 30ms so that screen can refresh.
-	//image will not appear without this waitKey() command
+	while (cont)
+	{
+		switch (trackFilteredObject(x, y, threshold, cameraFeed))
+		{
+			case 0:
+				objectsFound = true;
+				objects++;
+				cont = false;
+				break;
+			case 1:
+				if (morphs<3)
+				{
+					morphOps(threshold);
+					morphs++;
+				}
+				else
+				{
+					cont = false;
+				}
+				break;
+			case 2:
+				cont = false;
+				//TODO zelfstandig bewegen
+				break;
+		}
+	}
 	return ;
 }
 
