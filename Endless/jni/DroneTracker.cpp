@@ -155,6 +155,7 @@ int trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed)
 		}
 		else return 2;
 	}
+	return 3;
 }
 
 vector<uchar> ConvertMat(Mat &img)
@@ -234,12 +235,12 @@ JNIEXPORT void JNICALL Java_DroneTracker_Track(JNIEnv *env, jobject)
 
 	inRange(HSV, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), thresh);
 	int objects = 0, morphs = 0;
-	Boolean objectsFound = false;
-	Boolean cont = true;
+	bool objectsFound = false;
+	bool cont = true;
 
 	while (cont)
 	{
-		switch (trackFilteredObject(x, y, threshold, cameraFeed))
+		switch (trackFilteredObject(x, y, thresh, cameraFeed))
 		{
 			case 0:
 				objectsFound = true;
@@ -249,7 +250,7 @@ JNIEXPORT void JNICALL Java_DroneTracker_Track(JNIEnv *env, jobject)
 			case 1:
 				if (morphs<3)
 				{
-					morphOps(threshold);
+					morphOps(thresh);
 					morphs++;
 				}
 				else
