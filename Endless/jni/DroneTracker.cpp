@@ -164,7 +164,6 @@ JNIEXPORT jbyteArray JNICALL Java_DroneTracker_GetFeed(JNIEnv *env, jobject)
 		temp[i] = (jbyte)tempvec[i];
 	}
 	env->SetByteArrayRegion(res, 0, tempvec.size(), temp);
-	~tempvec;
 	return res;
 }
 
