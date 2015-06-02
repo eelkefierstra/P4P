@@ -4,7 +4,7 @@ CLASS_PATH = ../bin
 # Define a virtual path for .class in the bin directory
 vpath %.class $(CLASS_PATH)
 
-all : dronetracker.dll
+all : dronetracker.so
 
 # $@ matches the target, $< matches the first dependancy
 dronetracker.so : DroneTracker.o
