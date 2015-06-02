@@ -42,6 +42,9 @@ int x=0, y=0;
 //video capture object to acquire webcam feed
 VideoCapture capture;
 
+vector<int> param = vector<int>(2);
+param[0] = IMWRITE_PNG_COMPRESSION;
+param[1] = 3;
 bool first = true;
 
 JNIEXPORT void JNICALL Java_DroneTracker_Setup(JNIEnv *, jobject)
@@ -147,9 +150,6 @@ void trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed){
 vector<uchar> ConvertMat(Mat &img)
 {
 	vector<uchar> buff;//buffer for coding
-	vector<int> param = vector<int>(2);
-	param[0] = IMWRITE_PNG_COMPRESSION;
-	param[1] = 3;
 	imencode(".png", img, buff, param);
 	return buff;
 }
@@ -164,6 +164,7 @@ JNIEXPORT jbyteArray JNICALL Java_DroneTracker_GetFeed(JNIEnv *env, jobject)
 		temp[i] = (jbyte)tempvec[i];
 	}
 	env->SetByteArrayRegion(res, 0, tempvec.size(), temp);
+
 	return res;
 }
 

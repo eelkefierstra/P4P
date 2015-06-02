@@ -4,23 +4,19 @@ import java.awt.Point;
 import java.text.DecimalFormat;
 */
 import java.awt.Point;
-import java.net.URLEncoder;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
-//import org.opencv.core.Core;
-
-@SuppressWarnings("unused")
+//@SuppressWarnings("unused")
 public class Main
 {
 	//private GUI gui = new GUI();
@@ -38,21 +34,19 @@ public class Main
 	private ScheduledExecutorService executor;
 	private ScheduledFuture<?>[] futureList;
 	private DecimalFormat format;
-	
+
 	// Main loop
     //@SuppressWarnings("unused")
 	public static void main(String[] args)
     {
-    	//System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
         Main p = new Main();
         try
         {
-        	String path = p.getClass().getResource("/lib/").toURI().toString();
+			String path = p.getClass().getResource("/lib/").toURI().toString();
         	path = path.substring(6);
-        	//path = path.replace('%', ' ');
-        	//path = path.substring(0, 21) + path.substring(23);
-			System.load(path + "dronetracker.dll");
-        }
+        	path = path.replace('%', ' ');
+        	path = path.substring(0, 21) + path.substring(23);
+			System.load(path + "dronetracker.dll");        }
 		catch (Exception ex)
 		{
 			Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
@@ -60,8 +54,7 @@ public class Main
 		String[] files = null;
 		try
 		{
-			java.io.File file = new java.io.File(p.getClass().getResource("/audio/").toURI());
-	    	files = p.GetFileNames(file.list());
+	    	files = p.GetResourceListing(p.getClass(), "/audio/");
 		}
 		catch (Exception ex)
 		{
@@ -126,8 +119,6 @@ public class Main
 		}
 	}
 	
-	private native void Loop();
-	
     /*
     public Point getLocationRelativeTo()
     {
@@ -148,22 +139,52 @@ public class Main
         return y + screen2.getHeight() / 2;
     }
 	*/
-	private String[] GetFileNames(String[] files) throws InterruptedException, ExecutionException
-    {
-    	String[] res = new String[files.length];
-    	ExecutorService executor = Executors.newFixedThreadPool(3);
-	    List<Future<String>> futurelist = new ArrayList<Future<String>>();
-	    for (String file : files)
-	    {
-		    futurelist.add(executor.submit(new SomeCallableTask(file)));
-		}
-		int i = 0;
-		for (Future<String> future : futurelist)
-		{
-		   	res[i] = future.get();
-		   	i++;
-		}
-		executor.shutdown();
-		return res;
-    }
+	
+	private String[] GetResourceListing(Class clazz, String path) throws URISyntaxException, IOException
+	{
+	      URL dirURL = clazz.getClassLoader().getResource(path);
+	      if (dirURL != null && dirURL.getProtocol().equals("file"))
+	      {
+	        /* A file path: easy enough */
+	        return new java.io.File(dirURL.toURI()).list();
+	      }
+
+	      if (dirURL == null)
+	      {
+	        /* 
+	         * In case of a jar file, we can't actually find a directory.
+	         * Have to assume the same jar as clazz.
+	         */
+	        String me = clazz.getName().replace(".", "/")+".class";
+	        dirURL = clazz.getClassLoader().getResource(me);
+	      }
+	      
+	      if (dirURL.getProtocol().equals("jar"))
+	      {
+	    	  /* A JAR path */
+	    	  String jarPath = dirURL.getPath().substring(5, dirURL.getPath().indexOf("!")); //strip out only the JAR file
+	    	  JarFile jar = new JarFile(URLDecoder.decode(jarPath, "UTF-8"));
+	    	  Enumeration<JarEntry> entries = jar.entries(); //gives ALL entries in jar
+	    	  Set<String> result = new HashSet<String>(); //avoid duplicates in case it is a subdirectory
+	    	  while(entries.hasMoreElements())
+	    	  {
+	    		  String name = entries.nextElement().getName();
+	    		  if (name.startsWith(path))
+	    		  { //filter according to the path
+	    			  String entry = name.substring(path.length());
+	    			  int checkSubdir = entry.indexOf("/");
+	    			  if (checkSubdir >= 0)
+	    			  {
+	    				  // if it is a subdirectory, we just return the directory name
+	    				  entry = entry.substring(0, checkSubdir);
+	    			  }
+	    			  result.add(entry);
+	    		  }
+	    	  }
+	    	  jar.close();
+	    	  return result.toArray(new String[result.size()]);
+	      }
+	      throw new UnsupportedOperationException("Cannot list files for URL "+dirURL);
+	}
+	
 }

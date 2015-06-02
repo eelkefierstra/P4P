@@ -4,15 +4,15 @@ CLASS_PATH = ../bin
 # Define a virtual path for .class in the bin directory
 vpath %.class $(CLASS_PATH)
 
-all : libdronetracker.so
+all : dronetracker.dll
 
 # $@ matches the target, $< matches the first dependancy
-libdronetracker.so : DroneTracker.o
-	c++ -Wl,--add-stdcall-alias -shared -o ..\resources\lib\$@ $< -LC:\Users\Dudecake\Downloads\opencv\build\x64\MinGW\lib -LD:\Dudecake\Downloads\opencv\build\x64\MinGW\lib -lopencv_core2410 -lopencv_ml2410 -lopencv_video2410 -lopencv_features2d2410 -lopencv_calib3d2410 -lopencv_objdetect2410 -lopencv_contrib2410 -lopencv_flann2410 -lopencv_highgui2410 -lopencv_imgproc2410
+dronetracker.so : DroneTracker.o
+	g++ -Wl,--add-stdcall-alias -shared -o ..\resources\lib\$@ $< -LC:\Users\Dudecake\Downloads\opencv\build\x64\MinGW\lib -LD:\Dudecake\Downloads\opencv\build\x64\MinGW\lib -lopencv_core2410 -lopencv_ml2410 -lopencv_video2410 -lopencv_features2d2410 -lopencv_calib3d2410 -lopencv_objdetect2410 -lopencv_contrib2410 -lopencv_flann2410 -lopencv_highgui2410 -lopencv_imgproc2410
 
 # $@ matches the target, $< matches the first dependancy
 DroneTracker.o : DroneTracker.cpp DroneTracker.h
-	c++ -I"C:\Program Files\Java\jdk1.8.0_45\include" -I"C:\Program Files\Java\jdk1.8.0_45\include\win32" -I"C:\Program Files\mingw-w64\x86_64-4.9.2-win32-seh-rt_v4-rev2\mingw64\include" -I"D:\Dudecake\Downloads\opencv\build\include" -I"C:\Users\Dudecake\Downloads\opencv\build\include" -c $< -o $@ $(LDFLAGS)
+	g++ -I"C:\Program Files\Java\jdk1.8.0_45\include" -I"C:\Program Files\Java\jdk1.8.0_45\include\win32" -I"C:\Program Files\mingw-w64\x86_64-4.9.2-win32-seh-rt_v4-rev2\mingw64\include" -I"D:\Dudecake\Downloads\opencv\build\include" -I"C:\Users\Dudecake\Downloads\opencv\build\include" -c $< -o $@ $(LDFLAGS)
 
 # $* matches the target filename without the extension
 DroneTracker.h : DroneTracker.class
