@@ -34,19 +34,25 @@ public class Main
 	private ScheduledExecutorService executor;
 	private ScheduledFuture<?>[] futureList;
 	private DecimalFormat format;
-
+	
+	
 	// Main loop
     //@SuppressWarnings("unused")
 	public static void main(String[] args)
     {
         Main p = new Main();
+
+		p.screen1.setSize(1280, 720);
+		p.screen2.setSize(1280, 720);
+		p.screen3.setSize(1280, 720);
+		
         try
         {
 			String path = p.getClass().getResource("/lib/").toURI().toString();
         	path = path.substring(6);
-        	path = path.replace('%', ' ');
-        	path = path.substring(0, 21) + path.substring(23);
-			System.load(path + "dronetracker.dll");        }
+        	path = path.replaceAll("%20", " ");
+			System.load(path + "dronetracker.dll");        
+		}
 		catch (Exception ex)
 		{
 			Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
@@ -89,6 +95,9 @@ public class Main
 				p.futureList[2] = p.executor.schedule(p.show3, 0, TimeUnit.NANOSECONDS);
 			}
 			else first = false;
+
+
+
 			counter.interrupt();
 			p.fps = counter.GetFPS();
 			if (p.nextTime <= System.nanoTime())
@@ -186,5 +195,4 @@ public class Main
 	      }
 	      throw new UnsupportedOperationException("Cannot list files for URL "+dirURL);
 	}
-	
 }
