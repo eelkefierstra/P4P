@@ -3,15 +3,9 @@ import java.awt.MouseInfo;
 import java.awt.Point;
 import java.text.DecimalFormat;
 */
-import java.awt.Point;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLDecoder;
 import java.text.DecimalFormat;
-import java.util.*;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.concurrent.*;
@@ -60,7 +54,8 @@ public class Main
 		String[] files = null;
 		try
 		{
-	    	files = p.GetResourceListing(p.getClass(), "/audio/");
+			java.io.File file = new java.io.File(p.getClass().getResource("/audio/").toURI());
+	    	files = p.GetFileNames(file.list());
 		}
 		catch (Exception ex)
 		{
@@ -77,11 +72,12 @@ public class Main
 		ShutdownHook hook = new ShutdownHook();
 		hook.attachShutDownHook(p.executor);
 		counter.start();
-        //DroneDetection detection = new DroneDetection(new Audio(files));
+		Audio audio = new Audio(files);
         DroneTracker tracker = new DroneTracker();
         tracker.Setup();
+        
         boolean first = true;
-		
+		int z = 0;
 		while(true)
 		{
 			tracker.Track();
@@ -96,21 +92,19 @@ public class Main
 			}
 			else first = false;
 
-
-
 			counter.interrupt();
 			p.fps = counter.GetFPS();
 			if (p.nextTime <= System.nanoTime())
 			{
 				p.maxfps = 0.0;
 				p.nextTime = System.nanoTime() + 2500000000L;
-				//audio.SetClip(z);
-				//audio.PLayClip();
-				/*z++;
+				audio.SetClip(z);
+				audio.PLayClip();
+				z++;
 				if (z > 22)
 				{
-					x = 0;
-				}*/
+					z = 0;
+				}
 			}
 			if (p.fps > p.maxfps)
 			{
@@ -149,50 +143,23 @@ public class Main
     }
 	*/
 	
-	private String[] GetResourceListing(Class clazz, String path) throws URISyntaxException, IOException
-	{
-	      URL dirURL = clazz.getClassLoader().getResource(path);
-	      if (dirURL != null && dirURL.getProtocol().equals("file"))
-	      {
-	        /* A file path: easy enough */
-	        return new java.io.File(dirURL.toURI()).list();
-	      }
+	private String[] GetFileNames(String[] files) throws InterruptedException, ExecutionException
+    {
+    	String[] res = new String[files.length];
+    	ExecutorService executor = Executors.newFixedThreadPool(3);
+	    List<Future<String>> futurelist = new ArrayList<Future<String>>();
+	    for (String file : files)
+	    {
+		    futurelist.add(executor.submit(new SomeCallableTask(file)));
+		}
+		int i = 0;
+		for (Future<String> future : futurelist)
+		{
+		   	res[i] = future.get();
+		   	i++;
+		}
+		executor.shutdown();
+		return res;
+    }	
 
-	      if (dirURL == null)
-	      {
-	        /* 
-	         * In case of a jar file, we can't actually find a directory.
-	         * Have to assume the same jar as clazz.
-	         */
-	        String me = clazz.getName().replace(".", "/")+".class";
-	        dirURL = clazz.getClassLoader().getResource(me);
-	      }
-	      
-	      if (dirURL.getProtocol().equals("jar"))
-	      {
-	    	  /* A JAR path */
-	    	  String jarPath = dirURL.getPath().substring(5, dirURL.getPath().indexOf("!")); //strip out only the JAR file
-	    	  JarFile jar = new JarFile(URLDecoder.decode(jarPath, "UTF-8"));
-	    	  Enumeration<JarEntry> entries = jar.entries(); //gives ALL entries in jar
-	    	  Set<String> result = new HashSet<String>(); //avoid duplicates in case it is a subdirectory
-	    	  while(entries.hasMoreElements())
-	    	  {
-	    		  String name = entries.nextElement().getName();
-	    		  if (name.startsWith(path))
-	    		  { //filter according to the path
-	    			  String entry = name.substring(path.length());
-	    			  int checkSubdir = entry.indexOf("/");
-	    			  if (checkSubdir >= 0)
-	    			  {
-	    				  // if it is a subdirectory, we just return the directory name
-	    				  entry = entry.substring(0, checkSubdir);
-	    			  }
-	    			  result.add(entry);
-	    		  }
-	    	  }
-	    	  jar.close();
-	    	  return result.toArray(new String[result.size()]);
-	      }
-	      throw new UnsupportedOperationException("Cannot list files for URL "+dirURL);
-	}
 }

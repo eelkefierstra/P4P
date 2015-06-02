@@ -42,6 +42,7 @@ int x=0, y=0;
 //video capture object to acquire webcam feed
 VideoCapture capture;
 
+vector<int> param = vector<int>(2);
 bool first = true;
 
 JNIEXPORT void JNICALL Java_DroneTracker_Setup(JNIEnv *, jobject)
@@ -51,6 +52,9 @@ JNIEXPORT void JNICALL Java_DroneTracker_Setup(JNIEnv *, jobject)
 	//set height and width of capture frame
 	capture.set(CV_CAP_PROP_FRAME_WIDTH,FRAME_WIDTH);
 	capture.set(CV_CAP_PROP_FRAME_HEIGHT,FRAME_HEIGHT);
+
+	param[0] = IMWRITE_PNG_COMPRESSION;
+	param[1] = 3;
 }
 
 std::string intToString(int number)
@@ -173,7 +177,7 @@ JNIEXPORT jbyteArray JNICALL Java_DroneTracker_GetFeed(JNIEnv *env, jobject)
 		temp[i] = (jbyte)tempvec[i];
 	}
 	env->SetByteArrayRegion(res, 0, tempvec.size(), temp);
-	~tempvec;
+	delete temp, tempvec;
 	return res;
 }
 
@@ -187,6 +191,7 @@ JNIEXPORT jbyteArray JNICALL Java_DroneTracker_GetThresh(JNIEnv *env, jobject)
 		temp[i] = (jbyte)tempvec[i];
 	}
 	env->SetByteArrayRegion(res, 0, tempvec.size(), temp);
+	delete temp, tempvec;
 	return res;
 }
 
@@ -200,6 +205,7 @@ JNIEXPORT jbyteArray JNICALL Java_DroneTracker_GetHSV(JNIEnv *env, jobject)
 		temp[i] = (jbyte)tempvec[i];
 	}
 	env->SetByteArrayRegion(res, 0, tempvec.size(), temp);
+	delete temp, tempvec;
 	return res;
 }
 
