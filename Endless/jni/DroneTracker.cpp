@@ -161,9 +161,6 @@ int trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed)
 vector<uchar> ConvertMat(Mat &img)
 {
 	vector<uchar> buff;//buffer for coding
-	vector<int> param = vector<int>(2);
-	param[0] = IMWRITE_PNG_COMPRESSION;
-	param[1] = 3;
 	imencode(".png", img, buff, param);
 	return buff;
 }
@@ -179,6 +176,7 @@ JNIEXPORT jbyteArray JNICALL Java_DroneTracker_GetFeed(JNIEnv *env, jobject)
 	}
 	env->SetByteArrayRegion(res, 0, tempvec.size(), temp);
 	delete temp, tempvec;
+	//temp = nullptr, tempvec = nullptr;
 	return res;
 }
 
@@ -193,6 +191,7 @@ JNIEXPORT jbyteArray JNICALL Java_DroneTracker_GetThresh(JNIEnv *env, jobject)
 	}
 	env->SetByteArrayRegion(res, 0, tempvec.size(), temp);
 	delete temp, tempvec;
+	//temp = nullptr, tempvec = nullptr;
 	return res;
 }
 
@@ -207,6 +206,7 @@ JNIEXPORT jbyteArray JNICALL Java_DroneTracker_GetHSV(JNIEnv *env, jobject)
 	}
 	env->SetByteArrayRegion(res, 0, tempvec.size(), temp);
 	delete temp, tempvec;
+	//temp = nullptr, tempvec = nullptr;
 	return res;
 }
 

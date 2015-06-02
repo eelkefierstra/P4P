@@ -20,6 +20,7 @@ public class Main
 	private Screen screen3 = new Screen();
 	
 	private double maxfps;
+	private double minfps;
 	private double fps;
 	private long nextTime;
 	private ImShow show1;
@@ -69,9 +70,11 @@ public class Main
 		p.executor = Executors.newScheduledThreadPool(3);
 		p.futureList = new ScheduledFuture<?>[3];
 		p.format = new DecimalFormat("#.##");
+		p.minfps = 10;
 		ShutdownHook hook = new ShutdownHook();
 		hook.attachShutDownHook(p.executor);
 		counter.start();
+		
 		Audio audio = new Audio(files);
         DroneTracker tracker = new DroneTracker();
         tracker.Setup();
@@ -83,12 +86,19 @@ public class Main
 			tracker.Track();
 			if (!first)
 			{
-				p.show1.SetImage(tracker.GetThresh());
-				p.futureList[0] = p.executor.schedule(p.show1, 0, TimeUnit.NANOSECONDS);
-				p.show2.SetImage(tracker.GetFeed());
-				p.futureList[1] = p.executor.schedule(p.show2, 0, TimeUnit.NANOSECONDS);
-				p.show3.SetImage(tracker.GetHSV());
-				p.futureList[2] = p.executor.schedule(p.show3, 0, TimeUnit.NANOSECONDS);
+				try
+				{
+					p.show1.SetImage(tracker.GetThresh());
+					p.futureList[0] = p.executor.schedule(p.show1, 0, TimeUnit.NANOSECONDS);
+					p.show2.SetImage(tracker.GetFeed());
+					p.futureList[1] = p.executor.schedule(p.show2, 0, TimeUnit.NANOSECONDS);
+					p.show3.SetImage(tracker.GetHSV());
+					p.futureList[2] = p.executor.schedule(p.show3, 0, TimeUnit.NANOSECONDS);
+				}
+				catch (RejectedExecutionException ex)
+				{
+					Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+				}
 			}
 			else first = false;
 
@@ -96,10 +106,11 @@ public class Main
 			p.fps = counter.GetFPS();
 			if (p.nextTime <= System.nanoTime())
 			{
+				p.minfps = p.maxfps;
 				p.maxfps = 0.0;
 				p.nextTime = System.nanoTime() + 2500000000L;
 				audio.SetClip(z);
-				audio.PLayClip();
+				//audio.PLayClip();
 				z++;
 				if (z > 22)
 				{
@@ -110,7 +121,11 @@ public class Main
 			{
 				p.maxfps = p.fps;
 			}
-			p.screen2.setTitle(p.format.format(p.fps)+" max "+p.format.format(p.maxfps));
+			else if (p.minfps > p.fps)
+			{
+				p.minfps = p.fps;
+			}
+			p.screen2.setTitle(p.format.format(p.fps)+" max " + p.format.format(p.maxfps) + " min " + p.format.format(p.minfps));
 			try
 			{
 				Thread.sleep(0);

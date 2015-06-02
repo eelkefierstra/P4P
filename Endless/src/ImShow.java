@@ -2,6 +2,8 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 
@@ -28,11 +30,13 @@ public class ImShow implements Runnable
 			BufferedImage bufImage = null;
 			InputStream in = new ByteArrayInputStream(bytes);
 			bufImage = ImageIO.read(in);
+			in.close();
 			screen.SetImage(bufImage);
+			bufImage.flush();
 		}
 		catch (IOException ex)
 		{
-			ex.printStackTrace();
+			Logger.getLogger(ImShow.class.getName()).log(Level.SEVERE, null, ex);
 		}
 	}
 }
