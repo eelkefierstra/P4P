@@ -3,18 +3,10 @@ import java.awt.Point;
 
 public class ServoController
 {
-	private PWMPin[] pins = { new PWMPin((byte)18, (short)45, (short)36, (short)54), new PWMPin((byte) 23), new PWMPin((byte) 24), new PWMPin((byte) 25) };
-	private short PIXY_MIN_X             =    0;
-	private short PIXY_MAX_X             =  319;
-	private short PIXY_MIN_Y             =    0;
-	private short PIXY_MAX_Y             =  199;
-
-	private short PIXY_X_CENTER          =  (short) ((PIXY_MAX_X-PIXY_MIN_X) / 2);
-	private short PIXY_Y_CENTER          =  (short) ((PIXY_MAX_Y-PIXY_MIN_Y) / 2);
-	private short PIXY_RCS_MIN_POS       =    0;
-	private short PIXY_RCS_MAX_POS       =  180;
-	@SuppressWarnings("unused")
-	private short PIXY_RCS_CENTER_POS    =  (short) ((PIXY_RCS_MAX_POS-PIXY_RCS_MIN_POS) / 2);
+	private PWMPin[] pins = { new PWMPin((byte)18, (short)500, (short)300, (short)400, (byte) 90), 
+			new PWMPin((byte) 23, (short)500, (short)300, (short)400, (byte) 90), 
+			new PWMPin((byte) 24, (short)500, (short)300, (short)400, (byte) 25), 
+			new PWMPin((byte) 25, (short)500, (short)300, (short)400, (byte) 90) };
 	
 	public ServoController()
 	{
@@ -22,16 +14,27 @@ public class ServoController
 	
 	public void Update(Point location)
 	{
-		short xError = (short) (PIXY_X_CENTER - location.x);
-		short yError = (short) (location.y - PIXY_Y_CENTER);
-		
-		if (Math.abs(xError) > 250)
+		if (Math.abs(location.x) > 100)
 		{
-			pins[0].Update(xError);
+			pins[2].Update((short) location.x);
+			/*
+			if (Math.abs(location.x) > 319)
+			{
+				pins[3].Update((short) location.x);
+			}
+			*/
 		}
-		if (Math.abs(yError) < 125)
+		if (Math.abs(location.y) > 75)
 		{
-			pins[1].Update(yError);
+			pins[3].Update((short) location.y);
+		}
+		if (pins[2].GetLocation() < 70)
+		{
+			pins[0].Update((short) -100);
+		}
+		else if (pins[2].GetLocation() > 110)
+		{
+			pins[1].Update((short) 100);
 		}
 	}
 }

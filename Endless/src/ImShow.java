@@ -5,35 +5,28 @@ import java.io.InputStream;
 
 import javax.imageio.ImageIO;
 
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfByte;
-import org.opencv.highgui.Highgui;
-
 public class ImShow implements Runnable
 {
-	private volatile Mat mat;
+	private volatile byte[] bytes;
 	private Screen screen;
 	
-	public ImShow(Screen screen, Mat mat)
+	public ImShow(Screen screen)
 	{
 		this.screen = screen;
-		this.mat = mat;
+		this.bytes = null;
 	}
 	
-	public void SetMat(Mat mat)
+	public void SetImage(byte[] bytes)
 	{
-		this.mat = mat;
+		this.bytes = bytes;
 	}
 	
 	public void run()
 	{
 		try
 		{
-			MatOfByte matOfByte = new MatOfByte();
-			Highgui.imencode(".jpg", mat, matOfByte);
-			byte[] byteArray = matOfByte.toArray();
 			BufferedImage bufImage = null;
-			InputStream in = new ByteArrayInputStream(byteArray);
+			InputStream in = new ByteArrayInputStream(bytes);
 			bufImage = ImageIO.read(in);
 			screen.SetImage(bufImage);
 		}

@@ -2,32 +2,31 @@
 
 public class PWMPin
 {
-	byte pin;
-	short position;
-	short error;
-	short previousError;
-	short proportionalGain;
-	short derivativeGain;
-	short maxPosition;
-	short minPosition;
-	boolean first;
+	private byte pin;
+	private short position;
+	private short previousError;
+	private short proportionalGain;
+	private short derivativeGain;
+	private short middlePosition = 90;
+	private short maxPosition;
+	private short minPosition;
+	private boolean first;
 	
-	public PWMPin(byte pin)
-	{
-		this.pin = pin;
-		first = true;
-	}
-	
-	public PWMPin(byte pin, short startPosition, short proportionalGain, short derivativeGain)
+	public PWMPin(byte pin, short startPosition, short proportionalGain, short derivativeGain, byte range)
 	{
 		this.pin = pin;
 		this.position = startPosition;
 		this.proportionalGain = proportionalGain;
 		this.derivativeGain = derivativeGain;
-		//this.maxPosition = maxPosition;
-		//this.minPosition = minPosition;
+		this.maxPosition = (short) MapPosition(middlePosition + range, 0, 180, 0, 1000);
+		this.minPosition = (short) MapPosition(middlePosition - range, 0, 180, 0, 1000);
 		this.previousError = 0;
 		this.first = true;
+	}
+	
+	public short GetLocation()
+	{
+		return (short) MapPosition(position, 0, 1000, 0, 180);
 	}
 	
 	public void SetPWM(float value)
@@ -37,12 +36,8 @@ public class PWMPin
 	
 	public void Actuate()
 	{
-		if (pin == 23)
-		{
-			
-		}
-		System.out.println(MapPWM(position, 0, 180, 0.025f, 0.125f));
-		//PWMController.WritePWM(pin, MapPWM(position, 0, 180, 0.025f, 0.125f));
+		System.out.println(MapPWM(position, 0, 1000, 0.074f, 0.301f));
+		//PWMController.WritePWM(pin, MapPWM(position, 0, 180, 0.074f, 0.301f));
 	}
 	
 	public void Update(short error)
@@ -54,18 +49,17 @@ public class PWMPin
 			short DGain = derivativeGain;
 			int velocity = (error * PGain + errorDelta * DGain) / 1024;
 			position += velocity;
-			if (position > 180)
+			if (position > maxPosition)
 			{
-				position = 180;
+				position = maxPosition;
 			}
-			else if (position < 0)
+			else if (position < minPosition)
 			{
-				position = 0;
+				position = minPosition;
 			}
 		}
 		else
 		{
-			this.error = error;
 			first = false;
 		}
 		previousError = error;
@@ -73,6 +67,11 @@ public class PWMPin
 	}
 	
 	private float MapPWM(int x, int in_min, int in_max, float out_min, float out_max)
+	{
+		return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+	}
+
+	private int MapPosition(int x, int in_min, int in_max, int out_min, int out_max)
 	{
 		return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 	}

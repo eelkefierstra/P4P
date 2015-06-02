@@ -18,6 +18,7 @@ public class Main
 	    shutdown.attachShutDownHook();
 	    String[] files = null;
 	    FPSCounter counter = new FPSCounter();
+	    /*
 		try
 		{
 			java.io.File file = new java.io.File(p.getClass().getResource("/audio/").toURI());
@@ -47,13 +48,14 @@ public class Main
 		{
 			Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
 		}
+		*/
 		ServoController servos = new ServoController();
-	    AudioStuff audio = new AudioStuff(files);
-	    audio.SetClip(0);
+	    //AudioStuff audio = new AudioStuff(files);
+	    //audio.SetClip(0);
 	    int x = 0;
 		try
 		{
-			audio.PLayClip();
+			//audio.PLayClip();
 			float i = 0.025f;
 			//PWMPin pin = new PWMPin((byte)23);
 		    counter.start();
