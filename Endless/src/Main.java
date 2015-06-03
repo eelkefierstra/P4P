@@ -80,13 +80,20 @@ public class Main
         DroneTracker tracker = new DroneTracker();
         tracker.Setup();
 		long lastKnownTime = System.nanoTime();
-        
+        int i = 0;
+        int j = 1;
         boolean first = true;
 		int z = 0;
-		int[] arr = new int[5];
+		Point[] IdleMove = new Point[5];
+		IdleMove[0] = new Point();
+		IdleMove[1] = new Point(-101, 76); //p1
+		IdleMove[2] = new Point(-101, -76); //p2
+		IdleMove[3] = new Point(101, 76); //p3
+		IdleMove[4] = new Point(-101, 76); //p4
+		
 		while(true)
 		{
-			if (tracker.Track())
+			if (!tracker.Track())
 			{
 				lastKnownTime = System.nanoTime();
 				controller.Update(tracker.GetLoc());
@@ -95,40 +102,17 @@ public class Main
 			{
 				if (lastKnownTime + 2500000000L <= System.nanoTime())
 				{
-					Point[] IdleMove = new Point[5];
-					IdleMove[0] = new Point();
-					IdleMove[1] = new Point(-639, 359); //p1
-					IdleMove[2] = new Point(-639, -359); //p2
-					IdleMove[3] = new Point(639, 359); //p3
-					IdleMove[4] = new Point(-639, 359); //p4
-					
-					controller.Update(IdleMove[1]);
-					if(IdleMove[1].equals(new Point(-639, 359)))
+					controller.Update(IdleMove[j]);
+					i++;
+					if (i == 25)
 					{
-						controller.Update(IdleMove[2]);
-						if(IdleMove[2].equals(new Point(-639, -359)))
-						{
-							controller.Update(IdleMove[3]);
-							if(IdleMove[3].equals(new Point (639, 359)))
-							{
-								controller.Update(IdleMove[4]);
-								if(IdleMove[4].equals(new Point(-639, 359)))
-								{
-									controller.Update(IdleMove[0]);
-								}
-							}
-						}
+						j++;
+						i = 0;
 					}
-					//Point mPoint is het midden van het raster
-					//Point mPoint = new Point();
-					//Point aPoint = new Point(-639, 359);
-					//Point bPoint = new Point(-639, -359);
-					//Point cPoint = new Point(639, 359);
-					//Point dPoint = new Point(639, -359);
-					
-					
-					//controller.Update(mPoint.setLocation(-639, 359));
-					// TODO Add idle movement here.
+					if (j == 5)
+					{
+						j = 1;
+					}
 				}
 			}
 			if (!first)
@@ -172,7 +156,7 @@ public class Main
 			{
 				p.minfps = p.fps;
 			}
-			p.screen2.setTitle(p.format.format(p.fps)+" max " + p.format.format(p.maxfps) + " min " + p.format.format(p.minfps));
+			p.screen2.setTitle(p.format.format(p.fps)+" max " + p.format.format(p.maxfps) + " min " + p.format.format(p.minfps) + " PWM1 " + controller.GetLocation(2) + " PWM2 " + controller.GetLocation(3) + " PWM3 " + controller.GetLocation(0) + " PWM4 " + controller.GetLocation(1));
 			try
 			{
 				Thread.sleep(0);

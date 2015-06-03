@@ -18,12 +18,6 @@ public class ServoController
 		if (Math.abs(location.x) > 100)
 		{
 			pins[2].Update((short) location.x);
-			/*
-			if (Math.abs(location.x) > 319)
-			{
-				pins[3].Update((short) location.x);
-			}
-			*/
 		}
 		if (Math.abs(location.y) > 75)
 		{
@@ -35,7 +29,20 @@ public class ServoController
 		}
 		else if (pins[2].GetLocation() > 110)
 		{
+			pins[0].Update((short) 100);
+		}
+		if (pins[3].GetLocation() < 25)
+		{
+			pins[1].Update((short) -100);
+		}
+		else if (pins[3].GetLocation() > 155)
+		{
 			pins[1].Update((short) 100);
 		}
+	}
+	
+	public int GetLocation(int i)
+	{
+		return pins[i].GetLocation();
 	}
 }

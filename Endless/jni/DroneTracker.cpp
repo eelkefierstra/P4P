@@ -31,6 +31,12 @@ const int MAX_NUM_OBJECTS=1500;
 //minimum and maximum object area
 const int MIN_OBJECT_AREA = 10*10;
 const int MAX_OBJECT_AREA = FRAME_HEIGHT*FRAME_WIDTH/1.5;
+
+const std::string windowName = "Original Image";
+const std::string windowName1 = "HSV Image";
+const std::string windowName2 = "Thresholded Image";
+const std::string windowName3 = "After Morphological Operations";
+//const string trackbarWindowName = "Trackbars";
 //Matrix to store each frame of the webcam feed
 Mat cameraFeed;
 //matrix storage for HSV image
@@ -235,6 +241,7 @@ JNIEXPORT jboolean JNICALL Java_DroneTracker_Track(JNIEnv *env, jobject)
 	cvtColor(cameraFeed,HSV,COLOR_BGR2HSV);
 
 	inRange(HSV, Scalar(H_MIN2, S_MIN2, V_MIN2), Scalar(H_MAX2, S_MAX2, V_MAX2), thresh);
+	//imshow("pre morph", thresh);
 	int objects = 0, morphs = 0;
 	bool objectsFound = false;
 	bool cont = true;
@@ -261,10 +268,13 @@ JNIEXPORT jboolean JNICALL Java_DroneTracker_Track(JNIEnv *env, jobject)
 				break;
 			case 2:
 				cont = false, tracker = false;
-				return tracker;
 				break;
 		}
 	}
+	imshow("Threshold Blue", thresh);
+	imshow(windowName,cameraFeed);
+	imshow(windowName1,HSV);
+
 	return tracker;
 }
 

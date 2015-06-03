@@ -180,7 +180,7 @@ int DroneDetection::loop()
 	//convert frame from BGR to HSV colorspace
 	cvtColor(cameraFeed,HSV,COLOR_BGR2HSV);
 
-	inRange(HSV, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), thresh);
+	inRange(HSV, Scalar(H_MIN2, S_MIN2, V_MIN2), Scalar(H_MAX2, S_MAX2, V_MAX2), thresh);
 	imshow("pre morph", thresh);
 	morphOps(thresh);
 	trackFilteredObject(x, y, thresh, cameraFeed);
