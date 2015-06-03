@@ -31,7 +31,6 @@ public class Main
 	private ScheduledFuture<?>[] futureList;
 	private DecimalFormat format;
 	
-	
 	// Main loop
     //@SuppressWarnings("unused")
 	public static void main(String[] args)
@@ -84,6 +83,7 @@ public class Main
         
         boolean first = true;
 		int z = 0;
+		int[] arr = new int[5];
 		while(true)
 		{
 			if (tracker.Track())
@@ -95,6 +95,39 @@ public class Main
 			{
 				if (lastKnownTime + 2500000000L <= System.nanoTime())
 				{
+					Point[] IdleMove = new Point[5];
+					IdleMove[0] = new Point();
+					IdleMove[1] = new Point(-639, 359); //p1
+					IdleMove[2] = new Point(-639, -359); //p2
+					IdleMove[3] = new Point(639, 359); //p3
+					IdleMove[4] = new Point(-639, 359); //p4
+					
+					controller.Update(IdleMove[1]);
+					if(IdleMove[1].equals(new Point(-639, 359)))
+					{
+						controller.Update(IdleMove[2]);
+						if(IdleMove[2].equals(new Point(-639, -359)))
+						{
+							controller.Update(IdleMove[3]);
+							if(IdleMove[3].equals(new Point (639, 359)))
+							{
+								controller.Update(IdleMove[4]);
+								if(IdleMove[4].equals(new Point(-639, 359)))
+								{
+									controller.Update(IdleMove[0]);
+								}
+							}
+						}
+					}
+					//Point mPoint is het midden van het raster
+					//Point mPoint = new Point();
+					//Point aPoint = new Point(-639, 359);
+					//Point bPoint = new Point(-639, -359);
+					//Point cPoint = new Point(639, 359);
+					//Point dPoint = new Point(639, -359);
+					
+					
+					//controller.Update(mPoint.setLocation(-639, 359));
 					// TODO Add idle movement here.
 				}
 			}
