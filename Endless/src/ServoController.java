@@ -10,6 +10,7 @@ public class ServoController
 	
 	public ServoController()
 	{
+		
 	}
 	
 	public void Update(Point location)

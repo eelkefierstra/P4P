@@ -3,6 +3,7 @@ import java.awt.MouseInfo;
 import java.awt.Point;
 import java.text.DecimalFormat;
 */
+import java.awt.Point;
 import java.text.DecimalFormat;
 import java.util.List;
 import java.util.ArrayList;
@@ -76,14 +77,27 @@ public class Main
 		counter.start();
 		
 		Audio audio = new Audio(files);
+		ServoController controller = new ServoController();
         DroneTracker tracker = new DroneTracker();
         tracker.Setup();
+		long lastKnownTime = System.nanoTime();
         
         boolean first = true;
 		int z = 0;
 		while(true)
 		{
-			tracker.Track();
+			if (tracker.Track())
+			{
+				lastKnownTime = System.nanoTime();
+				controller.Update(tracker.GetLoc());
+			}
+			else
+			{
+				if (lastKnownTime + 2500000000L <= System.nanoTime())
+				{
+					// TODO Add idle movement here.
+				}
+			}
 			if (!first)
 			{
 				try

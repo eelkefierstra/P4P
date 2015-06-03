@@ -6,7 +6,7 @@ public class DroneTracker
 	
 	native void Setup();
 	
-	native void Track();
+	native boolean Track();
 	
 	native byte[] GetFeed();
 	

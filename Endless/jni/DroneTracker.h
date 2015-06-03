@@ -18,9 +18,9 @@ JNIEXPORT void JNICALL Java_DroneTracker_Setup
 /*
  * Class:     DroneTracker
  * Method:    Track
- * Signature: ()V
+ * Signature: ()Z
  */
-JNIEXPORT void JNICALL Java_DroneTracker_Track
+JNIEXPORT jboolean JNICALL Java_DroneTracker_Track
   (JNIEnv *, jobject);
 
 /*

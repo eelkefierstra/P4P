@@ -220,20 +220,21 @@ JNIEXPORT jint JNICALL Java_DroneTracker_GetY(JNIEnv *, jobject)
 	return 0;
 }
 
-JNIEXPORT void JNICALL Java_DroneTracker_Track(JNIEnv *env, jobject)
+JNIEXPORT jboolean JNICALL Java_DroneTracker_Track(JNIEnv *env, jobject)
 {
+	jboolean tracker = true;
 	//store image to matrix
 	capture.read(cameraFeed);
 	if (first)
 	{
-		first = false;
-		return ;
+		first = false, tracker = false;
+		return tracker;
 	}
 	
 	//convert frame from BGR to HSV colorspace
 	cvtColor(cameraFeed,HSV,COLOR_BGR2HSV);
 
-	inRange(HSV, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), thresh);
+	inRange(HSV, Scalar(H_MIN2, S_MIN2, V_MIN2), Scalar(H_MAX2, S_MAX2, V_MAX2), thresh);
 	int objects = 0, morphs = 0;
 	bool objectsFound = false;
 	bool cont = true;
@@ -259,12 +260,12 @@ JNIEXPORT void JNICALL Java_DroneTracker_Track(JNIEnv *env, jobject)
 				}
 				break;
 			case 2:
-				cont = false;
-				//TODO zelfstandig bewegen
+				cont = false, tracker = false;
+				return tracker;
 				break;
 		}
 	}
-	return ;
+	return tracker;
 }
 
 /*
