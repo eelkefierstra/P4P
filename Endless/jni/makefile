@@ -12,7 +12,7 @@ dronetracker.dll : DroneTracker.o
 
 # $@ matches the target, $< matches the first dependancy
 DroneTracker.o : DroneTracker.cpp DroneTracker.h
-	g++ -I"C:\Program Files\Java\jdk1.8.0_45\include" -I"C:\Program Files\Java\jdk1.8.0_45\include\win32" -I"C:\Program Files\mingw-w64\x86_64-4.9.2-win32-seh-rt_v4-rev2\mingw64\include" -I"D:\Dudecake\Downloads\opencv\build\include" -I"C:\Users\Dudecake\Downloads\opencv\build\include" -c $< -o $@ $(LDFLAGS)
+	g++ -I"C:\Program Files\Java\jdk1.8.0_45\include" -I"C:\Program Files\Java\jdk1.8.0_45\include\win32" -I"C:\Program Files\mingw-w64\x86_64-4.9.2-win32-seh-rt_v4-rev2\mingw64\include" -I"C:\Program Files\mingw-w64\x86_64-4.9.2-posix-seh-rt_v4-rev3\mingw64\include" -I"D:\Dudecake\Downloads\opencv\build\include" -I"C:\Users\Dudecake\Downloads\opencv\build\include" -I"C:\Users\Eelke\Downloads\utorrent\opencv\build\include" -c $< -o $@ $(LDFLAGS)
 
 # $* matches the target filename without the extension
 DroneTracker.h : DroneTracker.class
