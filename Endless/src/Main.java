@@ -80,8 +80,8 @@ public class Main
         DroneTracker tracker = new DroneTracker();
         tracker.Setup();
 		long lastKnownTime = System.nanoTime();
-        int i = 0;
-        int j = 1;
+        int fIndex = 0;
+        int index = 1;
         boolean first = true;
 		int z = 0;
 		Point[] IdleMove = new Point[5];
@@ -102,16 +102,16 @@ public class Main
 			{
 				if (lastKnownTime + 2500000000L <= System.nanoTime())
 				{
-					controller.Update(IdleMove[j]);
-					i++;
-					if (i == 25)
+					controller.Update(IdleMove[index]);
+					fIndex++;
+					if (fIndex == 25)
 					{
-						j++;
-						i = 0;
+						index++;
+						fIndex = 0;
 					}
-					if (j == 5)
+					if (index == 5)
 					{
-						j = 1;
+						index = 1;
 					}
 				}
 			}

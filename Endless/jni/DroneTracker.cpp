@@ -31,11 +31,11 @@ const int MAX_NUM_OBJECTS=1500;
 //minimum and maximum object area
 const int MIN_OBJECT_AREA = 10*10;
 const int MAX_OBJECT_AREA = FRAME_HEIGHT*FRAME_WIDTH/1.5;
-
+/*
 const std::string windowName = "Original Image";
 const std::string windowName1 = "HSV Image";
 const std::string windowName2 = "Thresholded Image";
-const std::string windowName3 = "After Morphological Operations";
+const std::string windowName3 = "After Morphological Operations";*/
 //const string trackbarWindowName = "Trackbars";
 //Matrix to store each frame of the webcam feed
 Mat cameraFeed;
@@ -271,9 +271,9 @@ JNIEXPORT jboolean JNICALL Java_DroneTracker_Track(JNIEnv *env, jobject)
 				break;
 		}
 	}
-	imshow("Threshold Blue", thresh);
-	imshow(windowName,cameraFeed);
-	imshow(windowName1,HSV);
+	//imshow("Threshold Blue", thresh);
+	//imshow(windowName,cameraFeed);
+	//imshow(windowName1,HSV);
 
 	return tracker;
 }
