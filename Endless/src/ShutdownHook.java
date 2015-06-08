@@ -10,7 +10,7 @@ public class ShutdownHook
 			public void run()
 			{
 				//ServoController.ResetPWM();
-				executor.shutdown();
+				//executor.shutdown();
 				System.out.println("exit");
 			}
 		});

@@ -45,8 +45,8 @@ public class Main
         {
 			String path = p.getClass().getResource("/lib/").toURI().toString();
         	path = path.substring(6);
-        	path = path.replaceAll("%20", " ");
-			System.load(path + "dronetracker.dll");        
+        	path = "/" + path.replaceAll("%20", " ");
+			System.load(path + "libdronetracker.so");        
 		}
 		catch (Exception ex)
 		{
