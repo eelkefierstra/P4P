@@ -1,4 +1,5 @@
 #include <jni.h>
+#include <vector>
 #include <sstream>
 #include <string>
 #include <iostream>
@@ -23,14 +24,17 @@ int S_MAX2 = 142;
 int V_MIN2 = 200;
 int V_MAX2 = 256;
 
+Vector<int> xPuntLijst;
+Vector<int> yPuntLijst;
+
 //default capture width and height
-const int FRAME_WIDTH = 1280;
-const int FRAME_HEIGHT = 720;
+const int FRAME_WIDTH = 854;
+const int FRAME_HEIGHT = 480;
 //max number of objects to be detected in frame
 const int MAX_NUM_OBJECTS=1500;
 //minimum and maximum object area
 const int MIN_OBJECT_AREA = 10*10;
-const int MAX_OBJECT_AREA = FRAME_HEIGHT*FRAME_WIDTH/1.5;
+const int MAX_OBJECT_AREA = FRAME_HEIGHT*FRAME_WIDTH/10;
 /*
 const std::string windowName = "Original Image";
 const std::string windowName1 = "HSV Image";
@@ -148,7 +152,9 @@ int trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed)
 					x = moment.m10/area;
 					y = moment.m01/area;
 					objectFound = true;
-					drawObject(x, y, cameraFeed);
+					xPuntLijst.push_back(x);
+					yPuntLijst.push_back(y);
+					//drawObject(x, y, cameraFeed);
 				}
 				else objectFound = false;
 			}
@@ -218,12 +224,24 @@ JNIEXPORT jbyteArray JNICALL Java_DroneTracker_GetHSV(JNIEnv *env, jobject)
 
 JNIEXPORT jint JNICALL Java_DroneTracker_GetX(JNIEnv *, jobject)
 {
-	return 0;
+	jint sum = 0;
+	jint aantal = xPuntLijst.size();
+	while(xPuntLijst.size()>0)
+	{
+		sum = sum + xPuntLijst.pop_back();
+	}
+	return sum/aantal;
 }
 
 JNIEXPORT jint JNICALL Java_DroneTracker_GetY(JNIEnv *, jobject)
 {
-	return 0;
+	jint sum = 0;
+	jint aantal = yPuntLijst.size();
+	while(yPuntLijst.size()>0)
+	{
+		sum = sum + yPuntLijst.pop_back();
+	}
+	return sum/aantal;
 }
 
 JNIEXPORT jboolean JNICALL Java_DroneTracker_Track(JNIEnv *env, jobject)
@@ -270,6 +288,7 @@ JNIEXPORT jboolean JNICALL Java_DroneTracker_Track(JNIEnv *env, jobject)
 				cont = false, tracker = false;
 				break;
 		}
+		return 0;
 	}
 	//imshow("Threshold Blue", thresh);
 	//imshow(windowName,cameraFeed);

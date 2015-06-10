@@ -18,7 +18,7 @@ public class Main
 	
 	private Screen screen1 = new Screen();
 	private Screen screen2 = new Screen();
-	private Screen screen3 = new Screen();
+	//private Screen screen3 = new Screen();
 	
 	private double maxfps;
 	private double minfps;
@@ -26,7 +26,7 @@ public class Main
 	private long nextTime;
 	private ImShow show1;
 	private ImShow show2;
-	private ImShow show3;
+	//private ImShow show3;
 	private ScheduledExecutorService executor;
 	private ScheduledFuture<?>[] futureList;
 	private DecimalFormat format;
@@ -39,7 +39,7 @@ public class Main
 
 		p.screen1.setSize(1280, 720);
 		p.screen2.setSize(1280, 720);
-		p.screen3.setSize(1280, 720);
+		//p.screen3.setSize(1280, 720);
 		
         try
         {
@@ -66,7 +66,7 @@ public class Main
 		FPSCounter counter = new FPSCounter();
 		p.show1 = new ImShow(p.screen1);
 		p.show2 = new ImShow(p.screen2);
-		p.show3 = new ImShow(p.screen3);
+		//p.show3 = new ImShow(p.screen3);
 		p.executor = Executors.newScheduledThreadPool(3);
 		p.futureList = new ScheduledFuture<?>[3];
 		p.format = new DecimalFormat("#.##");
@@ -123,8 +123,8 @@ public class Main
 					p.futureList[0] = p.executor.schedule(p.show1, 0, TimeUnit.NANOSECONDS);
 					p.show2.SetImage(tracker.GetFeed());
 					p.futureList[1] = p.executor.schedule(p.show2, 0, TimeUnit.NANOSECONDS);
-					p.show3.SetImage(tracker.GetHSV());
-					p.futureList[2] = p.executor.schedule(p.show3, 0, TimeUnit.NANOSECONDS);
+					//p.show3.SetImage(tracker.GetHSV());
+					//p.futureList[2] = p.executor.schedule(p.show3, 0, TimeUnit.NANOSECONDS);
 				}
 				catch (RejectedExecutionException ex)
 				{
