@@ -61,7 +61,6 @@ public class GUI extends JFrame
 		 */
 		private static final long serialVersionUID = -5706724813693343281L;
 
-		@Override
 		public void actionPerformed(ActionEvent e)
 		{
 			label.setText("" + i);

@@ -8,8 +8,9 @@
 #include <sstream>
 #include <string>
 #include <iostream>
-#include <opencv\highgui.h>
-#include <opencv\cv.h>
+#include <highgui.h>
+#include <cv.h>
+#include "RaspiCamCV.h"
 #include "DroneDetection.h"
 
 using namespace cv;
@@ -59,16 +60,20 @@ int x=0, y=0;
 //create slider bars for HSV filtering
 //createTrackbars();
 //video capture object to acquire webcam feed
-VideoCapture capture;
+//VideoCapture capture;
+RaspiCamCvCapture * camera;
+
 bool first = true;
 
 DroneDetection::DroneDetection()
 {
 	//open capture object at location zero (default location for webcam)
-	capture.open(0);
+	//capture.open(0);
 	//set height and width of capture frame
-	capture.set(CV_CAP_PROP_FRAME_WIDTH,FRAME_WIDTH);
-	capture.set(CV_CAP_PROP_FRAME_HEIGHT,FRAME_HEIGHT);
+	//capture.set(CV_CAP_PROP_FRAME_WIDTH,FRAME_WIDTH);
+	//capture.set(CV_CAP_PROP_FRAME_HEIGHT,FRAME_HEIGHT);
+
+	camera = raspiCamCvCreateCameraCapture(0);
 }
 
 /*
@@ -171,7 +176,10 @@ void DroneDetection::trackFilteredObject(int &x, int &y, Mat threshold, Mat &cam
 int DroneDetection::loop()
 {
 	//store image to matrix
-	capture.read(cameraFeed);
+	//capture.read(cameraFeed);
+	IplImage * temp = raspiCamCvQueryFrame(camera);
+	cameraFeed = cvarrToMat(temp);
+
 	if (first)
 	{
 		first = false;

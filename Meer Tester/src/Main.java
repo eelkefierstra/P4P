@@ -56,36 +56,36 @@ public class Main
 		try
 		{
 			//audio.PLayClip();
-			float i = 0.025f;
-			//PWMPin pin = new PWMPin((byte)23);
+			float i = 0.1875f;
+			PWMPin pin = new PWMPin((byte)25);
 		    counter.start();
 			for(;;)
 			{
 				p.gui.setTitle(p.getLocationRelativeTo().toString());
 				servos.Update(p.getLocationRelativeTo());
-				/*
-				for(; i <= 0.125f; i += 0.000125f)
+				
+				for(; i <= 0.26f; i += 0.0125f)
 				{
-					//pin.SetPWM(i);
+					pin.SetPWM(i);
 					System.out.println("PWM = " + i);
 					p.gui.setTitle("X = " + (p.getXRelativeTo() + " Y = " + p.getYRelativeTo()));
 					//p.gui.label.setText("PWM = " + i);
-					Thread.sleep(50);
+					Thread.sleep(500);
 				}
-				i = 0.125f;
-				for(; i >= 0.025f; i -= 0.000125f)
+				i = 0.26f;
+				for(; i >= 0.1875f; i -= 0.0125f)
 				{
-					//pin.SetPWM(i);
+					pin.SetPWM(i);
 					System.out.println("PWM = " + i);
 					//p.gui.label.setText("PWM = " + i);
-					Thread.sleep(50);
+					Thread.sleep(500);
 				}
 				i = 0.025f;
 				System.out.println("Loop" + x);
 				x++;
-				audio.SetClip(x);
-				audio.PLayClip();
-				*/
+				//audio.SetClip(x);
+				//audio.PLayClip();
+				
 				counter.interrupt();
 				p.gui.label.setText(counter.GetFPS()+"FPS");
 				Thread.sleep(100);

@@ -3,8 +3,9 @@
 #include <sstream>
 #include <string>
 #include <iostream>
-#include <opencv\highgui.h>
-#include <opencv\cv.h>
+#include <highgui.h>
+#include <cv.h>
+#include <raspicam/raspicam.h>
 #include "DroneTracker.h"
 
 using namespace cv;
@@ -51,6 +52,7 @@ Mat thresh;
 int x=0, y=0;
 //video capture object to acquire webcam feed
 VideoCapture capture;
+//raspicam::RaspiCam_Cv camera;
 
 vector<int> param = vector<int>(2);
 bool first = true;
@@ -59,6 +61,8 @@ JNIEXPORT void JNICALL Java_DroneTracker_Setup(JNIEnv *, jobject)
 {
 	//open capture object at location zero (default location for webcam)
 	capture.open(0);
+	//camera.set(CV_CAP_PROP_FRAME_WIDTH, FRAME_WIDTH);
+	//camera.set(CV_CAP_PROP_FRAME_HEIGHT, FRAME_HEIGHT);
 	//set height and width of capture frame
 	capture.set(CV_CAP_PROP_FRAME_WIDTH,FRAME_WIDTH);
 	capture.set(CV_CAP_PROP_FRAME_HEIGHT,FRAME_HEIGHT);
@@ -244,14 +248,19 @@ JNIEXPORT jint JNICALL Java_DroneTracker_GetY(JNIEnv *, jobject)
 	return sum/aantal;
 }
 
+int ding = 0;
+
 JNIEXPORT jboolean JNICALL Java_DroneTracker_Track(JNIEnv *env, jobject)
 {
 	jboolean tracker = true;
 	//store image to matrix
 	capture.read(cameraFeed);
-	if (first)
+	//camera.grab();
+	//camera.retrieve(cameraFeed);
+	if (ding < 5)
 	{
 		first = false, tracker = false;
+		ding++;
 		return tracker;
 	}
 	

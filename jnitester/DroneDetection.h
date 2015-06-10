@@ -7,8 +7,8 @@
 
 #ifndef DRONEDETECTION_H_
 #define DRONEDETECTION_H_
-#include <opencv\highgui.h>
-#include <opencv\cv.h>
+#include <highgui.h>
+#include <cv.h>
 
 class DroneDetection {
 public:
