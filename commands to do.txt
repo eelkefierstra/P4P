@@ -1,5 +1,5 @@
 sudo modprobe bcm2835-v4l2 // als je een picam gebruikt
-export PATH=/usr/lib/jvm/jdk-8-oracle-arm-vfp-hflt/bin;$PATH
+export PATH=/usr/lib/jvm/jdk-8-oracle-arm-vfp-hflt/bin:$PATH
 sudo pi-blaster/./pi-blaster -pcm
 java -jar p4p.jar
 
