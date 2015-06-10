@@ -1,25 +1,63 @@
-# Define a variable for classpath
-CLASS_PATH = ../bin
+OBJS = objs
 
-# Define a virtual path for .class in the bin directory
-vpath %.class $(CLASS_PATH)
+CFLAGS_OPENCV = -I/usr/include/opencv
+#LDFLAGS2_OPENCV = -lopencv_highgui -lopencv_core -lopencv_legacy -lopencv_video -lopencv_features2d -lopencv_calib3d -lopencv_imgproc -lpthread -lm
+LDFLAGS2_OPENCV = `pkg-config --static --cflags --libs opencv`
 
-all : dronetracker.dll
+USERLAND_ROOT = /home/pi/git/raspberrypi/userland
+CFLAGS_PI = \
+	-I$(USERLAND_ROOT)/host_applications/linux/libs/bcm_host/include \
+	-I$(USERLAND_ROOT)/host_applications/linux/apps/raspicam \
+	-I$(USERLAND_ROOT) \
+	-I$(USERLAND_ROOT)/interface/vcos/pthreads \
+	-I$(USERLAND_ROOT)/interface/vmcs_host/linux \
+	-I$(USERLAND_ROOT)/interface/mmal \
 
-# $@ matches the target, $< matches the first dependancy
-dronetracker.dll : DroneTracker.o
-	g++ -Wl,--add-stdcall-alias -shared -o ..\resources\lib\$@ $< -LC:\Users\Dudecake\Downloads\opencv\build\x64\MinGW\lib -lopencv_core2410 -lopencv_ml2410 -lopencv_video2410 -lopencv_features2d2410 -lopencv_calib3d2410 -lopencv_objdetect2410 -lopencv_contrib2410 -lopencv_flann2410 -lopencv_highgui2410 -lopencv_imgproc2410
+LDFLAGS_PI = -L$(USERLAND_ROOT)/build/lib -lmmal_core -lmmal -l mmal_util -lvcos -lbcm_host
 
-# $@ matches the target, $< matches the first dependancy
-DroneTracker.o : DroneTracker.cpp DroneTracker.h
-	g++ -I"C:\Program Files\Java\jdk1.8.0_45\include" -I"C:\Program Files\Java\jdk1.8.0_45\include\win32" -I"C:\Program Files\mingw-w64\x86_64-4.9.2-win32-seh-rt_v4-rev2\mingw64\include" -I"D:\Dudecake\Downloads\opencv\build\include" -I"C:\Users\Dudecake\Downloads\opencv\build\include" -c $< -o $@ $(LDFLAGS)
+BUILD_TYPE=debug
+#BUILD_TYPE=release
 
-# $* matches the target filename without the extension
-DroneTracker.h : DroneTracker.class
-	javah -classpath $(CLASS_PATH) $*
+CFLAGS_COMMON = -Wno-multichar -g $(CFLAGS_OPENCV) $(CFLAGS_PI) -MD
 
-clean :
-	rm DroneTracker.h DroneTracker.o ../resources/lib/dronetracker.dll
-# g++ "-ID:\\Dudecake\\Downloads\\opencv\\build\\include" "-IC:\\Program Files\\Java\\jdk1.8.0_45\\include" "-IC:\\Users\\Dudecake\\Documents\\GitHub\\P4P\\jnitester" "-IC:\\Program Files\\mingw-w64\\x86_64-4.9.2-posix-seh-rt_v4-rev2\\mingw64\\include" "-IC:\\Users\\Dudecake\\Downloads\\opencv\\build\\include" -O2 -g -Wall -c -fmessage-length=0 -o jnitester.o "..\\jnitester.cpp"
-# g++ "-ID:\\Dudecake\\Downloads\\opencv\\build\\include" "-IC:\\Program Files\\Java\\jdk1.8.0_45\\include" "-IC:\\Users\\Dudecake\\Documents\\GitHub\\P4P\\jnitester" "-IC:\\Program Files\\mingw-w64\\x86_64-4.9.2-posix-seh-rt_v4-rev2\\mingw64\\include" "-IC:\\Users\\Dudecake\\Downloads\\opencv\\build\\include" -O2 -g -Wall -c -fmessage-length=0 -o DroneDetection.o "..\\DroneDetection.cpp"
-# g++ "-LD:\\Dudecake\\Downloads\\opencv\\build\\x64\\MinGW\\lib" "-LC:\\Users\\Dudecake\\Downloads\\opencv\\build\\x64\\MinGW\\lib" -o jnitester jnitester.o DroneDetection.o -lopencv_core2410 -lopencv_ml2410 -lopencv_video2410 -lopencv_features2d2410 -lopencv_calib3d2410 -lopencv_objdetect2410 -lopencv_contrib2410 -lopencv_flann2410 -lopencv_highgui2410 -lopencv_imgproc2410
+ifeq ($(BUILD_TYPE), debug)
+	CFLAGS = $(CFLAGS_COMMON)
+endif
+ifeq ($(BUILD_TYPE), release)
+	CFLAGS = $(CFLAGS_COMMON) -O3
+endif
+
+LDFLAGS = 
+LDFLAGS2 = $(LDFLAGS2_OPENCV) $(LDFLAGS_PI) -lX11 -lXext -lrt -lstdc++
+
+RASPICAMCV_OBJS = \
+	$(OBJS)/RaspiCamControl.o \
+	$(OBJS)/RaspiCLI.o \
+	$(OBJS)/RaspiCamCV.o \
+
+RASPICAMTEST_OBJS = \
+	$(OBJS)/RaspiCamTest.o \
+
+TARGETS = libraspicamcv.a raspicamtest libraspicamcv.so
+
+all: $(TARGETS)
+
+$(OBJS)/%.o: %.c
+	gcc -c $(CFLAGS) $< -o $@
+
+$(OBJS)/%.o: $(USERLAND_ROOT)/host_applications/linux/apps/raspicam/%.c
+	gcc -c $(CFLAGS) $< -o $@
+
+libraspicamcv.a: $(RASPICAMCV_OBJS)
+	ar rcs libraspicamcv.a -o $+
+
+libraspicamcv.so: $(RASPICAMCV_OBJS)
+	gcc -shared -o libraspicamcv.so $+ -Wl,-whole-archive $(LDFLAGS_PI) -lopencv_core -lopencv_highgui -Wl,-no-whole-archive
+
+raspicamtest: $(RASPICAMTEST_OBJS) libraspicamcv.a
+	gcc $(LDFLAGS) $+ $(LDFLAGS2) -L. libraspicamcv.a -o $@
+
+clean:
+	rm -f $(OBJS)/* $(TARGETS)
+
+-include $(OBJS)/*.d
