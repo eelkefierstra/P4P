@@ -214,7 +214,7 @@ int main(int argc, char* argv[])
 		waitKey(15);
 		*/
 		drone->loop();
-		cv::waitKey(15);
+		cv::waitKey(1);
 	}
 	return 0;
 }

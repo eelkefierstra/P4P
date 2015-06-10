@@ -14,19 +14,17 @@ import java.util.concurrent.*;
 //@SuppressWarnings("unused")
 public class Main
 {
-	//private GUI gui = new GUI();
-	
-	private Screen screen1 = new Screen();
+	//private Screen screen1 = new Screen();
 	private Screen screen2 = new Screen();
-	private Screen screen3 = new Screen();
+	//private Screen screen3 = new Screen();
 	
 	private double maxfps;
 	private double minfps;
 	private double fps;
 	private long nextTime;
-	private ImShow show1;
+	//private ImShow show1;
 	private ImShow show2;
-	private ImShow show3;
+	//private ImShow show3;
 	private ScheduledExecutorService executor;
 	private ScheduledFuture<?>[] futureList;
 	private DecimalFormat format;
@@ -37,16 +35,12 @@ public class Main
     {
         Main p = new Main();
 
-		p.screen1.setSize(1280, 720);
-		p.screen2.setSize(1280, 720);
-		p.screen3.setSize(1280, 720);
-		
         try
         {
 			String path = p.getClass().getResource("/lib/").toURI().toString();
         	path = path.substring(6);
         	path = "/" + path.replaceAll("%20", " ");
-			System.load(path + "libdronetracker.so");        
+			System.load(path + "libdronetracker.so");
 		}
 		catch (Exception ex)
 		{
@@ -64,32 +58,31 @@ public class Main
 		}
 		
 		FPSCounter counter = new FPSCounter();
-		p.show1 = new ImShow(p.screen1);
+		//p.show1 = new ImShow(p.screen1);
 		p.show2 = new ImShow(p.screen2);
-		p.show3 = new ImShow(p.screen3);
-		p.executor = Executors.newScheduledThreadPool(3);
-		p.futureList = new ScheduledFuture<?>[3];
+		//p.show3 = new ImShow(p.screen3);
+		p.executor = Executors.newScheduledThreadPool(2);
+		p.futureList = new ScheduledFuture<?>[2];
 		p.format = new DecimalFormat("#.##");
 		p.minfps = 10;
-		ShutdownHook hook = new ShutdownHook();
-		hook.attachShutDownHook(p.executor);
 		counter.start();
 		
 		Audio audio = new Audio(files);
 		ServoController controller = new ServoController();
         DroneTracker tracker = new DroneTracker();
         tracker.Setup();
+        ShutdownHook hook = new ShutdownHook();
+		hook.attachShutDownHook(p.executor, tracker);
 		long lastKnownTime = System.nanoTime();
         int fIndex = 0;
         int index = 1;
         boolean first = true;
 		int z = 0;
-		Point[] IdleMove = new Point[5];
-		IdleMove[0] = new Point();
-		IdleMove[1] = new Point(-101, 76); //p1
-		IdleMove[2] = new Point(-101, -76); //p2
-		IdleMove[3] = new Point(101, 76); //p3
-		IdleMove[4] = new Point(-101, 76); //p4
+		Point[] IdleMove = new Point[4];
+		IdleMove[0] = new Point(-101, 76); //p1
+		IdleMove[1] = new Point(-101, -76); //p2
+		IdleMove[2] = new Point(101, 76); //p3
+		IdleMove[3] = new Point(-101, 76); //p4
 		
 		while(true)
 		{
@@ -109,9 +102,9 @@ public class Main
 						index++;
 						fIndex = 0;
 					}
-					if (index == 5)
+					if (index == 4)
 					{
-						index = 1;
+						index = 0;
 					}
 				}
 			}
@@ -119,12 +112,12 @@ public class Main
 			{
 				try
 				{
-					p.show1.SetImage(tracker.GetThresh());
-					p.futureList[0] = p.executor.schedule(p.show1, 0, TimeUnit.NANOSECONDS);
+					//p.show1.SetImage(tracker.GetThresh());
+					//p.futureList[0] = p.executor.schedule(p.show1, 0, TimeUnit.NANOSECONDS);
 					p.show2.SetImage(tracker.GetFeed());
 					p.futureList[1] = p.executor.schedule(p.show2, 0, TimeUnit.NANOSECONDS);
-					p.show3.SetImage(tracker.GetHSV());
-					p.futureList[2] = p.executor.schedule(p.show3, 0, TimeUnit.NANOSECONDS);
+					//p.show3.SetImage(tracker.GetHSV());
+					//p.futureList[2] = p.executor.schedule(p.show3, 0, TimeUnit.NANOSECONDS);
 				}
 				catch (RejectedExecutionException ex)
 				{
@@ -206,6 +199,6 @@ public class Main
 		}
 		executor.shutdown();
 		return res;
-    }	
+    }
 
 }

@@ -26,7 +26,7 @@
 									<listOptionValue builtIn="false" value="/home/pi/git/robidouille/raspicam_cv"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}}&quot;"/>
 								</option>
-								<option id="gnu.cpp.compiler.option.include.files.1078643207" superClass="gnu.cpp.compiler.option.include.files" valueType="includeFiles">
+								<option id="gnu.cpp.compiler.option.include.files.1078643207" name="Include files (-include)" superClass="gnu.cpp.compiler.option.include.files" valueType="includeFiles">
 									<listOptionValue builtIn="false" value="/home/pi/git/robidouille/raspicam_cv/RaspiCamCV.h"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1063934063" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>

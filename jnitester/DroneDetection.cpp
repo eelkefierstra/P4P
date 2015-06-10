@@ -131,46 +131,52 @@ void DroneDetection::morphOps(Mat &thresh1){
 	dilate(thresh1,thresh1,dilateElement);
 }
 
-void DroneDetection::trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed){
+int DroneDetection::trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed){
 
 	Mat temp;
-	threshold.copyTo(temp);
-	//these two vectors needed for output of findContours
-	vector< vector<Point> > contours;
-	vector<Vec4i> hierarchy;
-	//find contours of filtered image using openCV findContours function
-	findContours(temp,contours,hierarchy,CV_RETR_CCOMP,CV_CHAIN_APPROX_SIMPLE );
-	//use moments method to find our filtered object
-	double refArea = 0;
-	bool objectFound = false;
-	if (hierarchy.size() > 0) {
-		int numObjects = hierarchy.size();
-        //if number of objects greater than MAX_NUM_OBJECTS we have a noisy filter
-        if(numObjects<MAX_NUM_OBJECTS){
-			for (int index = 0; index >= 0; index = hierarchy[index][0]) {
+		threshold.copyTo(temp);
+		//these two vectors needed for output of findContours
+		vector< vector<Point> > contours;
+		vector<Vec4i> hierarchy;
+		//find contours of filtered image using openCV findContours function
+		findContours(temp,contours,hierarchy,CV_RETR_CCOMP,CV_CHAIN_APPROX_SIMPLE );
+		//use moments method to find our filtered object
+		bool objectFound = false;
+		if (hierarchy.size() > 0)
+		{
+			int numObjects = hierarchy.size();
+	        //if number of objects greater than MAX_NUM_OBJECTS we have a noisy filter
+	        if(numObjects<MAX_NUM_OBJECTS)
+			{
+				for (int index = 0; index >= 0; index = hierarchy[index][0])
+				{
 
-				Moments moment = moments((Mat)contours[index]);
-				double area = moment.m00;
+					Moments moment = moments((Mat)contours[index]);
+					double area = moment.m00;
 
-				//if the area is less than 20 px by 20px then it is probably just noise
-				//if the area is the same as the 3/2 of the image size, probably just a bad filter
-				//we only want the object with the largest area so we safe a reference area each
-				//iteration and compare it to the area in the next iteration.
-                if(area>MIN_OBJECT_AREA && area<MAX_OBJECT_AREA && area>refArea){
-					x = moment.m10/area;
-					y = moment.m01/area;
-					objectFound = true;
-					refArea = area;
-				}else objectFound = false;
+					//if the area is less than 20 px by 20px then it is probably just noise
+					//if the area is the same as the 3/2 of the image size, probably just a bad filter
+					//we only want the object with the largest area so we safe a reference area each
+					//iteration and compare it to the area in the next iteration.
+	                if(area>MIN_OBJECT_AREA && area<MAX_OBJECT_AREA)
+					{
+						x = moment.m10/area;
+						y = moment.m01/area;
+						objectFound = true;
+						drawObject(x, y, cameraFeed);
+					}
+					else objectFound = false;
+				}
+				//let user know you found an object
+				if(objectFound ==true)
+				{
+					return 0;
+				}
+				else return 1;
 			}
-			//let user know you found an object
-			if(objectFound ==true){
-				putText(cameraFeed,"Tracking Object",Point(0,50),2,1,Scalar(0,255,0),2);
-				//draw object location on screen
-				drawObject(x,y,cameraFeed);}
-
-		}else putText(cameraFeed,"TOO MUCH NOISE! ADJUST FILTER",Point(0,50),1,2,Scalar(0,0,255),2);
-	}
+			else return 2;
+		}
+		return 0;
 }
 
 int DroneDetection::loop()
@@ -189,23 +195,47 @@ int DroneDetection::loop()
 	cvtColor(cameraFeed,HSV,COLOR_BGR2HSV);
 
 	inRange(HSV, Scalar(H_MIN2, S_MIN2, V_MIN2), Scalar(H_MAX2, S_MAX2, V_MAX2), thresh);
-	imshow("pre morph", thresh);
-	morphOps(thresh);
-	trackFilteredObject(x, y, thresh, cameraFeed);
-	imshow("Threshold Blue", thresh);
+	//imshow("pre morph", thresh);
+	int objects = 0, morphs = 0;
+	bool objectsFound = false;
+	bool cont = true;
 
-	//show frames
+		while (cont)
+		{
+			switch (trackFilteredObject(x, y, thresh, cameraFeed))
+			{
+				case 0:
+					objectsFound = true;
+					objects++;
+					cont = false;
+					break;
+				case 1:
+					if (morphs<3)
+					{
+						morphOps(thresh);
+						morphs++;
+					}
+					else
+					{
+						cont = false;
+					}
+					break;
+				case 2:
+					cont = false;
+					break;
+			}
 
+		}
+	//imshow("Threshold Blue", thresh);
 	imshow(windowName,cameraFeed);
 	imshow(windowName1,HSV);
-	//delay 30ms so that screen can refresh.
-	//image will not appear without this waitKey() command
 	return 0;
 }
 
 
 DroneDetection::~DroneDetection()
 {
-	// TODO Auto-generated destructor stub
+	//camera->raspiCamCvReleaseCapture();
+	delete camera;
 }
 

@@ -4,7 +4,7 @@
 #include <iostream>
 #include <highgui.h>
 #include <cv.h>
-#include <raspicam/raspicam.h>
+#include "RaspiCamCV.h"
 #include "DroneTracker.h"
 
 using namespace cv;
@@ -31,13 +31,8 @@ const int FRAME_HEIGHT = 720;
 const int MAX_NUM_OBJECTS=1500;
 //minimum and maximum object area
 const int MIN_OBJECT_AREA = 10*10;
-const int MAX_OBJECT_AREA = FRAME_HEIGHT*FRAME_WIDTH/1.5;
-/*
-const std::string windowName = "Original Image";
-const std::string windowName1 = "HSV Image";
-const std::string windowName2 = "Thresholded Image";
-const std::string windowName3 = "After Morphological Operations";*/
-//const string trackbarWindowName = "Trackbars";
+const int MAX_OBJECT_AREA = FRAME_HEIGHT*FRAME_WIDTH/10;
+
 //Matrix to store each frame of the webcam feed
 Mat cameraFeed;
 //matrix storage for HSV image
@@ -47,8 +42,10 @@ Mat thresh;
 //x and y values for the location of the object
 int x=0, y=0;
 //video capture object to acquire webcam feed
-VideoCapture capture;
-//raspicam::RaspiCam_Cv camera;
+RaspiCamCvCapture * camera;
+
+vector<int> xList;
+vector<int> yList;
 
 vector<int> param = vector<int>(2);
 bool first = true;
@@ -56,12 +53,7 @@ bool first = true;
 JNIEXPORT void JNICALL Java_DroneTracker_Setup(JNIEnv *, jobject)
 {
 	//open capture object at location zero (default location for webcam)
-	capture.open(0);
-	//camera.set(CV_CAP_PROP_FRAME_WIDTH, FRAME_WIDTH);
-	//camera.set(CV_CAP_PROP_FRAME_HEIGHT, FRAME_HEIGHT);
-	//set height and width of capture frame
-	capture.set(CV_CAP_PROP_FRAME_WIDTH,FRAME_WIDTH);
-	capture.set(CV_CAP_PROP_FRAME_HEIGHT,FRAME_HEIGHT);
+	camera = raspiCamCvCreateCameraCapture(0);
 
 	param[0] = IMWRITE_PNG_COMPRESSION;
 	param[1] = 3;
@@ -152,7 +144,9 @@ int trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed)
 					x = moment.m10/area;
 					y = moment.m01/area;
 					objectFound = true;
-					drawObject(x, y, cameraFeed);
+					xList.push_back(x);
+					yList.push_back(y);
+					//drawObject(x, y, cameraFeed);
 				}
 				else objectFound = false;
 			}
@@ -165,7 +159,7 @@ int trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed)
 		}
 		else return 2;
 	}
-	return 3;
+	return 0;
 }
 
 vector<uchar> ConvertMat(Mat &img)
@@ -205,52 +199,57 @@ JNIEXPORT jbyteArray JNICALL Java_DroneTracker_GetThresh(JNIEnv *env, jobject)
 	return res;
 }
 
-JNIEXPORT jbyteArray JNICALL Java_DroneTracker_GetHSV(JNIEnv *env, jobject)
+JNIEXPORT jint JNICALL Java_DroneTracker_GetX(JNIEnv *env, jobject)
 {
-	vector<uchar> tempvec = ConvertMat(HSV);
-	jbyte* temp = new jbyte[tempvec.size()];
-	jbyteArray res = env->NewByteArray(tempvec.size());
-	for (int i = 0; i < tempvec.size(); i++)
+	jint sum = 0;
+	jint aantal = xList.size();
+	while(xList.size()>0)
 	{
-		temp[i] = (jbyte)tempvec[i];
+		sum += (jint)xList.back();
+		xList.pop_back();
 	}
-	env->SetByteArrayRegion(res, 0, tempvec.size(), temp);
-	delete temp, tempvec;
-	//temp = nullptr, tempvec = nullptr;
+	jint res = sum/aantal;
 	return res;
 }
 
-JNIEXPORT jint JNICALL Java_DroneTracker_GetX(JNIEnv *, jobject)
+JNIEXPORT jint JNICALL Java_DroneTracker_GetY(JNIEnv *env, jobject)
 {
-	return 0;
+	jint sum = 0;
+	jint aantal = yList.size();
+	while(yList.size()>0)
+	{
+		sum += (jint)yList.back();
+		yList.pop_back();
+	}
+	jint res = sum/aantal;
+	return res;
 }
 
-JNIEXPORT jint JNICALL Java_DroneTracker_GetY(JNIEnv *, jobject)
-{
-	return 0;
-}
-
-int ding = 0;
+bool dinges = true;
 
 JNIEXPORT jboolean JNICALL Java_DroneTracker_Track(JNIEnv *env, jobject)
 {
 	jboolean tracker = true;
 	//store image to matrix
-	capture.read(cameraFeed);
-	//camera.grab();
-	//camera.retrieve(cameraFeed);
-	if (ding < 5)
+	//capture.read(cameraFeed);
+	IplImage * temp = raspiCamCvQueryFrame(camera);
+	cameraFeed = cvarrToMat(temp);
+	//delete temp;
+
+	if (first)
 	{
 		first = false, tracker = false;
-		ding++;
 		return tracker;
 	}
 	
-	//convert frame from BGR to HSV colorspace
-	cvtColor(cameraFeed,HSV,COLOR_BGR2HSV);
+	if (dinges)
+	{
+		//convert frame from BGR to HSV colorspace
+		cvtColor(cameraFeed,HSV,COLOR_BGR2HSV);
+		//dinges = false;
+	}
 
 	inRange(HSV, Scalar(H_MIN2, S_MIN2, V_MIN2), Scalar(H_MAX2, S_MAX2, V_MAX2), thresh);
-	//imshow("pre morph", thresh);
 	int objects = 0, morphs = 0;
 	bool objectsFound = false;
 	bool cont = true;
@@ -280,10 +279,6 @@ JNIEXPORT jboolean JNICALL Java_DroneTracker_Track(JNIEnv *env, jobject)
 				break;
 		}
 	}
-	//imshow("Threshold Blue", thresh);
-	//imshow(windowName,cameraFeed);
-	//imshow(windowName1,HSV);
-
 	return tracker;
 }
 

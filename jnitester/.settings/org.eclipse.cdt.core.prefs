@@ -1,6 +1,11 @@
 eclipse.preferences.version=1
 environment/project/0.1731862006/append=true
 environment/project/0.1731862006/appendContributed=true
+environment/project/cdt.managedbuild.toolchain.gnu.base.1480742518/LD_LIBRARY_PATH/delimiter=\:
+environment/project/cdt.managedbuild.toolchain.gnu.base.1480742518/LD_LIBRARY_PATH/operation=append
+environment/project/cdt.managedbuild.toolchain.gnu.base.1480742518/LD_LIBRARY_PATH/value=/home/pi/git/robidouille/raspicam_cv/
+environment/project/cdt.managedbuild.toolchain.gnu.base.1480742518/append=true
+environment/project/cdt.managedbuild.toolchain.gnu.base.1480742518/appendContributed=true
 environment/project/cdt.managedbuild.toolchain.gnu.mingw.base.2083307055/MINGW_HOME/delimiter=;
 environment/project/cdt.managedbuild.toolchain.gnu.mingw.base.2083307055/MINGW_HOME/operation=replace
 environment/project/cdt.managedbuild.toolchain.gnu.mingw.base.2083307055/MINGW_HOME/value=C\:\\Program Files\\mingw-w64\\x86_64-4.9.2-posix-seh-rt_v4-rev2\\mingw64
