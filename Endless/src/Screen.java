@@ -32,7 +32,7 @@ public class Screen extends JFrame
 	    }
 
 		this.add(screen);
-		this.setSize(1280, 720);
+		this.setSize(854,480);
 		this.setLocationRelativeTo(null);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setVisible(true);

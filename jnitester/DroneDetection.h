@@ -18,7 +18,7 @@ public:
 	std::string intToString(int number);
 	void drawObject(int x, int y,cv::Mat &frame);
 	void morphOps(cv::Mat &thresh);
-	void trackFilteredObject(int &x, int &y, cv::Mat threshold, cv::Mat &cameraFeed);
+	int trackFilteredObject(int &x, int &y, cv::Mat threshold, cv::Mat &cameraFeed);
 };
 
 #endif /* DRONEDETECTION_H_ */

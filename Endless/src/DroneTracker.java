@@ -4,15 +4,13 @@ public class DroneTracker
 {
 	private Point loc;
 	
-	native void Setup();
+	public native void Setup();
 	
-	native boolean Track();
+	public native boolean Track();
 	
-	native byte[] GetFeed();
+	public native byte[] GetFeed();
 	
-	native byte[] GetThresh();
-	
-	native byte[] GetHSV();
+	public native byte[] GetThresh();
 	
 	private native int GetX();
 	
@@ -21,7 +19,6 @@ public class DroneTracker
 	public DroneTracker()
 	{
 		loc = new Point();
-		Setup();
 	}
 	
 	public Point GetLoc()

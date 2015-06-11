@@ -2,7 +2,7 @@ import java.util.concurrent.ScheduledExecutorService;
 
 public class ShutdownHook 
 {
-	public void attachShutDownHook(ScheduledExecutorService executor)
+	public void attachShutDownHook(final ScheduledExecutorService executor, final DroneTracker tracker)
 	{
 		Runtime.getRuntime().addShutdownHook(new Thread()
 		{
@@ -10,7 +10,7 @@ public class ShutdownHook
 			public void run()
 			{
 				//ServoController.ResetPWM();
-				//executor.shutdown();
+				executor.shutdown();
 				System.out.println("exit");
 			}
 		});
