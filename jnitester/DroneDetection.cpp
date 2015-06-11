@@ -2,7 +2,7 @@
  * DroneDetection.cpp
  *
  *  Created on: 30 mei 2015
- *      Author: Dudecake
+ *      Author: Dudecake and Siroci
  */
 
 #include <sstream>
@@ -23,27 +23,20 @@ int S_MAX = 256;
 int V_MIN = 0;
 int V_MAX = 256;
 
-int H_MIN2 = 77;
-int H_MAX2 = 256;
-int S_MIN2 = 44;
-int S_MAX2 = 142;
-int V_MIN2 = 200;
-int V_MAX2 = 256;
-
 //default capture width and height
 const int FRAME_WIDTH = 640;
 const int FRAME_HEIGHT = 480;
 //max number of objects to be detected in frame
-const int MAX_NUM_OBJECTS=1500;
+const int MAX_NUM_OBJECTS=150;
 //minimum and maximum object area
 const int MIN_OBJECT_AREA = 10*10;
-const int MAX_OBJECT_AREA = FRAME_HEIGHT*FRAME_WIDTH/1.5;
+const int MAX_OBJECT_AREA = FRAME_HEIGHT*FRAME_WIDTH/10;
 //names that will appear at the top of each window
 const std::string windowName = "Original Image";
 const std::string windowName1 = "HSV Image";
 const std::string windowName2 = "Thresholded Image";
 const std::string windowName3 = "After Morphological Operations";
-//const string trackbarWindowName = "Trackbars";
+const std::string trackbarWindowName = "Trackbars";
 
 //some boolean variables for different functionality within this
 //program
@@ -73,22 +66,56 @@ DroneDetection::DroneDetection()
 	//capture.set(CV_CAP_PROP_FRAME_WIDTH,FRAME_WIDTH);
 	//capture.set(CV_CAP_PROP_FRAME_HEIGHT,FRAME_HEIGHT);
 
+	//create slider bars for HSV filtering
+	createTrackbars();
+
 	camera = raspiCamCvCreateCameraCapture(0);
 }
 
-/*
+
 void on_trackbar( int, void* )
 {//This function gets called whenever a
 	// trackbar position is changed
 }
-*/
-std::string DroneDetection::intToString(int number){
+
+void DroneDetection::createTrackbars()
+{
+	//create window for trackbars
+
+
+    namedWindow(trackbarWindowName,0);
+	//create memory to store trackbar name on window
+	char TrackbarName[50];
+	sprintf( TrackbarName, "H_MIN", H_MIN);
+	sprintf( TrackbarName, "H_MAX", H_MAX);
+	sprintf( TrackbarName, "S_MIN", S_MIN);
+	sprintf( TrackbarName, "S_MAX", S_MAX);
+	sprintf( TrackbarName, "V_MIN", V_MIN);
+	sprintf( TrackbarName, "V_MAX", V_MAX);
+	//create trackbars and insert them into window
+	//3 parameters are: the address of the variable that is changing when the trackbar is moved(eg.H_LOW),
+	//the max value the trackbar can move (eg. H_HIGH),
+	//and the function that is called whenever the trackbar is moved(eg. on_trackbar)
+	//                                  ---->    ---->     ---->
+    createTrackbar( "H_MIN", trackbarWindowName, &H_MIN, H_MAX, on_trackbar );
+    createTrackbar( "H_MAX", trackbarWindowName, &H_MAX, H_MAX, on_trackbar );
+    createTrackbar( "S_MIN", trackbarWindowName, &S_MIN, S_MAX, on_trackbar );
+    createTrackbar( "S_MAX", trackbarWindowName, &S_MAX, S_MAX, on_trackbar );
+    createTrackbar( "V_MIN", trackbarWindowName, &V_MIN, V_MAX, on_trackbar );
+    createTrackbar( "V_MAX", trackbarWindowName, &V_MAX, V_MAX, on_trackbar );
+
+
+}
+
+std::string DroneDetection::intToString(int number)
+{
 	std::stringstream ss;
 	ss << number;
 	return ss.str();
 }
 
-void DroneDetection::drawObject(int x, int y,Mat &frame){
+void DroneDetection::drawObject(int x, int y,Mat &frame)
+{
 
 	//use some of the openCV drawing functions to draw crosshairs
 	//on your tracked image!
@@ -114,7 +141,8 @@ void DroneDetection::drawObject(int x, int y,Mat &frame){
 	putText(frame,intToString(x)+","+intToString(y),Point(x,y+30),1,1,Scalar(0,255,0),2);
 }
 
-void DroneDetection::morphOps(Mat &thresh1){
+void DroneDetection::morphOps(Mat &thresh1)
+{
 
 	//create structuring element that will be used to "dilate" and "erode" image.
 	//the element chosen here is a 3px by 3px rectangle
@@ -131,52 +159,52 @@ void DroneDetection::morphOps(Mat &thresh1){
 	dilate(thresh1,thresh1,dilateElement);
 }
 
-int DroneDetection::trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed){
-
+int DroneDetection::trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed)
+{
 	Mat temp;
-		threshold.copyTo(temp);
-		//these two vectors needed for output of findContours
-		vector< vector<Point> > contours;
-		vector<Vec4i> hierarchy;
-		//find contours of filtered image using openCV findContours function
-		findContours(temp,contours,hierarchy,CV_RETR_CCOMP,CV_CHAIN_APPROX_SIMPLE );
-		//use moments method to find our filtered object
-		bool objectFound = false;
-		if (hierarchy.size() > 0)
+	threshold.copyTo(temp);
+	//these two vectors needed for output of findContours
+	vector< vector<Point> > contours;
+	vector<Vec4i> hierarchy;
+	//find contours of filtered image using openCV findContours function
+	findContours(temp,contours,hierarchy,CV_RETR_CCOMP,CV_CHAIN_APPROX_SIMPLE );
+	//use moments method to find our filtered object
+	bool objectFound = false;
+	if (hierarchy.size() > 0)
+	{
+		int numObjects = hierarchy.size();
+		//if number of objects greater than MAX_NUM_OBJECTS we have a noisy filter
+		if(numObjects<MAX_NUM_OBJECTS)
 		{
-			int numObjects = hierarchy.size();
-	        //if number of objects greater than MAX_NUM_OBJECTS we have a noisy filter
-	        if(numObjects<MAX_NUM_OBJECTS)
+			for (int index = 0; index >= 0; index = hierarchy[index][0])
 			{
-				for (int index = 0; index >= 0; index = hierarchy[index][0])
-				{
 
-					Moments moment = moments((Mat)contours[index]);
-					double area = moment.m00;
+				Moments moment = moments((Mat)contours[index]);
+				double area = moment.m00;
 
-					//if the area is less than 20 px by 20px then it is probably just noise
-					//if the area is the same as the 3/2 of the image size, probably just a bad filter
-					//we only want the object with the largest area so we safe a reference area each
-					//iteration and compare it to the area in the next iteration.
-	                if(area>MIN_OBJECT_AREA && area<MAX_OBJECT_AREA)
-					{
-						x = moment.m10/area;
-						y = moment.m01/area;
-						objectFound = true;
-						drawObject(x, y, cameraFeed);
-					}
-					else objectFound = false;
-				}
-				//let user know you found an object
-				if(objectFound ==true)
+				//if the area is less than 20 px by 20px then it is probably just noise
+				//if the area is the same as the 3/2 of the image size, probably just a bad filter
+				//we only want the object with the largest area so we safe a reference area each
+				//iteration and compare it to the area in the next iteration.
+				if(area>MIN_OBJECT_AREA && area<MAX_OBJECT_AREA)
 				{
-					return 0;
+					x = moment.m10/area;
+					y = moment.m01/area;
+					objectFound = true;
+					drawObject(x, y, cameraFeed);
 				}
-				else return 1;
+				else objectFound = false;
 			}
-			else return 2;
+			//let user know you found an object
+			if(objectFound ==true)
+			{
+				return 0;
+			}
+			else return 1;
 		}
-		return 0;
+		else return 2;
+	}
+	return 0;
 }
 
 int DroneDetection::loop()
@@ -194,8 +222,8 @@ int DroneDetection::loop()
 	//convert frame from BGR to HSV colorspace
 	cvtColor(cameraFeed,HSV,COLOR_BGR2HSV);
 
-	inRange(HSV, Scalar(H_MIN2, S_MIN2, V_MIN2), Scalar(H_MAX2, S_MAX2, V_MAX2), thresh);
-	//imshow("pre morph", thresh);
+	inRange(HSV, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), thresh);
+	imshow("pre morph", thresh);
 	int objects = 0, morphs = 0;
 	bool objectsFound = false;
 	bool cont = true;

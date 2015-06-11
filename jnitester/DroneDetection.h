@@ -19,6 +19,8 @@ public:
 	void drawObject(int x, int y,cv::Mat &frame);
 	void morphOps(cv::Mat &thresh);
 	int trackFilteredObject(int &x, int &y, cv::Mat threshold, cv::Mat &cameraFeed);
+	//void on_trackbar( int, void* );
+	void createTrackbars();
 };
 
 #endif /* DRONEDETECTION_H_ */

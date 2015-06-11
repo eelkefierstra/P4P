@@ -89,7 +89,7 @@ public class Main
 			if (!tracker.Track())
 			{
 				lastKnownTime = System.nanoTime();
-				controller.Update(tracker.GetLoc());
+				//controller.Update(tracker.GetLoc());
 			}
 			else
 			{
@@ -133,7 +133,7 @@ public class Main
 				p.minfps = p.maxfps;
 				p.maxfps = 0.0;
 				p.nextTime = System.nanoTime() + 2500000000L;
-				audio.SetClip(z);
+				//audio.SetClip(z);
 				//audio.PLayClip();
 				z++;
 				if (z > 22)
