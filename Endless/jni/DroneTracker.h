@@ -55,14 +55,6 @@ JNIEXPORT jint JNICALL Java_DroneTracker_GetX
 JNIEXPORT jint JNICALL Java_DroneTracker_GetY
   (JNIEnv *, jobject);
 
-/*
- * Class:     DroneTracker
- * Method:    ReleaseCam
- * Signature: ()V
- */
-JNIEXPORT void JNICALL Java_DroneTracker_ReleaseCam
-  (JNIEnv *, jobject);
-
 #ifdef __cplusplus
 }
 #endif

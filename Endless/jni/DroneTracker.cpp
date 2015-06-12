@@ -2,6 +2,11 @@
 #include <vector>
 #include <sstream>
 #include <string>
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include <iostream>
 #include <highgui.h>
 #include <cv.h>
@@ -44,6 +49,7 @@ Mat HSV;
 //matrix storage for binary threshold image
 Mat thresh;
 //x and y values for the location of the object
+Mat betweenMat;
 int x=0, y=0;
 //video capture object to acquire webcam feed
 RaspiCamCvCapture * camera;
@@ -52,15 +58,17 @@ vector<int> xList;
 vector<int> yList;
 
 vector<int> param = vector<int>(2);
+
 bool first = true;
+bool even = false;
 
 JNIEXPORT void JNICALL Java_DroneTracker_Setup(JNIEnv *, jobject)
 {
 	//open capture object at location zero (default location for webcam)
 	camera = raspiCamCvCreateCameraCapture(0);
 
-	param[0] = IMWRITE_PNG_COMPRESSION;
-	param[1] = 3;
+	param[0] = IMWRITE_PXM_BINARY;
+	param[1] = 0;
 }
 
 std::string intToString(int number)
@@ -165,17 +173,17 @@ int trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed)
 	}
 	return 0;
 }
-
+/*
 vector<uchar> ConvertMat(Mat &img)
 {
 	vector<uchar> buff;//buffer for coding
-	imencode(".png", img, buff, param);
+	imencode(".bmp", img, buff, param);
 	return buff;
 }
 
 JNIEXPORT jbyteArray JNICALL Java_DroneTracker_GetFeed(JNIEnv *env, jobject)
 {
-	vector<uchar> tempvec = ConvertMat(cameraFeed);
+	vector<uchar> tempvec = ConvertMat(betweenMat);
 	jbyte* temp = new jbyte[tempvec.size()];
 	jbyteArray res = env->NewByteArray(tempvec.size());
 	for (int i = 0; i < tempvec.size(); i++)
@@ -202,6 +210,56 @@ JNIEXPORT jbyteArray JNICALL Java_DroneTracker_GetThresh(JNIEnv *env, jobject)
 	//temp = nullptr, tempvec = nullptr;
 	return res;
 }
+*/
+
+int sendImage(Mat frame)
+{
+	int  imgSize = frame.total()*frame.elemSize();
+	int  bytes = 0;
+	int clientSock;
+	char temp[] = { 127, 0, 0, 1 };
+	const char* server_ip = temp;
+	delete temp;
+	int server_port = 2000;
+	struct sockaddr_in serverAddr;
+	socklen_t serverAddrLen = sizeof(serverAddr);
+
+    if ((clientSock = socket(PF_INET, SOCK_STREAM, 0)) < 0)
+    {
+        printf("\n--> socket() failed.");
+        return -1;
+    }
+
+    serverAddr.sin_family = PF_INET;
+    serverAddr.sin_addr.s_addr = inet_addr(server_ip);
+    serverAddr.sin_port = htons(server_port);
+
+    if (connect(clientSock, (sockaddr*)&serverAddr, serverAddrLen) < 0)
+    {
+    	printf("\n--> connect() failed.");
+    	return -1;
+    }
+
+    frame = (frame.reshape(0,1)); // to make it continuous
+
+    /* start sending images */
+    if ((bytes = send(clientSock, frame.data, imgSize, 0)) < 0)
+    {
+        printf("\n--> send() failed");
+        return -1;
+     }
+
+    /* if something went wrong, restart the connection */
+    if (bytes != imgSize)
+    {
+    	std::cout << "\n-->  Connection closed " << std::endl;
+    	close(clientSock);
+    	return -1;
+    }
+
+return 0;
+
+}
 
 JNIEXPORT jint JNICALL Java_DroneTracker_GetX(JNIEnv *env, jobject)
 {
@@ -209,7 +267,7 @@ JNIEXPORT jint JNICALL Java_DroneTracker_GetX(JNIEnv *env, jobject)
 	jint aantal = xList.size();
 	while(xList.size()>0)
 	{
-		sum += (jint)xList.back();
+		sum += xList.back();
 		xList.pop_back();
 	}
 	jint res = sum/aantal;
@@ -222,14 +280,12 @@ JNIEXPORT jint JNICALL Java_DroneTracker_GetY(JNIEnv *env, jobject)
 	jint aantal = yList.size();
 	while(yList.size()>0)
 	{
-		sum += (jint)yList.back();
+		sum += yList.back();
 		yList.pop_back();
 	}
 	jint res = sum/aantal;
 	return res;
 }
-
-bool dinges = true;
 
 JNIEXPORT jboolean JNICALL Java_DroneTracker_Track(JNIEnv *env, jobject)
 {
@@ -245,13 +301,13 @@ JNIEXPORT jboolean JNICALL Java_DroneTracker_Track(JNIEnv *env, jobject)
 		first = false, tracker = false;
 		return tracker;
 	}
-	
-	if (dinges)
+	if (even)
 	{
-		//convert frame from BGR to HSV colorspace
-		cvtColor(cameraFeed,HSV,COLOR_BGR2HSV);
-		//dinges = false;
+		cameraFeed.copyTo(betweenMat);
 	}
+	even = !even;
+	//convert frame from BGR to HSV colorspace
+	cvtColor(cameraFeed,HSV,COLOR_BGR2HSV);
 
 	inRange(HSV, Scalar(H_MIN2, S_MIN2, V_MIN2), Scalar(H_MAX2, S_MAX2, V_MAX2), thresh);
 	int objects = 0, morphs = 0;
@@ -284,6 +340,7 @@ JNIEXPORT jboolean JNICALL Java_DroneTracker_Track(JNIEnv *env, jobject)
 		}
 		return 0;
 	}
+	sendImage(cameraFeed);
 	return tracker;
 }
 
