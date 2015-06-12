@@ -82,7 +82,7 @@ public class Main
 		
 		while(true)
 		{
-			if (!tracker.Track())
+			if (tracker.Track())
 			{
 				lastKnownTime = System.nanoTime();
 				//controller.Update(tracker.GetLoc());
@@ -93,7 +93,7 @@ public class Main
 				{
 					controller.Update(IdleMove[index]);
 					fIndex++;
-					if (fIndex == 25)
+					if (fIndex == 50)
 					{
 						index++;
 						fIndex = 0;
@@ -103,9 +103,19 @@ public class Main
 						index = 0;
 					}
 				}
-			}/*
+			}
 			if (!first)
 			{
+				int i = tracker.SendFeed();
+				switch(i)
+				{
+					case -1:
+						System.out.println("Failure");
+						break;
+					case 0:
+						break;
+				}
+				
 				try
 				{
 					//p.show.SetImage(tracker.GetFeed());
@@ -117,7 +127,7 @@ public class Main
 				}
 			}
 			else first = false;
-			*/
+			
 			counter.interrupt();
 			p.fps = counter.GetFPS();
 			if (p.nextTime <= System.nanoTime())
