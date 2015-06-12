@@ -16,12 +16,13 @@
 using namespace cv;
 //initial min and max HSV filter values.
 //these will be changed using trackbars
-int H_MIN = 0;
-int H_MAX = 256;
-int S_MIN = 0;
-int S_MAX = 256;
-int V_MIN = 0;
-int V_MAX = 256;
+
+int H_MIN = 108; //rode leds
+int H_MAX = 143; //Dit zijn denk ik
+int S_MIN = 64; //goede waardes
+int S_MAX = 200; //lampjes zijn alleen
+int V_MIN = 108; // wel wat klein
+int V_MAX = 224; //dus lastig te vinden
 
 int H_MIN2 = 77;
 int H_MAX2 = 256;
@@ -115,16 +116,16 @@ void morphOps(Mat &thresh1)
 	//create structuring element that will be used to "dilate" and "erode" image.
 	//the element chosen here is a 3px by 3px rectangle
 
-	Mat erodeElement = getStructuringElement( MORPH_RECT,Size(3,3));
+	//Mat erodeElement = getStructuringElement( MORPH_RECT,Size(3,3));
     //dilate with larger element so make sure object is nicely visible
 	Mat dilateElement = getStructuringElement( MORPH_RECT,Size(6,6));
 
-	erode(thresh1,thresh1,erodeElement);
-	erode(thresh1,thresh1,erodeElement);
+	//erode(thresh1,thresh1,erodeElement);
+	//erode(thresh1,thresh1,erodeElement);
 
 
 	dilate(thresh1,thresh1,dilateElement);
-	dilate(thresh1,thresh1,dilateElement);
+	//dilate(thresh1,thresh1,dilateElement);
 }
 
 int trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed)
