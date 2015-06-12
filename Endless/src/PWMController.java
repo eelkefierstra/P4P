@@ -18,13 +18,13 @@ public class PWMController
 	}
 	
 	public static void WritePWM(int pin, float percentage)
-	{
+	{/*
 		if (!Arrays.asList(pins).contains(pin))
 		{
 			String i = (pin == 23) + " Positive";
 			System.out.println(i);
 			//throw new IllegalArgumentException("Pin" + pin + " is outside range");
-		}
+		}*/
 		try
 		{
 			OutputStream out = new FileOutputStream(servos);

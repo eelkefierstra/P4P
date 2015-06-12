@@ -32,7 +32,7 @@ public class PWMPin
 	private void Actuate()
 	{
 		//System.out.println(MapPWM(position, 0, 1000, 0.074f, 0.301f));
-		//PWMController.WritePWM(pin, MapPWM(position, minPosition, maxPosition, 0.074f, 0.301f));
+		PWMController.WritePWM(pin, MapPWM(position, 0, 1000, 0.1f, 0.27f));
 	}
 	
 	public void Update(short error)
@@ -63,7 +63,10 @@ public class PWMPin
 	
 	private float MapPWM(int x, int in_min, int in_max, float out_min, float out_max)
 	{
-		return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+		if (x >= in_max) System.out.println("input te hoog, input " + x + ", max " + in_max);
+		float out = ((float)x - (float)in_min) * (out_max - out_min) / ((float)in_max - (float)in_min) + out_min;
+		if (out >= out_max) System.out.println("to hoog, " + out);
+		return out;
 	}
 
 	private int MapPosition(int x, int in_min, int in_max, int out_min, int out_max)
