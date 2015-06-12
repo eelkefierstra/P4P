@@ -3,14 +3,14 @@
 #include <sstream>
 #include <string>
 #include <stdio.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
+//#include <sys/types.h>
+//#include <sys/socket.h>
+//#include <netinet/in.h>
+//#include <arpa/inet.h>
 #include <iostream>
-#include <highgui.h>
-#include <cv.h>
-#include "RaspiCamCV.h"
+#include <opencv/highgui.h>
+#include <opencv/cv.h>
+//#include "RaspiCamCV.h"
 #include "DroneTracker.h"
 
 using namespace cv;
@@ -52,7 +52,8 @@ Mat thresh;
 Mat betweenMat;
 int x=0, y=0;
 //video capture object to acquire webcam feed
-RaspiCamCvCapture * camera;
+VideoCapture capture;
+//RaspiCamCvCapture * camera;
 
 vector<int> xList;
 vector<int> yList;
@@ -65,7 +66,9 @@ bool even = false;
 JNIEXPORT void JNICALL Java_DroneTracker_Setup(JNIEnv *, jobject)
 {
 	//open capture object at location zero (default location for webcam)
-	camera = raspiCamCvCreateCameraCapture(0);
+	capture.set(CV_CAP_PROP_FRAME_WIDTH,FRAME_WIDTH);
+	capture.set(CV_CAP_PROP_FRAME_HEIGHT,FRAME_HEIGHT);
+	//camera = raspiCamCvCreateCameraCapture(0);
 
 	param[0] = IMWRITE_PXM_BINARY;
 	param[1] = 0;
@@ -211,7 +214,7 @@ JNIEXPORT jbyteArray JNICALL Java_DroneTracker_GetThresh(JNIEnv *env, jobject)
 	return res;
 }
 */
-
+/*
 int sendImage(Mat frame)
 {
 	int  imgSize = frame.total()*frame.elemSize();
@@ -242,15 +245,15 @@ int sendImage(Mat frame)
 
     frame = (frame.reshape(0,1)); // to make it continuous
 
-    /* start sending images */
+    /* start sending images *//*
     if ((bytes = send(clientSock, frame.data, imgSize, 0)) < 0)
     {
         printf("\n--> send() failed");
         return -1;
      }
 
-    /* if something went wrong, restart the connection */
-    if (bytes != imgSize)
+    /* if something went wrong, restart the connection *//*
+	if (bytes != imgSize)
     {
     	std::cout << "\n-->  Connection closed " << std::endl;
     	close(clientSock);
@@ -260,7 +263,7 @@ int sendImage(Mat frame)
 return 0;
 
 }
-
+*/
 JNIEXPORT jint JNICALL Java_DroneTracker_GetX(JNIEnv *env, jobject)
 {
 	jint sum = 0;
@@ -291,9 +294,9 @@ JNIEXPORT jboolean JNICALL Java_DroneTracker_Track(JNIEnv *env, jobject)
 {
 	jboolean tracker = true;
 	//store image to matrix
-	//capture.read(cameraFeed);
-	IplImage * temp = raspiCamCvQueryFrame(camera);
-	cameraFeed = cvarrToMat(temp);
+	capture.read(cameraFeed);
+	//IplImage * temp = raspiCamCvQueryFrame(camera);
+	//cameraFeed = cvarrToMat(temp);
 	//delete temp;
 
 	if (first)
@@ -340,7 +343,7 @@ JNIEXPORT jboolean JNICALL Java_DroneTracker_Track(JNIEnv *env, jobject)
 		}
 		return 0;
 	}
-	sendImage(cameraFeed);
+	//sendImage(cameraFeed);
 	return tracker;
 }
 
