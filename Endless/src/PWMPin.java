@@ -29,15 +29,10 @@ public class PWMPin
 		return (short) MapPosition(position, 0, 1000, 0, 180);
 	}
 	
-	public void SetPWM(float value)
+	private void Actuate()
 	{
-		PWMController.WritePWM(pin, value);
-	}
-	
-	public void Actuate()
-	{
-		System.out.println(MapPWM(position, 0, 1000, 0.074f, 0.301f));
-		//PWMController.WritePWM(pin, MapPWM(position, 0, 180, 0.074f, 0.301f));
+		//System.out.println(MapPWM(position, 0, 1000, 0.074f, 0.301f));
+		//PWMController.WritePWM(pin, MapPWM(position, minPosition, maxPosition, 0.074f, 0.301f));
 	}
 	
 	public void Update(short error)

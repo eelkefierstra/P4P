@@ -9,22 +9,36 @@ import javax.imageio.ImageIO;
 
 public class ImShow implements Runnable
 {
-	private volatile byte[] bytes;
-	private Screen screen;
+	private boolean tresh = false;
+	private boolean feed = false;
 	
-	public ImShow(Screen screen)
+	private Screen screen;
+	private DroneTracker tracker;
+	public boolean done;
+	
+	public ImShow(int index, Screen screen, DroneTracker tracker)
 	{
 		this.screen = screen;
-		this.bytes = null;
-	}
-	
-	public void SetImage(byte[] bytes)
-	{
-		this.bytes = bytes;
+		this.tracker = tracker;
+		this.done = true;
+		switch(index)
+		{
+		case 1:
+			this.tresh = true;
+			break;
+		case 2:
+			this.feed = true;
+			break;
+		}
 	}
 	
 	public void run()
 	{
+		byte[] bytes = null;
+		done = false;
+		if (tresh) bytes = tracker.GetThresh();
+		if (feed) bytes = tracker.GetFeed();
+		done = true;
 		try
 		{
 			BufferedImage bufImage = null;

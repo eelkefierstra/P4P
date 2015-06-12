@@ -2,7 +2,7 @@ import java.util.concurrent.ScheduledExecutorService;
 
 public class ShutdownHook 
 {
-	public void attachShutDownHook(final ScheduledExecutorService executor, final DroneTracker tracker)
+	public void attachShutDownHook(final ScheduledExecutorService executor)
 	{
 		Runtime.getRuntime().addShutdownHook(new Thread()
 		{

@@ -14,17 +14,11 @@ import java.util.concurrent.*;
 //@SuppressWarnings("unused")
 public class Main
 {
-	//private Screen screen1 = new Screen();
-	private Screen screen2 = new Screen();
-	//private Screen screen3 = new Screen();
-	
 	private double maxfps;
 	private double minfps;
 	private double fps;
 	private long nextTime;
-	//private ImShow show1;
-	private ImShow show2;
-	//private ImShow show3;
+	private ImShow show;
 	private ScheduledExecutorService executor;
 	private ScheduledFuture<?>[] futureList;
 	private DecimalFormat format;
@@ -46,7 +40,7 @@ public class Main
 		{
 			Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
 		}
-		String[] files = null;
+		/*String[] files = null;
 		try
 		{
 			java.io.File file = new java.io.File(p.getClass().getResource("/audio/").toURI());
@@ -55,24 +49,21 @@ public class Main
 		catch (Exception ex)
 		{
 			Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-		}
-		
+		}*/
+
+        DroneTracker tracker = new DroneTracker();
+        tracker.Setup();
 		FPSCounter counter = new FPSCounter();
-		//p.show1 = new ImShow(p.screen1);
-		p.show2 = new ImShow(p.screen2);
-		//p.show3 = new ImShow(p.screen3);
-		p.executor = Executors.newScheduledThreadPool(2);
-		p.futureList = new ScheduledFuture<?>[2];
+		p.executor = Executors.newScheduledThreadPool(1);
+		p.futureList = new ScheduledFuture<?>[1];
 		p.format = new DecimalFormat("#.##");
 		p.minfps = 10;
 		counter.start();
 		
-		Audio audio = new Audio(files);
+		//Audio audio = new Audio(files);
 		ServoController controller = new ServoController();
-        DroneTracker tracker = new DroneTracker();
-        tracker.Setup();
         ShutdownHook hook = new ShutdownHook();
-		hook.attachShutDownHook(p.executor, tracker);
+		hook.attachShutDownHook(p.executor);
 		long lastKnownTime = System.nanoTime();
         int fIndex = 0;
         int index = 1;
@@ -89,7 +80,7 @@ public class Main
 			if (!tracker.Track())
 			{
 				lastKnownTime = System.nanoTime();
-				controller.Update(tracker.GetLoc());
+				//controller.Update(tracker.GetLoc());
 			}
 			else
 			{
@@ -110,19 +101,7 @@ public class Main
 			}
 			if (!first)
 			{
-				try
-				{
-					//p.show1.SetImage(tracker.GetThresh());
-					//p.futureList[0] = p.executor.schedule(p.show1, 0, TimeUnit.NANOSECONDS);
-					p.show2.SetImage(tracker.GetFeed());
-					p.futureList[1] = p.executor.schedule(p.show2, 0, TimeUnit.NANOSECONDS);
-					//p.show3.SetImage(tracker.GetHSV());
-					//p.futureList[2] = p.executor.schedule(p.show3, 0, TimeUnit.NANOSECONDS);
-				}
-				catch (RejectedExecutionException ex)
-				{
-					Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-				}
+				
 			}
 			else first = false;
 
@@ -133,7 +112,7 @@ public class Main
 				p.minfps = p.maxfps;
 				p.maxfps = 0.0;
 				p.nextTime = System.nanoTime() + 2500000000L;
-				audio.SetClip(z);
+				//audio.SetClip(z);
 				//audio.PLayClip();
 				z++;
 				if (z > 22)
@@ -149,7 +128,7 @@ public class Main
 			{
 				p.minfps = p.fps;
 			}
-			p.screen2.setTitle(p.format.format(p.fps)+" max " + p.format.format(p.maxfps) + " min " + p.format.format(p.minfps) + " PWM1 " + controller.GetLocation(2) + " PWM2 " + controller.GetLocation(3) + " PWM3 " + controller.GetLocation(0) + " PWM4 " + controller.GetLocation(1));
+			//p.screen2.setTitle(p.format.format(p.fps)+" max " + p.format.format(p.maxfps) + " min " + p.format.format(p.minfps) + " PWM1 " + controller.GetLocation(2) + " PWM2 " + controller.GetLocation(3) + " PWM3 " + controller.GetLocation(0) + " PWM4 " + controller.GetLocation(1));
 			try
 			{
 				Thread.sleep(0);
