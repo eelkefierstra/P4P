@@ -15,24 +15,19 @@
 
 using namespace cv;
 //initial min and max HSV filter values.
-//these will be changed using trackbars
+int H_MIN = 108; //red leds
+int H_MAX = 143; // Numbers found through trial and error(more error than trial :P)
+int S_MIN = 64;
+int S_MAX = 200;
+int V_MIN = 108;
+int V_MAX = 224;
 
-int H_MIN = 108; //rode leds
-int H_MAX = 143; //Dit zijn denk ik
-int S_MIN = 64; //goede waardes
-int S_MAX = 200; //lampjes zijn alleen
-int V_MIN = 108; // wel wat klein
-int V_MAX = 224; //dus lastig te vinden
-
-int H_MIN2 = 77;
-int H_MAX2 = 256;
+int H_MIN2 = 77; //Dit zijn denk ik de blauwe leds
+int H_MAX2 = 256; //Ben niet zeker
 int S_MIN2 = 44;
 int S_MAX2 = 142;
 int V_MIN2 = 200;
 int V_MAX2 = 256;
-
-Vector<int> xPuntLijst;
-Vector<int> yPuntLijst;
 
 //default capture width and height
 const int FRAME_WIDTH = 854;
@@ -56,14 +51,14 @@ int x=0, y=0;
 //VideoCapture capture;
 RaspiCamCvCapture * camera;
 
-vector<int> xList;
-vector<int> yList;
+vector<int> xList; // list with x coordinates of found objects
+vector<int> yList; // list with y coordinates of found objects
 
 vector<int> param = vector<int>(2);
 
 bool first = true;
-bool even = false;
 
+// Used for initial setup
 JNIEXPORT void JNICALL Java_DroneTracker_Setup(JNIEnv *, jobject)
 {
 	//open capture object at location zero (default location for webcam)
@@ -76,6 +71,7 @@ JNIEXPORT void JNICALL Java_DroneTracker_Setup(JNIEnv *, jobject)
 	param[1] = 0;
 }
 
+// Convert integers to strings
 std::string intToString(int number)
 {
 	std::stringstream ss;
@@ -83,6 +79,7 @@ std::string intToString(int number)
 	return ss.str();
 }
 
+// Used in debugging to draw circels on the screen at the x,y
 void drawObject(int x, int y,Mat &frame)
 {
 
@@ -110,6 +107,8 @@ void drawObject(int x, int y,Mat &frame)
 	putText(frame,intToString(x)+","+intToString(y),Point(x,y+30),1,1,Scalar(0,255,0),2);
 }
 
+// Use this to suppress noise in the threshold and enlarge the remaining objects
+// We adjusted this to only enlarge objects, because the leds we follow are only small dots on the screen
 void morphOps(Mat &thresh1)
 {
 
@@ -128,6 +127,7 @@ void morphOps(Mat &thresh1)
 	//dilate(thresh1,thresh1,dilateElement);
 }
 
+// Used to find objects in the threshold
 int trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed)
 {
 
@@ -152,10 +152,8 @@ int trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed)
 				Moments moment = moments((Mat)contours[index]);
 				double area = moment.m00;
 
-				//if the area is less than 20 px by 20px then it is probably just noise
-				//if the area is the same as the 3/2 of the image size, probably just a bad filter
-				//we only want the object with the largest area so we safe a reference area each
-				//iteration and compare it to the area in the next iteration.
+				//if the area is less than 10 px by 10px then it is probably just noise					//We adjusted these parameters to our own needs
+				//if the area is the same as the 3/2 of the image size, probably just a bad filter		
                 if(area>MIN_OBJECT_AREA && area<MAX_OBJECT_AREA)
 				{
 					x = moment.m10/area;
@@ -163,7 +161,7 @@ int trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed)
 					objectFound = true;
 					xList.push_back(x);
 					yList.push_back(y);
-					//drawObject(x, y, cameraFeed);
+					//drawObject(x, y, cameraFeed); // Use this to get a graphical feedback on what objects are found
 				}
 				else objectFound = false;
 			}
@@ -178,7 +176,8 @@ int trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed)
 	}
 	return 0;
 }
-/*
+//Just a bunch of unused code, since we don't need the screens anymore
+
 vector<uchar> ConvertMat(Mat &img)
 {
 	vector<uchar> buff;//buffer for coding
@@ -200,8 +199,9 @@ JNIEXPORT jbyteArray JNICALL Java_DroneTracker_GetFeed(JNIEnv *env, jobject)
 	//temp = nullptr, tempvec = nullptr;
 	return res;
 }
-*/
 
+
+// Coen, What happened here to naming stuff??
 jint dinges;
 
 JNIEXPORT jint JNICALL Java_DroneTracker_SendFeed(JNIEnv *, jobject)
@@ -209,6 +209,7 @@ JNIEXPORT jint JNICALL Java_DroneTracker_SendFeed(JNIEnv *, jobject)
 	return dinges;
 }
 
+//Sends image over the network
 int sendImage(Mat frame)
 {
 	int  imgSize = frame.total()*frame.elemSize();
@@ -258,10 +259,12 @@ return 0;
 
 }
 
+// Gets average x coordinate, this is done, to make the point that is returned more accurate
 JNIEXPORT jint JNICALL Java_DroneTracker_GetX(JNIEnv *env, jobject)
 {
 	jint sum = 0;
 	jint aantal = xList.size();
+	// Simple loop to calculate an average
 	while(xList.size()>0)
 	{
 		sum += xList.back();
@@ -271,6 +274,7 @@ JNIEXPORT jint JNICALL Java_DroneTracker_GetX(JNIEnv *env, jobject)
 	return res;
 }
 
+// Gets the average y coordinate, just like with the x
 JNIEXPORT jint JNICALL Java_DroneTracker_GetY(JNIEnv *env, jobject)
 {
 	jint sum = 0;
@@ -284,6 +288,7 @@ JNIEXPORT jint JNICALL Java_DroneTracker_GetY(JNIEnv *env, jobject)
 	return res;
 }
 
+// The heart of the tracking, this is the method with our detection 'algorithm'
 JNIEXPORT jboolean JNICALL Java_DroneTracker_Track(JNIEnv *env, jobject)
 {
 	jboolean tracker = true;
@@ -300,42 +305,50 @@ JNIEXPORT jboolean JNICALL Java_DroneTracker_Track(JNIEnv *env, jobject)
 	}
 	//convert frame from BGR to HSV colorspace
 	cvtColor(cameraFeed,HSV,COLOR_BGR2HSV);
-
-	inRange(HSV, Scalar(H_MIN2, S_MIN2, V_MIN2), Scalar(H_MAX2, S_MAX2, V_MAX2), thresh);
-	int objects = 0, morphs = 0;
-	bool objectsFound = false;
-	bool cont = true;
-
-	while (cont)
+	
+	for(int i = 0;i<2;i++)
 	{
-		switch (trackFilteredObject(x, y, thresh, cameraFeed))
+		if(i==0)
 		{
-			case 0:
-				objectsFound = true;
-				objects++;
-				cont = false;
-				break;
-			case 1:
-				if (morphs<3)
-				{
-					morphOps(thresh);
-					morphs++;
-				}
-				else
-				{
-					cont = false;
-				}
-				break;
-			case 2:
-				cont = false, tracker = false;
-				break;
+			inRange(HSV, Scalar(H_MIN2, S_MIN2, V_MIN2), Scalar(H_MAX2, S_MAX2, V_MAX2), thresh);
 		}
-		return 0;
+		else inRange(HSV, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), thresh);
+		int morphs = 0;
+		bool objectsFound = false;
+		bool cont = true;
+
+		while (cont)
+		{
+			switch (trackFilteredObject(x, y, thresh, cameraFeed))
+			{
+				case 0:
+					objectsFound = true;
+					cont = false;
+					break;
+				case 1:
+					if (morphs<3)
+					{
+						morphOps(thresh);
+						morphs++;
+					}
+					else
+					{
+						cont = false;
+					}
+					break;
+				case 2:
+					cont = false, tracker = false;
+					break;
+			}
+			return 0;
+		}
 	}
+	
 	sendImage(cameraFeed);
 	return tracker;
 }
 
+// Some automatic generated junk
 /*
 ~DroneTracker()
 {
