@@ -10,7 +10,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.concurrent.*;
 
-//@SuppressWarnings("unused")
 public class Main
 {
 	private Screen screen = new Screen();
