@@ -215,7 +215,7 @@ int sendImage(Mat frame)
 	int  imgSize = frame.total()*frame.elemSize();
 	int  bytes = 0;
 	int clientSock;
-	char temp[] = { 127, 0, 0, 1 };
+	char temp[] = { 192, 168, 1, 36 };
 	const char* server_ip = temp;
 	delete temp;
 	int server_port = 2000;
@@ -224,7 +224,7 @@ int sendImage(Mat frame)
 	dinges = -1;
     if ((clientSock = socket(PF_INET, SOCK_STREAM, 0)) < 0)
     {
-        printf("\n--> socket() failed.");
+        //printf("\n--> socket() failed.");
         return -1;
     }
 
@@ -234,7 +234,7 @@ int sendImage(Mat frame)
 
     if (connect(clientSock, (sockaddr*)&serverAddr, serverAddrLen) < 0)
     {
-    	printf("\n--> connect() failed.");
+    	//printf("\n--> connect() failed.");
     	return -1;
     }
 
@@ -243,7 +243,7 @@ int sendImage(Mat frame)
     /* start sending images */
     if ((bytes = send(clientSock, frame.data, imgSize, 0)) < 0)
     {
-        printf("\n--> send() failed");
+        //printf("\n--> send() failed");
         return -1;
      }
 
