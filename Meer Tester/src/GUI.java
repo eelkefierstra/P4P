@@ -53,6 +53,11 @@ public class GUI extends JFrame
 	    this.setVisible(true);
 	}
 	
+	public void SetImage(BufferedImage image)
+	{
+		picLabel.setIcon(new ImageIcon(image/*.getScaledInstance(-1, 360, 0)*/));
+	}
+	
 	class SomeAction extends AbstractAction
 	{
 		int i = 0;
