@@ -22,14 +22,18 @@ public class Main
     public static void main(String[] args)
     {
 		Main p = new Main();
-		try
+		for(int i = 0; i < 3; i++)
 		{
-			p.server = new Socket(InetAddress.getByName("172.16.42.219"), 2000);
-		}
-		catch (Exception ex)
-		{
-			Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-			p.gui.dispatchEvent(new WindowEvent(p.gui, WindowEvent.WINDOW_CLOSING));
+			try
+			{
+				p.gui.setTitle("Connectie poging #" + (i + 1));
+				p.server = new Socket(InetAddress.getByName("192.168.1.100"), 2000);
+			}
+			catch (Exception ex)
+			{
+				Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+				if (i == 2) p.gui.dispatchEvent(new WindowEvent(p.gui, WindowEvent.WINDOW_CLOSING));
+			}
 		}
 		while(true)
 		{
