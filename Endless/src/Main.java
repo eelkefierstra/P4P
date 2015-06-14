@@ -104,16 +104,6 @@ public class Main
 			}
 			if (!first)
 			{
-				int i = tracker.SendFeed();
-				switch(i)
-				{
-					case -1:
-						System.out.println("Failure");
-						break;
-					case 0:
-						break;
-				}
-				
 				try
 				{
 					//p.show.SetImage(tracker.GetFeed());
