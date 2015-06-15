@@ -22,21 +22,21 @@ int S_MAX = 200;
 int V_MIN = 108;
 int V_MAX = 224;
 
-int H_MIN2 = 77; //Dit zijn denk ik de blauwe leds
-int H_MAX2 = 256; //Ben niet zeker
-int S_MIN2 = 44;
-int S_MAX2 = 142;
-int V_MIN2 = 200;
+int H_MIN2 = 0; //blue leds
+int H_MAX2 = 102;
+int S_MIN2 = 0;
+int S_MAX2 = 129;
+int V_MIN2 = 195;
 int V_MAX2 = 256;
 
 //default capture width and height
 const int FRAME_WIDTH = 854;
 const int FRAME_HEIGHT = 480;
 //max number of objects to be detected in frame
-const int MAX_NUM_OBJECTS=1500;
+const int MAX_NUM_OBJECTS=150;
 //minimum and maximum object area
 const int MIN_OBJECT_AREA = 10*10;
-const int MAX_OBJECT_AREA = FRAME_HEIGHT*FRAME_WIDTH/10;
+const int MAX_OBJECT_AREA = 35*35;
 
 //Matrix to store each frame of the webcam feed
 Mat cameraFeed;
@@ -117,7 +117,7 @@ void morphOps(Mat &thresh1)
 
 	//Mat erodeElement = getStructuringElement( MORPH_RECT,Size(3,3));
     //dilate with larger element so make sure object is nicely visible
-	Mat dilateElement = getStructuringElement( MORPH_RECT,Size(6,6));
+	Mat dilateElement = getStructuringElement( MORPH_RECT,Size(8,8));
 
 	//erode(thresh1,thresh1,erodeElement);
 	//erode(thresh1,thresh1,erodeElement);
