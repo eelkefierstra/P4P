@@ -55,8 +55,8 @@ int x=0, y=0;
 VideoCapture capture;
 //RaspiCamCvCapture * camera;
 
-vector<int> xList;
-vector<int> yList;
+vector<int> xList, yList;
+
 
 vector<int> param = vector<int>(2);
 
@@ -267,7 +267,7 @@ return 0;
 JNIEXPORT jint JNICALL Java_DroneTracker_GetX(JNIEnv *env, jobject)
 {
 	jint sum = 0;
-	jint aantal = xList.size();
+	jint aantal = (int)xList.size();
 	while(xList.size()>0)
 	{
 		sum += xList.back();
@@ -280,7 +280,7 @@ JNIEXPORT jint JNICALL Java_DroneTracker_GetX(JNIEnv *env, jobject)
 JNIEXPORT jint JNICALL Java_DroneTracker_GetY(JNIEnv *env, jobject)
 {
 	jint sum = 0;
-	jint aantal = yList.size();
+	jint aantal = (int)yList.size();
 	while(yList.size()>0)
 	{
 		sum += yList.back();
