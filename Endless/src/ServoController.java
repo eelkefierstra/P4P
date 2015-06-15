@@ -31,11 +31,11 @@ public class ServoController
 		{
 			pins[0].Update((short) 100);
 		}
-		if (pins[3].GetLocation() < 35)
+		if (pins[3].GetLocation() < 25)
 		{
 			pins[1].Update((short) -100);
 		}
-		else if (pins[3].GetLocation() > 145)
+		else if (pins[3].GetLocation() > 155)
 		{
 			pins[1].Update((short) 100);
 		}

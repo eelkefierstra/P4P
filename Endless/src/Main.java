@@ -1,5 +1,6 @@
 /*
 import java.awt.MouseInfo;
+import java.awt.Point;
 import java.text.DecimalFormat;
 */
 import java.awt.Point;
@@ -10,17 +11,20 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.concurrent.*;
 
+//@SuppressWarnings("unused")
 public class Main
 {
-	private Screen screen = new Screen();
-	
+	private Screen screen1 = new Screen();
+	private Screen screen2 = new Screen();
+	//private Screen screen3 = new Screen();
 	private double maxfps;
 	private double minfps;
 	private double fps;
 	private long nextTime;
 	
-	private ImShow show;
-	
+	private ImShow show1;
+	private ImShow show2;
+	//private ImShow show3;
 	private ScheduledExecutorService executor;
 	private ScheduledFuture<?>[] futureList;
 	private DecimalFormat format;
@@ -56,9 +60,11 @@ public class Main
         DroneTracker tracker = new DroneTracker();
         tracker.Setup();
 		FPSCounter counter = new FPSCounter();
-		p.show = new ImShow(p.screen);
+		p.show1 = new ImShow(p.screen1);
+		p.show2 = new ImShow(p.screen2);
+		//p.show3 = new ImShow(p.screen3);
 		p.executor = Executors.newScheduledThreadPool(3);
-		p.futureList = new ScheduledFuture<?>[1];
+		p.futureList = new ScheduledFuture<?>[3];
 		p.format = new DecimalFormat("#.##");
 		p.minfps = 10;
 		counter.start();
@@ -80,7 +86,7 @@ public class Main
 		
 		while(true)
 		{
-			if (tracker.Track())
+			if (!tracker.Track())
 			{
 				lastKnownTime = System.nanoTime();
 				//controller.Update(tracker.GetLoc());
@@ -91,7 +97,7 @@ public class Main
 				{
 					controller.Update(IdleMove[index]);
 					fIndex++;
-					if (fIndex == 50)
+					if (fIndex == 25)
 					{
 						index++;
 						fIndex = 0;
@@ -104,20 +110,14 @@ public class Main
 			}
 			if (!first)
 			{
-				int i = tracker.SendFeed();
-				switch(i)
-				{
-					case -1:
-						System.out.println("Failure");
-						break;
-					case 0:
-						break;
-				}
-				
 				try
 				{
-					//p.show.SetImage(tracker.GetFeed());
-					//p.futureList[0] = p.executor.schedule(p.show, 0, TimeUnit.NANOSECONDS);
+					p.show1.SetImage(tracker.GetThresh());
+					p.futureList[0] = p.executor.schedule(p.show1, 0, TimeUnit.NANOSECONDS);
+					p.show2.SetImage(tracker.GetFeed());
+					p.futureList[1] = p.executor.schedule(p.show2, 0, TimeUnit.NANOSECONDS);
+					//p.show3.SetImage(tracker.GetHSV());
+					//p.futureList[2] = p.executor.schedule(p.show3, 0, TimeUnit.NANOSECONDS);
 				}
 				catch (RejectedExecutionException ex)
 				{
@@ -125,7 +125,7 @@ public class Main
 				}
 			}
 			else first = false;
-			
+
 			counter.interrupt();
 			p.fps = counter.GetFPS();
 			if (p.nextTime <= System.nanoTime())
@@ -145,11 +145,19 @@ public class Main
 			{
 				p.maxfps = p.fps;
 			}
-			else if (p.fps < p.minfps)
+			else if (p.minfps > p.fps)
 			{
 				p.minfps = p.fps;
 			}
-			p.screen.setTitle(p.format.format(p.fps)+" max " + p.format.format(p.maxfps) + " min " + p.format.format(p.minfps) + " PWM1 " + controller.GetLocation(2) + " PWM2 " + controller.GetLocation(3) + " PWM3 " + controller.GetLocation(0) + " PWM4 " + controller.GetLocation(1));
+			//p.screen2.setTitle(p.format.format(p.fps)+" max " + p.format.format(p.maxfps) + " min " + p.format.format(p.minfps) + " PWM1 " + controller.GetLocation(2) + " PWM2 " + controller.GetLocation(3) + " PWM3 " + controller.GetLocation(0) + " PWM4 " + controller.GetLocation(1));
+			try
+			{
+				Thread.sleep(0);
+			}
+			catch (InterruptedException ex)
+			{
+				Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+			}
 		}
 	}
 	

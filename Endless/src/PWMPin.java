@@ -63,8 +63,10 @@ public class PWMPin
 	
 	private float MapPWM(int x, int in_min, int in_max, float out_min, float out_max)
 	{
-		if (x > in_max || x < in_min) throw new IllegalArgumentException("Input not between min and max");
-		return ((float)x - (float)in_min) * (out_max - out_min) / ((float)in_max - (float)in_min) + out_min;
+		if (x >= in_max) System.out.println("input te hoog, input " + x + ", max " + in_max);
+		float out = ((float)x - (float)in_min) * (out_max - out_min) / ((float)in_max - (float)in_min) + out_min;
+		if (out >= out_max) System.out.println("to hoog, " + out);
+		return out;
 	}
 
 	private int MapPosition(int x, int in_min, int in_max, int out_min, int out_max)

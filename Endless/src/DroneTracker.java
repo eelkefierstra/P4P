@@ -8,7 +8,9 @@ public class DroneTracker
 	
 	public native boolean Track();
 	
-	public native int SendFeed();
+	public native byte[] GetFeed();
+	
+	public native byte[] GetThresh();
 	
 	private native int GetX();
 	

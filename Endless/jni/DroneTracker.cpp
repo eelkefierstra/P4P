@@ -3,18 +3,19 @@
 #include <sstream>
 #include <string>
 #include <stdio.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
+//#include <sys/types.h>
+//#include <sys/socket.h>
+//#include <netinet/in.h>
+//#include <arpa/inet.h>
 #include <iostream>
 #include <opencv/highgui.h>
 #include <opencv/cv.h>
-#include "RaspiCamCV.h"
+//#include "RaspiCamCV.h"
 #include "DroneTracker.h"
 
 using namespace cv;
 //initial min and max HSV filter values.
+<<<<<<< HEAD
 int H_MIN = 108; //red leds
 int H_MAX = 143; // Numbers found through trial and error(more error than trial :P)
 int S_MIN = 64;
@@ -27,7 +28,25 @@ int H_MAX2 = 102;
 int S_MIN2 = 0;
 int S_MAX2 = 129;
 int V_MIN2 = 195;
+=======
+//these will be changed using trackbars
+int H_MIN = 0;
+int H_MAX = 256;
+int S_MIN = 0;
+int S_MAX = 256;
+int V_MIN = 0;
+int V_MAX = 256;
+
+int H_MIN2 = 77;
+int H_MAX2 = 256;
+int S_MIN2 = 44;
+int S_MAX2 = 142;
+int V_MIN2 = 200;
+>>>>>>> f27ea86fbeb256fc8195b81202d29c4a78620bac
 int V_MAX2 = 256;
+
+Vector<int> xPuntLijst;
+Vector<int> yPuntLijst;
 
 //default capture width and height
 const int FRAME_WIDTH = 854;
@@ -48,30 +67,28 @@ Mat thresh;
 Mat betweenMat;
 int x=0, y=0;
 //video capture object to acquire webcam feed
-//VideoCapture capture;
-RaspiCamCvCapture * camera;
+VideoCapture capture;
+//RaspiCamCvCapture * camera;
 
-vector<int> xList; // list with x coordinates of found objects
-vector<int> yList; // list with y coordinates of found objects
+vector<int> xList, yList;
+
 
 vector<int> param = vector<int>(2);
 
 bool first = true;
+bool even = false;
 
-// Used for initial setup
 JNIEXPORT void JNICALL Java_DroneTracker_Setup(JNIEnv *, jobject)
 {
 	//open capture object at location zero (default location for webcam)
-	//capture.open(0);
-	//capture.set(CV_CAP_PROP_FRAME_WIDTH,FRAME_WIDTH);
-	//capture.set(CV_CAP_PROP_FRAME_HEIGHT,FRAME_HEIGHT);
-	camera = raspiCamCvCreateCameraCapture(0);
+	capture.set(CV_CAP_PROP_FRAME_WIDTH,FRAME_WIDTH);
+	capture.set(CV_CAP_PROP_FRAME_HEIGHT,FRAME_HEIGHT);
+	//camera = raspiCamCvCreateCameraCapture(0);
 
 	param[0] = IMWRITE_PXM_BINARY;
 	param[1] = 0;
 }
 
-// Convert integers to strings
 std::string intToString(int number)
 {
 	std::stringstream ss;
@@ -79,7 +96,6 @@ std::string intToString(int number)
 	return ss.str();
 }
 
-// Used in debugging to draw circels on the screen at the x,y
 void drawObject(int x, int y,Mat &frame)
 {
 
@@ -107,27 +123,24 @@ void drawObject(int x, int y,Mat &frame)
 	putText(frame,intToString(x)+","+intToString(y),Point(x,y+30),1,1,Scalar(0,255,0),2);
 }
 
-// Use this to suppress noise in the threshold and enlarge the remaining objects
-// We adjusted this to only enlarge objects, because the leds we follow are only small dots on the screen
 void morphOps(Mat &thresh1)
 {
 
 	//create structuring element that will be used to "dilate" and "erode" image.
 	//the element chosen here is a 3px by 3px rectangle
 
-	//Mat erodeElement = getStructuringElement( MORPH_RECT,Size(3,3));
+	Mat erodeElement = getStructuringElement( MORPH_RECT,Size(3,3));
     //dilate with larger element so make sure object is nicely visible
 	Mat dilateElement = getStructuringElement( MORPH_RECT,Size(8,8));
 
-	//erode(thresh1,thresh1,erodeElement);
-	//erode(thresh1,thresh1,erodeElement);
+	erode(thresh1,thresh1,erodeElement);
+	erode(thresh1,thresh1,erodeElement);
 
 
 	dilate(thresh1,thresh1,dilateElement);
-	//dilate(thresh1,thresh1,dilateElement);
+	dilate(thresh1,thresh1,dilateElement);
 }
 
-// Used to find objects in the threshold
 int trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed)
 {
 
@@ -152,8 +165,10 @@ int trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed)
 				Moments moment = moments((Mat)contours[index]);
 				double area = moment.m00;
 
-				//if the area is less than 10 px by 10px then it is probably just noise					//We adjusted these parameters to our own needs
-				//if the area is the same as the 3/2 of the image size, probably just a bad filter		
+				//if the area is less than 20 px by 20px then it is probably just noise
+				//if the area is the same as the 3/2 of the image size, probably just a bad filter
+				//we only want the object with the largest area so we safe a reference area each
+				//iteration and compare it to the area in the next iteration.
                 if(area>MIN_OBJECT_AREA && area<MAX_OBJECT_AREA)
 				{
 					x = moment.m10/area;
@@ -161,7 +176,7 @@ int trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed)
 					objectFound = true;
 					xList.push_back(x);
 					yList.push_back(y);
-					//drawObject(x, y, cameraFeed); // Use this to get a graphical feedback on what objects are found
+					//drawObject(x, y, cameraFeed);
 				}
 				else objectFound = false;
 			}
@@ -176,8 +191,7 @@ int trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed)
 	}
 	return 0;
 }
-//Just a bunch of unused code, since we don't need the screens anymore
-
+/*
 vector<uchar> ConvertMat(Mat &img)
 {
 	vector<uchar> buff;//buffer for coding
@@ -200,31 +214,37 @@ JNIEXPORT jbyteArray JNICALL Java_DroneTracker_GetFeed(JNIEnv *env, jobject)
 	return res;
 }
 
-
-// Coen, What happened here to naming stuff??
-jint dinges;
-
-JNIEXPORT jint JNICALL Java_DroneTracker_SendFeed(JNIEnv *, jobject)
+JNIEXPORT jbyteArray JNICALL Java_DroneTracker_GetThresh(JNIEnv *env, jobject)
 {
-	return dinges;
+	vector<uchar> tempvec = ConvertMat(thresh);
+	jbyte* temp = new jbyte[tempvec.size()];
+	jbyteArray res = env->NewByteArray(tempvec.size());
+	for (int i = 0; i < tempvec.size(); i++)
+	{
+		temp[i] = (jbyte)tempvec[i];
+	}
+	env->SetByteArrayRegion(res, 0, tempvec.size(), temp);
+	delete temp, tempvec;
+	//temp = nullptr, tempvec = nullptr;
+	return res;
 }
-
-//Sends image over the network
+*/
+/*
 int sendImage(Mat frame)
 {
 	int  imgSize = frame.total()*frame.elemSize();
 	int  bytes = 0;
 	int clientSock;
-	char temp[] = { 192, 168, 1, 36 };
+	char temp[] = { 127, 0, 0, 1 };
 	const char* server_ip = temp;
 	delete temp;
 	int server_port = 2000;
 	struct sockaddr_in serverAddr;
 	socklen_t serverAddrLen = sizeof(serverAddr);
-	dinges = -1;
+
     if ((clientSock = socket(PF_INET, SOCK_STREAM, 0)) < 0)
     {
-        //printf("\n--> socket() failed.");
+        printf("\n--> socket() failed.");
         return -1;
     }
 
@@ -234,37 +254,35 @@ int sendImage(Mat frame)
 
     if (connect(clientSock, (sockaddr*)&serverAddr, serverAddrLen) < 0)
     {
-    	//printf("\n--> connect() failed.");
+    	printf("\n--> connect() failed.");
     	return -1;
     }
 
     frame = (frame.reshape(0,1)); // to make it continuous
 
-    /* start sending images */
+    /* start sending images *//*
     if ((bytes = send(clientSock, frame.data, imgSize, 0)) < 0)
     {
-        //printf("\n--> send() failed");
+        printf("\n--> send() failed");
         return -1;
      }
 
-    /* if something went wrong, restart the connection */
+    /* if something went wrong, restart the connection *//*
 	if (bytes != imgSize)
     {
     	std::cout << "\n-->  Connection closed " << std::endl;
     	close(clientSock);
     	return -1;
     }
-dinges = 0;
+
 return 0;
 
 }
-
-// Gets average x coordinate, this is done, to make the point that is returned more accurate
+*/
 JNIEXPORT jint JNICALL Java_DroneTracker_GetX(JNIEnv *env, jobject)
 {
 	jint sum = 0;
-	jint aantal = xList.size();
-	// Simple loop to calculate an average
+	jint aantal = (int)xList.size();
 	while(xList.size()>0)
 	{
 		sum += xList.back();
@@ -274,11 +292,10 @@ JNIEXPORT jint JNICALL Java_DroneTracker_GetX(JNIEnv *env, jobject)
 	return res;
 }
 
-// Gets the average y coordinate, just like with the x
 JNIEXPORT jint JNICALL Java_DroneTracker_GetY(JNIEnv *env, jobject)
 {
 	jint sum = 0;
-	jint aantal = yList.size();
+	jint aantal = (int)yList.size();
 	while(yList.size()>0)
 	{
 		sum += yList.back();
@@ -288,14 +305,13 @@ JNIEXPORT jint JNICALL Java_DroneTracker_GetY(JNIEnv *env, jobject)
 	return res;
 }
 
-// The heart of the tracking, this is the method with our detection 'algorithm'
 JNIEXPORT jboolean JNICALL Java_DroneTracker_Track(JNIEnv *env, jobject)
 {
 	jboolean tracker = true;
 	//store image to matrix
-	//capture.read(cameraFeed);
-	IplImage * temp = raspiCamCvQueryFrame(camera);
-	cameraFeed = cvarrToMat(temp);
+	capture.read(cameraFeed);
+	//IplImage * temp = raspiCamCvQueryFrame(camera);
+	//cameraFeed = cvarrToMat(temp);
 	//delete temp;
 
 	if (first)
@@ -303,52 +319,49 @@ JNIEXPORT jboolean JNICALL Java_DroneTracker_Track(JNIEnv *env, jobject)
 		first = false, tracker = false;
 		return tracker;
 	}
+	if (even)
+	{
+		cameraFeed.copyTo(betweenMat);
+	}
+	even = !even;
 	//convert frame from BGR to HSV colorspace
 	cvtColor(cameraFeed,HSV,COLOR_BGR2HSV);
-	
-	for(int i = 0;i<2;i++)
-	{
-		if(i==0)
-		{
-			inRange(HSV, Scalar(H_MIN2, S_MIN2, V_MIN2), Scalar(H_MAX2, S_MAX2, V_MAX2), thresh);
-		}
-		else inRange(HSV, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), thresh);
-		int morphs = 0;
-		bool objectsFound = false;
-		bool cont = true;
 
-		while (cont)
+	inRange(HSV, Scalar(H_MIN2, S_MIN2, V_MIN2), Scalar(H_MAX2, S_MAX2, V_MAX2), thresh);
+	int objects = 0, morphs = 0;
+	bool objectsFound = false;
+	bool cont = true;
+
+	while (cont)
+	{
+		switch (trackFilteredObject(x, y, thresh, cameraFeed))
 		{
-			switch (trackFilteredObject(x, y, thresh, cameraFeed))
-			{
-				case 0:
-					objectsFound = true;
+			case 0:
+				objectsFound = true;
+				objects++;
+				cont = false;
+				break;
+			case 1:
+				if (morphs<3)
+				{
+					morphOps(thresh);
+					morphs++;
+				}
+				else
+				{
 					cont = false;
-					break;
-				case 1:
-					if (morphs<3)
-					{
-						morphOps(thresh);
-						morphs++;
-					}
-					else
-					{
-						cont = false;
-					}
-					break;
-				case 2:
-					cont = false, tracker = false;
-					break;
-			}
-			return 0;
+				}
+				break;
+			case 2:
+				cont = false, tracker = false;
+				break;
 		}
+		return 0;
 	}
-	
-	sendImage(cameraFeed);
+	//sendImage(cameraFeed);
 	return tracker;
 }
 
-// Some automatic generated junk
 /*
 ~DroneTracker()
 {

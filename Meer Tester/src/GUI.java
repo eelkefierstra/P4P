@@ -29,7 +29,6 @@ public class GUI extends JFrame
 		try
 		{
 			image = ImageIO.read(getClass().getResource("/images/Konachan.com - 199548 atha braids brown_eyes brown_hair hat long_hair original ponytail.png"));
-			this.setIconImage(image.getScaledInstance(-1, 360, 0));
 			picLabel.setIcon(new ImageIcon(image.getScaledInstance(-1, 360, 0)));
 	    }
 		catch (IOException ex)
@@ -52,11 +51,6 @@ public class GUI extends JFrame
 	    this.setLocationRelativeTo(null);
 	    this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    this.setVisible(true);
-	}
-	
-	public void SetImage(BufferedImage image)
-	{
-		picLabel.setIcon(new ImageIcon(image/*.getScaledInstance(-1, 360, 0)*/));
 	}
 	
 	class SomeAction extends AbstractAction

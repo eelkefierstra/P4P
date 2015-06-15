@@ -32,9 +32,9 @@ public class Main
 	static int minObjectArea = 10*10;
 	static int maxObjectArea = (int)((double)frame_width*(double)frame_height/1.5);
 	
-	//static Screen screen1 = new Screen();
+	static Screen screen1 = new Screen();
 	static Screen screen2 = new Screen();
-	//static Screen screen3 = new Screen();
+	static Screen screen3 = new Screen();
 	
 	public static void drawObject(double x,double y,Mat frame)
 	{
@@ -151,7 +151,7 @@ public class Main
 				}
 			//}
 		}
-		//System.out.println("Geen hierarchy");
+		System.out.println("Geen hierarchy");
 		return false;
 	}
 	
@@ -188,11 +188,11 @@ public class Main
         double maxfps = 0.0f;
         double fps = 0.0f;
         long nextTime = System.nanoTime() + 1000000000;
-		//ImShow show1 = new ImShow(screen1, threshold);
+		ImShow show1 = new ImShow(screen1, threshold);
 		ImShow show2 = new ImShow(screen2, cameraFeed);
-		//ImShow show3 = new ImShow(screen3, HSV);
+		ImShow show3 = new ImShow(screen3, HSV);
 		ScheduledExecutorService executor = Executors.newScheduledThreadPool(3);
-		ScheduledFuture<?>[] futureList = new ScheduledFuture<?>[1];
+		ScheduledFuture<?>[] futureList = new ScheduledFuture<?>[3];
 		DecimalFormat format = new DecimalFormat("#.##");
 		ShutdownHook hook = new ShutdownHook();
 		hook.attachShutDownHook(executor);
@@ -210,12 +210,12 @@ public class Main
 				trackFilteredObject(x,y,threshold,cameraFeed);
 			
 			//Zou afbeelding in venster moeten laten zien
-			//show1.SetMat(threshold);
-		    //futureList[0] = executor.schedule(show1, 0, TimeUnit.NANOSECONDS);
+			show1.SetMat(threshold);
+		    futureList[0] = executor.schedule(show1, 0, TimeUnit.NANOSECONDS);
 			show2.SetMat(cameraFeed);
-		    futureList[0] = executor.schedule(show2, 0, TimeUnit.NANOSECONDS);
-			//show3.SetMat(HSV);
-		    //futureList[2] = executor.schedule(show3, 0, TimeUnit.NANOSECONDS);
+		    futureList[1] = executor.schedule(show2, 0, TimeUnit.NANOSECONDS);
+			show3.SetMat(HSV);
+		    futureList[2] = executor.schedule(show3, 0, TimeUnit.NANOSECONDS);
 
 			
 			counter.interrupt();
