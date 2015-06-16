@@ -7,9 +7,12 @@ import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+// Class to control the PWM signal
 public class PWMController
 {
+	// declares output file "/dev/pi-blaster", this is to control the pwm on the pi
 	private static final File servos = new File("/dev/pi-blaster");
+	// list of used output pins
 	private static final byte[] pins = { 18, 23, 24, 25 };
 	
 	private PWMController()
@@ -17,6 +20,7 @@ public class PWMController
 		
 	}
 	
+	// Set pwm on pin at a certain percentage
 	public static void WritePWM(int pin, float percentage)
 	{/*
 		if (!Arrays.asList(pins).contains(pin))
@@ -39,6 +43,7 @@ public class PWMController
 		}
 	}
 	
+	// reset pwm on specified pin
 	public static void ReleasePin(byte pin)
 	{
 		try
@@ -55,6 +60,7 @@ public class PWMController
 		}
 	}
 	
+	// resets the pwm on all pins
 	public static void ResetPWM()
 	{
 		try

@@ -25,18 +25,10 @@ JNIEXPORT jboolean JNICALL Java_DroneTracker_Track
 
 /*
  * Class:     DroneTracker
- * Method:    GetFeed
- * Signature: ()[B
+ * Method:    SendFeed
+ * Signature: ()I
  */
-JNIEXPORT jbyteArray JNICALL Java_DroneTracker_GetFeed
-  (JNIEnv *, jobject);
-
-/*
- * Class:     DroneTracker
- * Method:    GetThresh
- * Signature: ()[B
- */
-JNIEXPORT jbyteArray JNICALL Java_DroneTracker_GetThresh
+JNIEXPORT jint JNICALL Java_DroneTracker_SendFeed
   (JNIEnv *, jobject);
 
 /*
