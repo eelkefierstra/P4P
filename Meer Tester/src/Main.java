@@ -1,10 +1,14 @@
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,15 +26,55 @@ public class Main
     public static void main(String[] args)
     {
 		Main p = new Main();
+		ServerSocket server;
+		BufferedReader in;
+		PrintWriter out;
+		
+		Socket client;
+		int port = 9020;
+		int nr = 0;
+		try{
+		    server = new ServerSocket(port); 
+		    
+		    client = server.accept();
+		    
+		    in = new BufferedReader(new InputStreamReader(  client.getInputStream()));
+		    out = new PrintWriter(client.getOutputStream(), true);
+		    
+		    while (true) {
+		    	nr++;
+		    	String str = in.readLine();
+		    	System.out.println(nr + ": " + str);
+		    }
+		    
+		    
+		  } catch (IOException e) {
+			  e.printStackTrace();
+		    System.out.println("Could not listen on port " + port);
+		    System.exit(-1);
+		  }
+		finally {
+			System.out.println("***********************************\n*                                 *\n***********************************\n");
+		}
+		
+		
+		
+		/*
+		String HOST = "192.168.1.100";
 		for(int i = 0; i < 3; i++)
 		{
+			
 			try
 			{
 				p.gui.setTitle("Connectie poging #" + (i + 1));
-				p.server = new Socket(InetAddress.getByName("192.168.1.100"), 2000);
+				System.err.println(InetAddress.getByName(HOST).getCanonicalHostName());
+				p.server = new Socket(InetAddress.getByName(HOST), 9020);
+				break;
 			}
 			catch (Exception ex)
 			{
+				ex.printStackTrace();
+				System.err.println(ex.getLocalizedMessage());
 				Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
 				if (i == 2) p.gui.dispatchEvent(new WindowEvent(p.gui, WindowEvent.WINDOW_CLOSING));
 			}
@@ -52,6 +96,7 @@ public class Main
 				Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
 			}
 		}
+		*/
 	}
     
     private void SetImageByte()
