@@ -58,6 +58,8 @@ vector<int> param = vector<int>(2);
 
 bool first = true;
 
+int connecter();
+
 // Used for initial setup
 JNIEXPORT void JNICALL Java_DroneTracker_Setup(JNIEnv *, jobject)
 {
@@ -69,6 +71,8 @@ JNIEXPORT void JNICALL Java_DroneTracker_Setup(JNIEnv *, jobject)
 
 	param[0] = IMWRITE_PXM_BINARY;
 	param[1] = 0;
+
+	while (connecter() < 0) { }
 }
 
 // Convert integers to strings
@@ -78,7 +82,7 @@ std::string intToString(int number)
 	ss << number;
 	return ss.str();
 }
-
+/*
 // Used in debugging to draw circels on the screen at the x,y
 void drawObject(int x, int y,Mat &frame)
 {
@@ -106,7 +110,7 @@ void drawObject(int x, int y,Mat &frame)
 
 	putText(frame,intToString(x)+","+intToString(y),Point(x,y+30),1,1,Scalar(0,255,0),2);
 }
-
+*/
 // Use this to suppress noise in the threshold and enlarge the remaining objects
 // We adjusted this to only enlarge objects, because the leds we follow are only small dots on the screen
 void morphOps(Mat &thresh1)
@@ -211,32 +215,6 @@ JNIEXPORT jint JNICALL Java_DroneTracker_SendFeed(JNIEnv *, jobject)
 	return dinges;
 }
 
-int connecter()
-{
-	char temp[] = { 192, 168, 1, 100 };
-	const char* server_ip = temp;
-	delete temp;
-	int server_port = 2000;
-	struct sockaddr_in serverAddr;
-	socklen_t serverAddrLen = sizeof(serverAddr);
-	dinges = -1;
-	if ((clientSock = socket(PF_INET, SOCK_STREAM, 0)) < 0)
-	{
-		//printf("\n--> socket() failed.");
-		return -1;
-	}
-
-	serverAddr.sin_family = PF_INET;
-	serverAddr.sin_addr.s_addr = inet_addr(server_ip);
-	serverAddr.sin_port = htons(server_port);
-
-	if (connect(clientSock, (sockaddr*)&serverAddr, serverAddrLen) < 0)
-	{
-		//printf("\n--> connect() failed.");
-		return -1;
-	}
-	return 0;
-}
 
 //Sends image over the network
 int sendImage(Mat frame)
@@ -249,7 +227,7 @@ int sendImage(Mat frame)
     /* start sending images */
     if ((bytes = send(clientSock, frame.data, imgSize, 0)) < 0)
     {
-        //printf("\n--> send() failed");
+        printf("\n--> send() failed");
         return -1;
      }
 
@@ -263,6 +241,42 @@ int sendImage(Mat frame)
 	dinges = 0;
 	return 0;
 }
+int connecter()
+{
+	char temp[] = { 192, 168, 1, 35 };
+	const char* server_ip = temp;
+	//delete temp;
+	int server_port = 9020;
+	struct sockaddr_in serverAddr;
+	socklen_t serverAddrLen = sizeof(serverAddr);
+	dinges = -1;
+
+
+
+
+	if ((clientSock = socket(PF_INET, SOCK_STREAM, 0)) < 0)
+	{
+		printf("\n--> socket() failed.");
+		//return -1;
+	}
+
+	serverAddr.sin_family = PF_INET;
+	serverAddr.sin_addr.s_addr = inet_addr(server_ip);
+	serverAddr.sin_port = htons(server_port);
+
+	if (connect(clientSock, (sockaddr*)&serverAddr, serverAddrLen) < 0)
+	{
+		printf("\n--> connect() failed.");
+		return -1;
+	}
+	else {
+		sendImage(cameraFeed);
+	}
+	dinges = 0;
+	return 0;
+}
+
+
 
 // Gets average x coordinate, this is done, to make the point that is returned more accurate
 JNIEXPORT jint JNICALL Java_DroneTracker_GetX(JNIEnv *env, jobject)
@@ -349,7 +363,10 @@ JNIEXPORT jboolean JNICALL Java_DroneTracker_Track(JNIEnv *env, jobject)
 		}
 	}
 	
-	sendImage(cameraFeed);
+	if (sendImage(cameraFeed) < 0)
+	{
+		connecter();
+	}
 	return tracker;
 }
 

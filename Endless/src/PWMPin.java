@@ -32,7 +32,7 @@ public class PWMPin
 	private void Actuate()
 	{
 		//System.out.println(MapPWM(position, 0, 1000, 0.074f, 0.301f));
-		PWMController.WritePWM(pin, MapPWM(position, 0, 1000, 0.1f, 0.27f));
+		//PWMController.WritePWM(pin, MapPWM(position, 0, 1000, 0.1f, 0.27f));
 	}
 	
 	public void Update(short error)
