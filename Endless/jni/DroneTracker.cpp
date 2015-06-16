@@ -203,10 +203,39 @@ JNIEXPORT jbyteArray JNICALL Java_DroneTracker_GetFeed(JNIEnv *env, jobject)
 
 // Coen, What happened here to naming stuff??
 jint dinges;
+int clientSock;
+
 
 JNIEXPORT jint JNICALL Java_DroneTracker_SendFeed(JNIEnv *, jobject)
 {
 	return dinges;
+}
+
+int connecter()
+{
+	char temp[] = { 192, 168, 1, 100 };
+	const char* server_ip = temp;
+	delete temp;
+	int server_port = 2000;
+	struct sockaddr_in serverAddr;
+	socklen_t serverAddrLen = sizeof(serverAddr);
+	dinges = -1;
+	if ((clientSock = socket(PF_INET, SOCK_STREAM, 0)) < 0)
+	{
+		//printf("\n--> socket() failed.");
+		return -1;
+	}
+
+	serverAddr.sin_family = PF_INET;
+	serverAddr.sin_addr.s_addr = inet_addr(server_ip);
+	serverAddr.sin_port = htons(server_port);
+
+	if (connect(clientSock, (sockaddr*)&serverAddr, serverAddrLen) < 0)
+	{
+		//printf("\n--> connect() failed.");
+		return -1;
+	}
+	return 0;
 }
 
 //Sends image over the network
@@ -214,29 +243,6 @@ int sendImage(Mat frame)
 {
 	int  imgSize = frame.total()*frame.elemSize();
 	int  bytes = 0;
-	int clientSock;
-	char temp[] = { 192, 168, 1, 36 };
-	const char* server_ip = temp;
-	delete temp;
-	int server_port = 2000;
-	struct sockaddr_in serverAddr;
-	socklen_t serverAddrLen = sizeof(serverAddr);
-	dinges = -1;
-    if ((clientSock = socket(PF_INET, SOCK_STREAM, 0)) < 0)
-    {
-        //printf("\n--> socket() failed.");
-        return -1;
-    }
-
-    serverAddr.sin_family = PF_INET;
-    serverAddr.sin_addr.s_addr = inet_addr(server_ip);
-    serverAddr.sin_port = htons(server_port);
-
-    if (connect(clientSock, (sockaddr*)&serverAddr, serverAddrLen) < 0)
-    {
-    	//printf("\n--> connect() failed.");
-    	return -1;
-    }
 
     frame = (frame.reshape(0,1)); // to make it continuous
 
@@ -254,9 +260,8 @@ int sendImage(Mat frame)
     	close(clientSock);
     	return -1;
     }
-dinges = 0;
-return 0;
-
+	dinges = 0;
+	return 0;
 }
 
 // Gets average x coordinate, this is done, to make the point that is returned more accurate
