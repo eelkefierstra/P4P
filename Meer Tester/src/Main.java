@@ -1,8 +1,11 @@
 import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.logging.Level;
@@ -72,34 +75,28 @@ public class Main
 		}
 	}
     
-    private byte[] GetImageByte(Socket client)
+    private byte[] GetImageByte(Socket client) throws IOException
     {
     	byte[] imageByte = null;
     	int imageSize = 921600;
-    	try
-    	{
-		    InputStream in = client.getInputStream();
-		    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		    byte buffer[] = new byte[1024];
-		    int remainingBytes = imageSize; //
-		    while (remainingBytes > 0)
-		    {
-		    	int bytesRead = in.read(buffer);
-		    	if (bytesRead < 0)
-		    	{
-		    		throw new IOException("Unexpected end of data");
-		    	}
-		    	baos.write(buffer, 0, bytesRead);
-		    	remainingBytes -= bytesRead;
-		    }
-		    in.close();
-		    imageByte = baos.toByteArray();  
-		    baos.close();
+		BufferedInputStream in = new BufferedInputStream(client.getInputStream());
+	    //InputStream in = client.getInputStream();
+	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	    byte buffer[] = new byte[1024];
+	    int remainingBytes = imageSize; //
+	    while (remainingBytes > 0)
+	    {
+	    	int bytesRead = in.read(buffer);
+	    	if (bytesRead < 0)
+	    	{
+	    		throw new IOException("Unexpected end of data");
+	    	}
+	    	baos.write(buffer, 0, bytesRead);
+	    	remainingBytes -= bytesRead;
 	    }
-    	catch (IOException ex)
-    	{
-    		Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-    	}
+	    in.close();
+	    imageByte = baos.toByteArray();  
+	    baos.close();
     	return imageByte;
     }
     /*
