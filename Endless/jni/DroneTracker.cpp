@@ -63,6 +63,7 @@ int connecter();
 // Used for initial setup
 JNIEXPORT void JNICALL Java_DroneTracker_Setup(JNIEnv *, jobject)
 {
+	for (int i = 0; connecter() < 0 && i < 3; i++) { }
 	//open capture object at location zero (default location for webcam)
 	//capture.open(0);
 	//capture.set(CV_CAP_PROP_FRAME_WIDTH,FRAME_WIDTH);
@@ -71,8 +72,6 @@ JNIEXPORT void JNICALL Java_DroneTracker_Setup(JNIEnv *, jobject)
 
 	param[0] = IMWRITE_PXM_BINARY;
 	param[1] = 0;
-
-	while (connecter() < 0) { }
 }
 
 // Convert integers to strings
@@ -204,17 +203,7 @@ JNIEXPORT jbyteArray JNICALL Java_DroneTracker_GetFeed(JNIEnv *env, jobject)
 	return res;
 }
 
-
-// Coen, What happened here to naming stuff??
-jint dinges;
 int clientSock;
-
-
-JNIEXPORT jint JNICALL Java_DroneTracker_SendFeed(JNIEnv *, jobject)
-{
-	return dinges;
-}
-
 
 //Sends image over the network
 int sendImage(Mat frame)
@@ -225,54 +214,49 @@ int sendImage(Mat frame)
     frame = (frame.reshape(0,1)); // to make it continuous
 
     /* start sending images */
-    if ((bytes = send(clientSock, frame.data, imgSize, 0)) < 0)
+    if ((bytes = write(clientSock, frame.data, imgSize)) < 0)
     {
         printf("\n--> send() failed");
+        perror("send");
         return -1;
      }
 
     /* if something went wrong, restart the connection */
 	if (bytes != imgSize)
     {
-    	std::cout << "\n-->  Connection closed " << std::endl;
+    	printf("\n-->  Connection closed ");
     	close(clientSock);
-    	return -1;
+    	return -2;
     }
-	dinges = 0;
 	return 0;
 }
+
 int connecter()
 {
-	char temp[] = { 192, 168, 1, 35 };
-	const char* server_ip = temp;
-	//delete temp;
 	int server_port = 9020;
 	struct sockaddr_in serverAddr;
 	socklen_t serverAddrLen = sizeof(serverAddr);
-	dinges = -1;
-
-
-
-
 	if ((clientSock = socket(PF_INET, SOCK_STREAM, 0)) < 0)
 	{
 		printf("\n--> socket() failed.");
-		//return -1;
+		perror("connect");
+		return -1;
 	}
 
 	serverAddr.sin_family = PF_INET;
-	serverAddr.sin_addr.s_addr = inet_addr(server_ip);
+	serverAddr.sin_addr.s_addr = inet_addr("172.16.42.205");
 	serverAddr.sin_port = htons(server_port);
 
 	if (connect(clientSock, (sockaddr*)&serverAddr, serverAddrLen) < 0)
 	{
 		printf("\n--> connect() failed.");
+		perror("connect");
 		return -1;
-	}
-	else {
+	}/*
+	else
+	{
 		sendImage(cameraFeed);
-	}
-	dinges = 0;
+	}*/
 	return 0;
 }
 
@@ -363,7 +347,7 @@ JNIEXPORT jboolean JNICALL Java_DroneTracker_Track(JNIEnv *env, jobject)
 		}
 	}
 	
-	if (sendImage(cameraFeed) < 0)
+	if (sendImage(cameraFeed) == -2)
 	{
 		connecter();
 	}
