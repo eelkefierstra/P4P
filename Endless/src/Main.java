@@ -103,7 +103,8 @@ public class Main
 				}
 			}
 			if (!first)
-			{/*
+			{
+				System.out.println("Getting error code");
 				int i = tracker.SendFeed();
 				switch(i)
 				{
@@ -112,8 +113,10 @@ public class Main
 						break;
 					case 0:
 						break;
+					default:
+						System.out.println("Bytes sent: " + i);
 				}
-				*/
+				
 				try
 				{
 					//p.show.SetImage(tracker.GetFeed());
