@@ -30,8 +30,8 @@ int V_MIN2 = 195;
 int V_MAX2 = 256;
 
 //default capture width and height
-const int FRAME_WIDTH = 854;
-const int FRAME_HEIGHT = 480;
+const int FRAME_WIDTH = 1280;
+const int FRAME_HEIGHT = 960;
 //max number of objects to be detected in frame
 const int MAX_NUM_OBJECTS=150;
 //minimum and maximum object area
