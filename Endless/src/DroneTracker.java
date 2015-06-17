@@ -21,8 +21,8 @@ public class DroneTracker
 	
 	public Point GetLoc()
 	{
-		loc.x = GetX();
-		loc.y = GetY();
+		loc.x = GetX()-640;
+		loc.y = GetY()-480;
 		return loc;
 	}
 }
