@@ -51,6 +51,7 @@ public class Main
 
         DroneTracker tracker = new DroneTracker();
         tracker.Setup();
+        tracker.Connect();
 		FPSCounter counter = new FPSCounter();
 		p.format = new DecimalFormat("#.##");
 		p.minfps = 10;
@@ -84,7 +85,7 @@ public class Main
 				{
 					controller.Update(IdleMove[index]);
 					fIndex++;
-					if (fIndex == 50)
+					if (fIndex == 150)
 					{
 						index++;
 						fIndex = 0;

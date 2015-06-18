@@ -8,7 +8,7 @@ public class ShutdownHook
 			@Override
 			public void run()
 			{
-				//ServoController.ResetPWM();
+				PWMController.ReleasePin();
 				System.out.println("exit");
 			}
 		});

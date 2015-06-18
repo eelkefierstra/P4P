@@ -63,7 +63,6 @@ int connecter();
 // Used for initial setup
 JNIEXPORT void JNICALL Java_DroneTracker_Setup(JNIEnv *, jobject)
 {
-	for (int i = 0; connecter() < 0 && i < 3; i++) { }
 	//open capture object at location zero (default location for webcam)
 	//capture.open(0);
 	//capture.set(CV_CAP_PROP_FRAME_WIDTH,FRAME_WIDTH);
@@ -226,16 +225,13 @@ int sendImage(Mat frame)
 		}
 		bytesLeft -= bytes;
 		printf("bytes sent: %d", bytes);
-		//bytesLeft -= bytes;
-		/* if something went wrong, restart the connection * /
-		if (bytes != imgSize)
-		{
-			printf("\n-->  Connection closed ");
-			close(clientSock);
-			return -2;
-		}/**/
     }
 	return 0;
+}
+
+JNIEXPORT jint JNICALL Java_DroneTracker_Connect(JNIEnv *, jobject)
+{
+	return (jint)connecter();
 }
 
 int connecter()

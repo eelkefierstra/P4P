@@ -17,6 +17,14 @@ JNIEXPORT void JNICALL Java_DroneTracker_Setup
 
 /*
  * Class:     DroneTracker
+ * Method:    Connect
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_DroneTracker_Connect
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     DroneTracker
  * Method:    Track
  * Signature: ()Z
  */
