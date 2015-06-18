@@ -20,24 +20,13 @@ public class Main
 		Main p = new Main();
 		ServerSocket server = null;
 		Socket       client = null;
-		//BufferedReader in;
 		ShutdownHook shutdownHook = new ShutdownHook();
 		int port = 9020;
-		//int nr = 0;
 		try
 		{
 			server = new ServerSocket(port);
 			client = server.accept();
 			shutdownHook.attachShutDownHook(server);
-		    //in = new BufferedReader(new InputStreamReader(  client.getInputStream()));
-		    //out = new PrintWriter(client.getOutputStream(), true);
-		    /*
-		    while (true)
-		    {
-		    	nr++;
-		    	String str = in.readLine();
-		    	System.out.println(nr + ": " + str);
-		    }*/
 		}
 		catch (IOException ex)
 		{

@@ -1,5 +1,7 @@
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
@@ -29,7 +31,8 @@ public class Audio
     	try
     	{
 			stream = AudioSystem.getAudioInputStream(getClass().getResource(files[x]));
-		    info = new DataLine.Info(Clip.class, stream.getFormat());
+			AudioFormat format = stream.getFormat();
+		    info = new DataLine.Info(Clip.class, new AudioFormat(format.getSampleRate(), format.getSampleSizeInBits(), format.getChannels(), true, false));
 		    clip = (Clip) AudioSystem.getLine(info);
 		    clip.open(stream);
 		}
