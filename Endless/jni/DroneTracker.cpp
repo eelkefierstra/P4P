@@ -218,7 +218,7 @@ int sendImage(Mat frame)
     /* start sending images */
     while (bytesLeft > 0)
     {
-		if ((bytes = write(clientSock, frame.data + bytes, imgSize)) < 0)
+		if ((bytes = send(clientSock, frame.data + bytes, imgSize, MSG_NOSIGNAL)) < 0)
 		{
 			printf("\n--> send() failed");
 			perror("write");
