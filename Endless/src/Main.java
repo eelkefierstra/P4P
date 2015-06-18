@@ -73,10 +73,10 @@ public class Main
         boolean first = true;
 		int z = 0;
 		Point[] IdleMove = new Point[4];
-		IdleMove[0] = new Point(-101, 76); //p1
-		IdleMove[1] = new Point(-101, -76); //p2
-		IdleMove[2] = new Point(101, 76); //p3
-		IdleMove[3] = new Point(-101, 76); //p4
+		IdleMove[0] = new Point(-55,  38); //p1
+		IdleMove[1] = new Point(-55, -38); //p2
+		IdleMove[2] = new Point( 55,  38); //p3
+		IdleMove[3] = new Point(-55,  38); //p4
 		
 		while(true)
 		{
@@ -104,6 +104,7 @@ public class Main
 			}
 			if (!first)
 			{
+				System.out.println("Getting error code");
 				int i = tracker.SendFeed();
 				switch(i)
 				{
@@ -112,6 +113,8 @@ public class Main
 						break;
 					case 0:
 						break;
+					default:
+						System.out.println("Bytes sent: " + i);
 				}
 				
 				try

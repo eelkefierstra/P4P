@@ -63,6 +63,7 @@ int connecter();
 // Used for initial setup
 JNIEXPORT void JNICALL Java_DroneTracker_Setup(JNIEnv *, jobject)
 {
+	for (int i = 0; connecter() < 0 && i < 3; i++) { }
 	//open capture object at location zero (default location for webcam)
 	//capture.open(0);
 	//capture.set(CV_CAP_PROP_FRAME_WIDTH,FRAME_WIDTH);
@@ -71,8 +72,6 @@ JNIEXPORT void JNICALL Java_DroneTracker_Setup(JNIEnv *, jobject)
 
 	param[0] = IMWRITE_PXM_BINARY;
 	param[1] = 0;
-
-	while (connecter() < 0) { }
 }
 
 // Convert integers to strings
@@ -204,79 +203,75 @@ JNIEXPORT jbyteArray JNICALL Java_DroneTracker_GetFeed(JNIEnv *env, jobject)
 	return res;
 }
 
-
-// Coen, What happened here to naming stuff??
-jint dinges;
 int clientSock;
-
-
-JNIEXPORT jint JNICALL Java_DroneTracker_SendFeed(JNIEnv *, jobject)
-{
-	return dinges;
-}
-
+int bytes;
 
 //Sends image over the network
 int sendImage(Mat frame)
 {
-	int  imgSize = frame.total()*frame.elemSize();
-	int  bytes = 0;
+	int imgSize = frame.total()*frame.elemSize();
+	int bytesLeft = imgSize;
+	bytes = 0;
 
     frame = (frame.reshape(0,1)); // to make it continuous
 
     /* start sending images */
-    if ((bytes = send(clientSock, frame.data, imgSize, 0)) < 0)
+    while (bytesLeft > 0)
     {
-        printf("\n--> send() failed");
-        return -1;
-     }
-
-    /* if something went wrong, restart the connection */
-	if (bytes != imgSize)
-    {
-    	std::cout << "\n-->  Connection closed " << std::endl;
-    	close(clientSock);
-    	return -1;
+		if ((bytes = send(clientSock, frame.data + bytes, imgSize, MSG_NOSIGNAL)) < 0)
+		{
+			printf("\n--> send() failed");
+			perror("write");
+			return -1;
+		}
+		bytesLeft -= bytes;
+		printf("bytes sent: %d", bytes);
+		//bytesLeft -= bytes;
+		/* if something went wrong, restart the connection * /
+		if (bytes != imgSize)
+		{
+			printf("\n-->  Connection closed ");
+			close(clientSock);
+			return -2;
+		}/**/
     }
-	dinges = 0;
 	return 0;
 }
+
 int connecter()
 {
-	char temp[] = { 192, 168, 1, 35 };
-	const char* server_ip = temp;
-	//delete temp;
 	int server_port = 9020;
 	struct sockaddr_in serverAddr;
 	socklen_t serverAddrLen = sizeof(serverAddr);
-	dinges = -1;
-
-
-
-
 	if ((clientSock = socket(PF_INET, SOCK_STREAM, 0)) < 0)
 	{
 		printf("\n--> socket() failed.");
-		//return -1;
+		perror("socket");
+		return -1;
 	}
 
 	serverAddr.sin_family = PF_INET;
-	serverAddr.sin_addr.s_addr = inet_addr(server_ip);
+	serverAddr.sin_addr.s_addr = inet_addr("192.168.1.36");
 	serverAddr.sin_port = htons(server_port);
 
 	if (connect(clientSock, (sockaddr*)&serverAddr, serverAddrLen) < 0)
 	{
 		printf("\n--> connect() failed.");
+		perror("connect");
 		return -1;
-	}
-	else {
+	}/*
+	else
+	{
 		sendImage(cameraFeed);
-	}
-	dinges = 0;
+	}*/
 	return 0;
 }
 
-
+JNIEXPORT jint JNICALL Java_DroneTracker_SendFeed(JNIEnv *, jobject)
+{
+	sendImage(cameraFeed);
+	return (jint)bytes;
+}
 
 // Gets average x coordinate, this is done, to make the point that is returned more accurate
 JNIEXPORT jint JNICALL Java_DroneTracker_GetX(JNIEnv *env, jobject)
@@ -286,10 +281,10 @@ JNIEXPORT jint JNICALL Java_DroneTracker_GetX(JNIEnv *env, jobject)
 	// Simple loop to calculate an average
 	while(xList.size()>0)
 	{
-		sum += xList.back();
+		sum += (jint)xList.back();
 		xList.pop_back();
 	}
-	jint res = sum/aantal;
+	jint res = (jint)(sum/aantal);
 	return res;
 }
 
@@ -300,10 +295,10 @@ JNIEXPORT jint JNICALL Java_DroneTracker_GetY(JNIEnv *env, jobject)
 	jint aantal = yList.size();
 	while(yList.size()>0)
 	{
-		sum += yList.back();
+		sum += (jint)yList.back();
 		yList.pop_back();
 	}
-	jint res = sum/aantal;
+	jint res = (jint)(sum/aantal);
 	return res;
 }
 
@@ -362,11 +357,11 @@ JNIEXPORT jboolean JNICALL Java_DroneTracker_Track(JNIEnv *env, jobject)
 			return 0;
 		}
 	}
-	
-	if (sendImage(cameraFeed) < 0)
+	printf("sending image");
+	/*if (sendImage(cameraFeed) == -2)
 	{
 		connecter();
-	}
+	}*/
 	return tracker;
 }
 
