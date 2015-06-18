@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -57,6 +58,24 @@ public class GUI extends JFrame
 	public void SetImage(BufferedImage image)
 	{
 		picLabel.setIcon(new ImageIcon(image/*.getScaledInstance(-1, 360, 0)*/));
+	}
+	
+	public void SetImage(byte[] imageByte)
+	{
+		int nrOfPixels = imageByte.length / 3; // Three bytes per pixel.
+        int pixels[] = new int[nrOfPixels];
+        for(int i = 0; i < nrOfPixels; i++)
+        {
+        	int r = imageByte[3*i];
+        	int g = imageByte[3*i + 1];
+        	int b = imageByte[3*i + 2];
+
+        	if (r < 0) r = r + 256; //Convert to positive
+        	if (g < 0) g = g + 256; //Convert to positive
+        	if (b < 0) b = b + 256; //Convert to positive
+        	pixels[i] = Color.rgb(b,g,r);
+        }
+        Bitmap bitmap = Bitmap.createBitmap(pixels, 640, 480, Bitmap.Config.ARGB_8888);
 	}
 	
 	class SomeAction extends AbstractAction
