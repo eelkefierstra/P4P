@@ -19,10 +19,6 @@ public class Main
 	private double fps;
 	private long nextTime;
 	
-	private ImShow show;
-	
-	private ScheduledExecutorService executor;
-	private ScheduledFuture<?>[] futureList;
 	private DecimalFormat format;
 	
 	// Main loop
@@ -42,7 +38,7 @@ public class Main
 		{
 			Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
 		}
-		/*String[] files = null;
+		String[] files = null;
 		try
 		{
 			java.io.File file = new java.io.File(p.getClass().getResource("/audio/").toURI());
@@ -51,22 +47,19 @@ public class Main
 		catch (Exception ex)
 		{
 			Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-		}*/
+		}
 
         DroneTracker tracker = new DroneTracker();
         tracker.Setup();
 		FPSCounter counter = new FPSCounter();
-		p.show = new ImShow(p.screen);
-		p.executor = Executors.newScheduledThreadPool(3);
-		p.futureList = new ScheduledFuture<?>[1];
 		p.format = new DecimalFormat("#.##");
 		p.minfps = 10;
 		counter.start();
 		
-		//Audio audio = new Audio(files);
+		Audio audio = new Audio(files);
 		ServoController controller = new ServoController();
         ShutdownHook hook = new ShutdownHook();
-		hook.attachShutDownHook(p.executor);
+		hook.attachShutDownHook();
 		long lastKnownTime = System.nanoTime();
         int fIndex = 0;
         int index = 1;
@@ -116,16 +109,6 @@ public class Main
 					default:
 						System.out.println("Bytes sent: " + i);
 				}
-				
-				try
-				{
-					//p.show.SetImage(tracker.GetFeed());
-					//p.futureList[0] = p.executor.schedule(p.show, 0, TimeUnit.NANOSECONDS);
-				}
-				catch (RejectedExecutionException ex)
-				{
-					Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-				}
 			}
 			else first = false;
 			
@@ -136,8 +119,8 @@ public class Main
 				p.minfps = p.maxfps;
 				p.maxfps = 0.0;
 				p.nextTime = System.nanoTime() + 2500000000L;
-				//audio.SetClip(z);
-				//audio.PLayClip();
+				audio.SetClip(z);
+				audio.PLayClip();
 				z++;
 				if (z > 22)
 				{

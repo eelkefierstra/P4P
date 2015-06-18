@@ -1,8 +1,7 @@
-import java.util.concurrent.ScheduledExecutorService;
 
 public class ShutdownHook 
 {
-	public void attachShutDownHook(final ScheduledExecutorService executor)
+	public void attachShutDownHook()
 	{
 		Runtime.getRuntime().addShutdownHook(new Thread()
 		{
@@ -10,7 +9,6 @@ public class ShutdownHook
 			public void run()
 			{
 				//ServoController.ResetPWM();
-				executor.shutdown();
 				System.out.println("exit");
 			}
 		});

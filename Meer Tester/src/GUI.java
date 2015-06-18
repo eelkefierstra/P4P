@@ -73,6 +73,7 @@ public class GUI extends JFrame
         	if (r < 0) r = r + 256; //Convert to positive
         	if (g < 0) g = g + 256; //Convert to positive
         	if (b < 0) b = b + 256; //Convert to positive
+        	
         	pixels[i] = Color.rgb(b,g,r);
         }
         Bitmap bitmap = Bitmap.createBitmap(pixels, 640, 480, Bitmap.Config.ARGB_8888);

@@ -61,7 +61,7 @@ public class PWMController
 	}
 	
 	// resets the pwm on all pins
-	public static void ResetPWM()
+	public static void ReleasePin()
 	{
 		try
 		{

@@ -17,14 +17,17 @@ public class Audio
     
     public Audio(String[] files)
     {
+    	// 
     	this.files = files;
     }
     
+    // plays the selected clip
     public void PLayClip()
     {
     	clip.start();
     }
     
+    // sets the clip to be played
     public void SetClip(int x)
     {
     	this.x = x;
@@ -32,6 +35,7 @@ public class Audio
     	{
 			stream = AudioSystem.getAudioInputStream(getClass().getResource(files[x]));
 			AudioFormat format = stream.getFormat();
+			// Converts the clip to little endian
 		    info = new DataLine.Info(Clip.class, new AudioFormat(format.getSampleRate(), format.getSampleSizeInBits(), format.getChannels(), true, false));
 		    clip = (Clip) AudioSystem.getLine(info);
 		    clip.open(stream);
@@ -42,6 +46,7 @@ public class Audio
 		}
     }
     
+    // Gets the name of the clip that is to be played
     public String GetClip()
     {
     	return files[x];

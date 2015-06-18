@@ -18,12 +18,15 @@ public class Main
     public static void main(String[] args)
     {
 		Main p = new Main();
+		// Initializes sockets
 		ServerSocket server = null;
 		Socket       client = null;
 		ShutdownHook shutdownHook = new ShutdownHook();
+		// Defines the port to be used for the stream
 		int port = 9020;
 		try
 		{
+			// Waits until the client connects to server
 			server = new ServerSocket(port);
 			client = server.accept();
 			shutdownHook.attachShutDownHook(server);
@@ -61,16 +64,18 @@ public class Main
 		}
 	}
     
+    
     private byte[] GetImageByte(Socket client)
     {
     	byte[] imageByte = null;
     	int imageSize = 921600;
     	try
     	{
+    		// Gets the inputstream from the client
 		    InputStream in = client.getInputStream();
 		    ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		    byte buffer[] = new byte[1024];
-		    int remainingBytes = imageSize; //
+		    int remainingBytes = imageSize; // Makes sure that the entire image is read
 		    while (remainingBytes > 0)
 		    {
 		    	int bytesRead = in.read(buffer);
@@ -91,9 +96,4 @@ public class Main
     	}
     	return imageByte;
     }
-    /*
-    private BufferedImage ConvertImage(byte[] imageByte)
-    {
-    	
-    }*/
 }
