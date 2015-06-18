@@ -63,7 +63,7 @@ int connecter();
 // Used for initial setup
 JNIEXPORT void JNICALL Java_DroneTracker_Setup(JNIEnv *, jobject)
 {
-	for (int i = 0; connecter() < 0 && i < 3; i++) { }
+	//for (int i = 0; connecter() < 0 && i < 3; i++) { }
 	//open capture object at location zero (default location for webcam)
 	//capture.open(0);
 	//capture.set(CV_CAP_PROP_FRAME_WIDTH,FRAME_WIDTH);

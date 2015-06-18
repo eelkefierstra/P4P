@@ -84,7 +84,7 @@ public class Main
 				{
 					controller.Update(IdleMove[index]);
 					fIndex++;
-					if (fIndex == 50)
+					if (fIndex == 150)
 					{
 						index++;
 						fIndex = 0;
@@ -95,6 +95,7 @@ public class Main
 					}
 				}
 			}
+			/*
 			if (!first)
 			{
 				System.out.println("Getting error code");
@@ -111,7 +112,7 @@ public class Main
 				}
 			}
 			else first = false;
-			
+			*/
 			counter.interrupt();
 			p.fps = counter.GetFPS();
 			if (p.nextTime <= System.nanoTime())
