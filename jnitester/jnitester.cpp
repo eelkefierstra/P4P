@@ -16,8 +16,6 @@
 #include <sstream>
 #include <string>
 #include <iostream>
-//#include <opencv\highgui.h>
-//#include <opencv\cv.h>
 #include <DroneDetection.h>
 
 using namespace std;
@@ -26,8 +24,16 @@ int main(int argc, char* argv[])
 {
 	DroneDetection* drone = new DroneDetection;
 	int i = 0;
-	while(i < 1000){
+	bool first = true;
+	while(i < 1000)
+	{
 		drone->loop();
+		int i;
+		if (!first)
+		{
+			i = drone->getX();
+		}
+		else first = false;
 		cv::waitKey(1);
 		i++;
 	}

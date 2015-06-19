@@ -53,23 +53,23 @@ int x=0, y=0;
 //create slider bars for HSV filtering
 //createTrackbars();
 //video capture object to acquire webcam feed
-//VideoCapture capture;
-RaspiCamCvCapture * camera;
+VideoCapture capture;
+//RaspiCamCvCapture * camera;
 
 bool first = true;
 
 DroneDetection::DroneDetection()
 {
 	//open capture object at location zero (default location for webcam)
-	//capture.open(0);
+	capture.open(0);
 	//set height and width of capture frame
-	//capture.set(CV_CAP_PROP_FRAME_WIDTH,FRAME_WIDTH);
-	//capture.set(CV_CAP_PROP_FRAME_HEIGHT,FRAME_HEIGHT);
+	capture.set(CV_CAP_PROP_FRAME_WIDTH,FRAME_WIDTH);
+	capture.set(CV_CAP_PROP_FRAME_HEIGHT,FRAME_HEIGHT);
 
 	//create slider bars for HSV filtering
-	createTrackbars();
+	//createTrackbars();
 
-	camera = raspiCamCvCreateCameraCapture(0);
+	//camera = raspiCamCvCreateCameraCapture(0);
 }
 
 
@@ -207,18 +207,35 @@ int DroneDetection::trackFilteredObject(int &x, int &y, Mat threshold, Mat &came
 	return 0;
 }
 
+vector<int> xList;
+
+int DroneDetection::getX()
+{
+	int sum = 0;
+	int aantal = xList.size();
+	// Simple loop to calculate an average
+	while(!xList.empty())
+	{
+		sum += (int)xList.back();
+		xList.pop_back();
+	}
+	int res = (int)(sum/aantal);
+	return res;
+}
+
 int DroneDetection::loop()
 {
 	//store image to matrix
-	//capture.read(cameraFeed);
-	IplImage * temp = raspiCamCvQueryFrame(camera);
-	cameraFeed = cvarrToMat(temp);
+	capture.read(cameraFeed);
+	//IplImage * temp = raspiCamCvQueryFrame(camera);
+	//cameraFeed = cvarrToMat(temp);
 
 	if (first)
 	{
 		first = false;
 		return 0;
 	}
+	for (int i = 0; i <= 10; i++) xList.push_back(i);
 	//convert frame from BGR to HSV colorspace
 	cvtColor(cameraFeed,HSV,COLOR_BGR2HSV);
 
@@ -264,6 +281,6 @@ int DroneDetection::loop()
 DroneDetection::~DroneDetection()
 {
 	//camera->raspiCamCvReleaseCapture();
-	delete camera;
+	//delete camera;
 }
 
