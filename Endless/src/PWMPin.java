@@ -31,8 +31,8 @@ public class PWMPin
 	
 	private void Actuate()
 	{
-		//System.out.println(MapPWM(position, 0, 1000, 0.074f, 0.301f));
-		//PWMController.WritePWM(pin, MapPWM(position, 0, 1000, 0.1f, 0.27f));
+		// Maps the location to the range of the PWM duty cycle
+		PWMController.WritePWM(pin, MapPWM(position, 0, 1000, 0.1f, 0.27f));
 	}
 	
 	public void Update(short error)
@@ -69,6 +69,7 @@ public class PWMPin
 
 	private int MapPosition(int x, int in_min, int in_max, int out_min, int out_max)
 	{
+		if (x > in_max || x < in_min) throw new IllegalArgumentException("Input not between min and max");
 		return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 	}
 	

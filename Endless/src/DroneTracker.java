@@ -6,6 +6,8 @@ public class DroneTracker
 	
 	public native void Setup();
 	
+	public native int Connect();
+	
 	public native boolean Track();
 	
 	public native int SendFeed();

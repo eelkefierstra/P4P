@@ -1,11 +1,8 @@
 import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.logging.Level;
@@ -21,26 +18,18 @@ public class Main
     public static void main(String[] args)
     {
 		Main p = new Main();
+		// Initializes sockets
 		ServerSocket server = null;
 		Socket       client = null;
-		//BufferedReader in;
 		ShutdownHook shutdownHook = new ShutdownHook();
+		// Defines the port to be used for the stream
 		int port = 9020;
-		//int nr = 0;
 		try
 		{
+			// Waits until the client connects to server
 			server = new ServerSocket(port);
 			client = server.accept();
 			shutdownHook.attachShutDownHook(server);
-		    //in = new BufferedReader(new InputStreamReader(  client.getInputStream()));
-		    //out = new PrintWriter(client.getOutputStream(), true);
-		    /*
-		    while (true)
-		    {
-		    	nr++;
-		    	String str = in.readLine();
-		    	System.out.println(nr + ": " + str);
-		    }*/
 		}
 		catch (IOException ex)
 		{
@@ -75,33 +64,36 @@ public class Main
 		}
 	}
     
-    private byte[] GetImageByte(Socket client) throws IOException
+    
+    private byte[] GetImageByte(Socket client)
     {
     	byte[] imageByte = null;
     	int imageSize = 921600;
-		BufferedInputStream in = new BufferedInputStream(client.getInputStream());
-	    //InputStream in = client.getInputStream();
-	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-	    byte buffer[] = new byte[1024];
-	    int remainingBytes = imageSize; //
-	    while (remainingBytes > 0)
-	    {
-	    	int bytesRead = in.read(buffer);
-	    	if (bytesRead < 0)
-	    	{
-	    		throw new IOException("Unexpected end of data");
-	    	}
-	    	baos.write(buffer, 0, bytesRead);
-	    	remainingBytes -= bytesRead;
+    	try
+    	{
+    		// Gets the inputstream from the client
+		    InputStream in = client.getInputStream();
+		    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		    byte buffer[] = new byte[1024];
+		    int remainingBytes = imageSize; // Makes sure that the entire image is read
+		    while (remainingBytes > 0)
+		    {
+		    	int bytesRead = in.read(buffer);
+		    	if (bytesRead < 0)
+		    	{
+		    		throw new IOException("Unexpected end of data");
+		    	}
+		    	baos.write(buffer, 0, bytesRead);
+		    	remainingBytes -= bytesRead;
+		    }
+		    in.close();
+		    imageByte = baos.toByteArray();  
+		    baos.close();
 	    }
-	    in.close();
-	    imageByte = baos.toByteArray();  
-	    baos.close();
+    	catch (IOException ex)
+    	{
+    		Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+    	}
     	return imageByte;
     }
-    /*
-    private BufferedImage ConvertImage(byte[] imageByte)
-    {
-    	
-    }*/
 }
