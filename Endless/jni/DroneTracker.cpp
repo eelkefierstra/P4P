@@ -205,7 +205,7 @@ JNIEXPORT jbyteArray JNICALL Java_DroneTracker_GetFeed(JNIEnv *env, jobject)
 int clientSock;
 int bytes;
 
-//Sends image over the network
+//Sends image over the network from www.codeplats.com/7HzyUUjqWe/sending-opencvmat-image-to-websocket-java-client.html
 int sendImage(Mat frame)
 {
 	int imgSize = frame.total()*frame.elemSize();

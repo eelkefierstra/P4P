@@ -64,7 +64,7 @@ public class Main
 		}
 	}
     
-    
+    // from www.codeplats.com/7HzyUUjqWe/sending-opencvmat-image-to-websocket-java-client.html
     private byte[] GetImageByte(Socket client)
     {
     	byte[] imageByte = null;
