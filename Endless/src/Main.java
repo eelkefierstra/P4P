@@ -21,11 +21,15 @@ public class Main
     //@SuppressWarnings("unused")
 	public static void main(String[] args)
     {
-        Main p = new Main();
-
+        Main mainVar = new Main();
+        DroneTracker tracker = new DroneTracker();
+        FPSCounter counter = new FPSCounter();
+        ServoController servController = new ServoController();
+        ShutdownHook hook = new ShutdownHook();
+		
         try
         {
-			String path = p.getClass().getResource("/lib/").toURI().toString();
+			String path = mainVar.getClass().getResource("/lib/").toURI().toString();
         	path = path.substring(6);
         	path = "/" + path.replaceAll("%20", " ");
 			System.load(path + "libdronetracker.so");
@@ -37,25 +41,23 @@ public class Main
 		String[] files = null;
 		try
 		{
-			java.io.File file = new java.io.File(p.getClass().getResource("/audio/").toURI());
-	    	files = p.GetFileNames(file.list());
+			java.io.File file = new java.io.File(mainVar.getClass().getResource("/audio/").toURI());
+	    	files = mainVar.GetFileNames(file.list());
 		}
 		catch (Exception ex)
 		{
 			Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
 		}
-
-        DroneTracker tracker = new DroneTracker();
-        tracker.Setup();
-        tracker.Connect();
-		FPSCounter counter = new FPSCounter();
-		p.format = new DecimalFormat("#.##");
-		p.minfps = 10;
-		counter.start();
 		
 		Audio audio = new Audio(files);
-		ServoController controller = new ServoController();
-        ShutdownHook hook = new ShutdownHook();
+		
+		
+        tracker.Setup();
+        tracker.Connect();
+		mainVar.format = new DecimalFormat("#.##");
+		mainVar.minfps = 10;
+		counter.start();
+		
 		hook.attachShutDownHook();
 		long lastKnownTime = System.nanoTime();
         int fIndex = 0;
@@ -73,13 +75,13 @@ public class Main
 			if (tracker.Track())
 			{
 				lastKnownTime = System.nanoTime();
-				//controller.Update(tracker.GetLoc());
+				servController.Update(tracker.GetLoc());
 			}
 			else
 			{
 				if (lastKnownTime + 2500000000L <= System.nanoTime())
 				{
-					controller.Update(IdleMove[index]);
+					servController.Update(IdleMove[index]);
 					fIndex++;
 					if (fIndex == 150)
 					{
@@ -111,12 +113,12 @@ public class Main
 			else first = false;
 			*/
 			counter.interrupt();
-			p.fps = counter.GetFPS();
-			if (p.nextTime <= System.nanoTime())
+			mainVar.fps = counter.GetFPS();
+			if (mainVar.nextTime <= System.nanoTime())
 			{
-				p.minfps = p.maxfps;
-				p.maxfps = 0.0;
-				p.nextTime = System.nanoTime() + 2500000000L;
+				mainVar.minfps = mainVar.maxfps;
+				mainVar.maxfps = 0.0;
+				mainVar.nextTime = System.nanoTime() + 2500000000L;
 				audio.SetClip(z);
 				audio.PLayClip();
 				z++;
@@ -125,15 +127,15 @@ public class Main
 					z = 0;
 				}
 			}
-			if (p.fps > p.maxfps)
+			if (mainVar.fps > mainVar.maxfps)
 			{
-				p.maxfps = p.fps;
+				mainVar.maxfps = mainVar.fps;
 			}
-			else if (p.fps < p.minfps)
+			else if (mainVar.fps < mainVar.minfps)
 			{
-				p.minfps = p.fps;
+				mainVar.minfps = mainVar.fps;
 			}
-			p.screen.setTitle(p.format.format(p.fps)+" max " + p.format.format(p.maxfps) + " min " + p.format.format(p.minfps) + " PWM1 " + controller.GetLocation(2) + " PWM2 " + controller.GetLocation(3) + " PWM3 " + controller.GetLocation(0) + " PWM4 " + controller.GetLocation(1));
+			mainVar.screen.setTitle(mainVar.format.format(mainVar.fps)+" max " + mainVar.format.format(mainVar.maxfps) + " min " + mainVar.format.format(mainVar.minfps) + " PWM1 " + servController.GetLocation(2) + " PWM2 " + servController.GetLocation(3) + " PWM3 " + servController.GetLocation(0) + " PWM4 " + servController.GetLocation(1));
 		}
 	}
 	

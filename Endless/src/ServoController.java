@@ -3,10 +3,12 @@ import java.awt.Point;
 
 public class ServoController
 {
-	private PWMPin[] pins = { new PWMPin((byte)18, (short)500, (short)200, (short)300, (byte) 90), 
+	private PWMPin[] pins = { 
+			new PWMPin((byte) 18, (short)500, (short)200, (short)300, (byte) 90), 
 			new PWMPin((byte) 23, (short)500, (short)200, (short)300, (byte) 25), 
 			new PWMPin((byte) 24, (short)500, (short)200, (short)300, (byte) 90), 
-			new PWMPin((byte) 25, (short)500, (short)200, (short)300, (byte) 90) };
+			new PWMPin((byte) 25, (short)500, (short)200, (short)300, (byte) 90) 
+			};
 	
 	public ServoController()
 	{
